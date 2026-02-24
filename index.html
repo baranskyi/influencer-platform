@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,31 +43,12 @@
             --pixel-dot: #E8788A;
         }
 
-        [data-theme="dark"] {
-            --bg: #1A1118;
-            --surface: rgba(30, 20, 28, 0.7);
-            --surface-solid: #241C22;
-            --accent: #E8788A;
-            --accent-hover: #F09DAA;
-            --accent-rgb: 232, 120, 138;
-            --text-primary: #F5EEF2;
-            --text-secondary: #A89BA6;
-            --border: rgba(255, 255, 255, 0.08);
-            --glass-bg: rgba(30, 20, 28, 0.55);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-            --glass-elevated-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(232, 120, 138, 0.08);
-            --nav-bg: rgba(26, 17, 24, 0.75);
-            --input-bg: rgba(36, 28, 34, 0.8);
-        }
-
         /* ===== Base ===== */
         body {
             font-family: var(--font-body);
             background: var(--bg);
             color: var(--text-primary);
             line-height: 1.6;
-            transition: background 0.35s ease, color 0.35s ease;
             overflow-x: hidden;
         }
 
@@ -194,46 +175,6 @@
             transition: all 0.2s;
         }
         .nav-cta:hover { background: var(--accent-hover); }
-
-        /* Theme toggle */
-        .theme-toggle {
-            width: 44px;
-            height: 26px;
-            border-radius: 13px;
-            background: rgba(var(--accent-rgb), 0.15);
-            border: 1px solid rgba(var(--accent-rgb), 0.25);
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s;
-            flex-shrink: 0;
-        }
-        .theme-toggle::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--accent);
-            top: 2px;
-            left: 2px;
-            transition: transform 0.3s;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-        }
-        [data-theme="dark"] .theme-toggle::after {
-            transform: translateX(18px);
-        }
-        .theme-icon {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 12px;
-            line-height: 1;
-            pointer-events: none;
-        }
-        .theme-icon--sun { left: 5px; }
-        .theme-icon--moon { right: 5px; }
-        [data-theme="light"] .theme-icon--moon { opacity: 0.3; }
-        [data-theme="dark"] .theme-icon--sun { opacity: 0.3; }
 
         /* ===== Hero ===== */
         .hero {
@@ -401,8 +342,6 @@
             pointer-events: none;
             z-index: 0;
         }
-        [data-theme="dark"] .orb { opacity: 0.12; }
-
         /* ===== Problem Section ===== */
         .section-problem {
             padding: 5rem 1.5rem 8rem;
@@ -743,10 +682,6 @@
                 <span class="logo-name">DealFlow</span>
             </div>
             <div class="navbar-actions">
-                <div class="theme-toggle" onclick="toggleTheme()" role="button" tabindex="0" aria-label="Toggle light/dark theme">
-                    <span class="theme-icon theme-icon--sun">☀️</span>
-                    <span class="theme-icon theme-icon--moon">🌙</span>
-                </div>
                 <a href="#waitlist" class="nav-cta nav-cta-desktop">Get early access</a>
             </div>
         </div>
@@ -982,36 +917,6 @@
 
     <!-- ========== JavaScript ========== -->
     <script>
-        // --- Theme ---
-        function getStoredTheme() {
-            try { return localStorage.getItem('df-theme'); } catch { return null; }
-        }
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            try { localStorage.setItem('df-theme', theme); } catch {}
-        }
-        function toggleTheme() {
-            const current = document.documentElement.getAttribute('data-theme');
-            setTheme(current === 'dark' ? 'light' : 'dark');
-        }
-        // Init: respect stored preference, else system, else light (default)
-        (function() {
-            const stored = getStoredTheme();
-            if (stored) { setTheme(stored); return; }
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                setTheme('dark');
-            }
-            // else default is light (set in HTML)
-        })();
-
-        // Keyboard support for theme toggle
-        document.querySelector('.theme-toggle').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleTheme();
-            }
-        });
-
         // --- Smooth scroll for anchor links ---
         document.querySelectorAll('a[href^="#"]').forEach(link => {
             link.addEventListener('click', function(e) {
