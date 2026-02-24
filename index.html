@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DealFlow — Built for creators, not accountants</title>
+    <meta name="description" content="DealFlow organizes every brand deal and nudges you only when it matters — so you stay in your flow.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300..800&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* ===== Reset ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===== CSS Custom Properties ===== */
+        :root {
+            --font-headline: 'DM Serif Display', Georgia, serif;
+            --font-body: 'Inter', system-ui, sans-serif;
+            --font-pixel: 'Press Start 2P', monospace;
+
+            /* Light theme (default) */
+            --bg: #FFF5F7;
+            --surface: rgba(255, 255, 255, 0.7);
+            --surface-solid: #FFFFFF;
+            --accent: #E8788A;
+            --accent-hover: #D4556A;
+            --accent-rgb: 232, 120, 138;
+            --mint: #7ECFB3;
+            --lavender: #B8A9E8;
+            --peach: #FFB088;
+            --sky: #8AC4F4;
+            --text-primary: #2D1F2D;
+            --text-secondary: #7A6B7A;
+            --border: rgba(0, 0, 0, 0.06);
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-blur: 20px;
+            --glass-border: rgba(0, 0, 0, 0.06);
+            --glass-shadow: 0 4px 24px rgba(45, 31, 45, 0.06);
+            --glass-elevated-blur: 28px;
+            --glass-elevated-shadow: 0 8px 40px rgba(45, 31, 45, 0.08), 0 0 60px rgba(232, 120, 138, 0.06);
+            --nav-bg: rgba(255, 245, 247, 0.7);
+            --input-bg: rgba(255, 255, 255, 0.8);
+            --pixel-dot: #E8788A;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1A1118;
+            --surface: rgba(30, 20, 28, 0.7);
+            --surface-solid: #241C22;
+            --accent: #E8788A;
+            --accent-hover: #F09DAA;
+            --accent-rgb: 232, 120, 138;
+            --text-primary: #F5EEF2;
+            --text-secondary: #A89BA6;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(30, 20, 28, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+            --glass-elevated-shadow: 0 8px 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(232, 120, 138, 0.08);
+            --nav-bg: rgba(26, 17, 24, 0.75);
+            --input-bg: rgba(36, 28, 34, 0.8);
+        }
+
+        /* ===== Base ===== */
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background 0.35s ease, color 0.35s ease;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 { font-family: var(--font-headline); font-weight: 400; }
+
+        a { text-decoration: none; color: inherit; cursor: pointer; }
+
+        img { max-width: 100%; height: auto; }
+
+        /* ===== Glassmorphism ===== */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .glass-elevated {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-elevated-blur));
+            -webkit-backdrop-filter: blur(var(--glass-elevated-blur));
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-elevated-shadow);
+        }
+
+        /* ===== Buttons ===== */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--accent);
+            color: #fff;
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(var(--accent-rgb), 0.3);
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: transparent;
+            color: var(--accent);
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 1rem;
+            border: 2px solid var(--accent);
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-ghost:hover {
+            background: rgba(var(--accent-rgb), 0.08);
+            transform: translateY(-1px);
+        }
+
+        /* ===== Navbar ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0.875rem 1.5rem;
+        }
+        .navbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-name {
+            font-family: var(--font-headline);
+            font-size: 1.375rem;
+            color: var(--text-primary);
+        }
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .nav-cta {
+            padding: 0.625rem 1.25rem;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-cta:hover { background: var(--accent-hover); }
+
+        /* Theme toggle */
+        .theme-toggle {
+            width: 44px;
+            height: 26px;
+            border-radius: 13px;
+            background: rgba(var(--accent-rgb), 0.15);
+            border: 1px solid rgba(var(--accent-rgb), 0.25);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        [data-theme="dark"] .theme-toggle::after {
+            transform: translateX(18px);
+        }
+        .theme-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            line-height: 1;
+            pointer-events: none;
+        }
+        .theme-icon--sun { left: 5px; }
+        .theme-icon--moon { right: 5px; }
+        [data-theme="light"] .theme-icon--moon { opacity: 0.3; }
+        [data-theme="dark"] .theme-icon--sun { opacity: 0.3; }
+
+        /* ===== Hero ===== */
+        .hero {
+            padding: 8rem 1.5rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            min-height: 90vh;
+            position: relative;
+        }
+        .hero-left { position: relative; z-index: 2; }
+        .hero-right { position: relative; z-index: 2; }
+
+        .hero-badge {
+            display: inline-block;
+            font-family: var(--font-pixel);
+            font-size: 9px;
+            color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.1);
+            border: 1px solid rgba(var(--accent-rgb), 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+        .hero h1 em {
+            color: var(--accent);
+            font-style: normal;
+        }
+
+        .hero-subhead {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            max-width: 520px;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-trust {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Hero visual: pixel character + floating card */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .hero-character {
+            width: 100%;
+            max-width: 420px;
+            margin-bottom: -2rem;
+            position: relative;
+            z-index: 2;
+        }
+        .hero-character img {
+            width: 100%;
+            height: auto;
+            image-rendering: auto;
+            filter: drop-shadow(0 20px 40px rgba(45, 31, 45, 0.12));
+        }
+
+        /* Hero card */
+        .hero-card {
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            max-width: 400px;
+        }
+        .hero-card-title {
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        .deal-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0.875rem;
+            background: var(--surface);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .deal-row:last-child { margin-bottom: 0; }
+        .deal-left {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
+        .deal-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .deal-info-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .deal-status {
+            font-family: var(--font-pixel);
+            font-size: 7px;
+            padding: 0.375rem 0.625rem;
+            border-radius: 0.375rem;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        .status-mint { background: rgba(126, 207, 179, 0.15); color: var(--mint); }
+        .status-peach { background: rgba(255, 176, 136, 0.15); color: var(--peach); }
+        .status-lavender { background: rgba(184, 169, 232, 0.15); color: var(--lavender); }
+        .status-sky { background: rgba(138, 196, 244, 0.15); color: var(--sky); }
+        .hero-card-footer {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Pixel art images — large, overlapping sections */
+        .pixel-art-img {
+            image-rendering: auto;
+            filter: drop-shadow(0 16px 40px rgba(45, 31, 45, 0.1));
+        }
+
+        /* Decorative orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 0;
+        }
+        [data-theme="dark"] .orb { opacity: 0.12; }
+
+        /* ===== Problem Section ===== */
+        .section-problem {
+            padding: 5rem 1.5rem 8rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .section-problem .section-art {
+            position: absolute;
+            right: -20px;
+            bottom: -60px;
+            width: 280px;
+            z-index: 3;
+            pointer-events: none;
+        }
+        .section-problem .section-art img {
+            width: 100%;
+            height: auto;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        .problem-card {
+            border-radius: 1.25rem;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .problem-card:hover { transform: translateY(-4px); }
+        .problem-stat {
+            font-family: var(--font-headline);
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+        .problem-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===== Features Section ===== */
+        .section-features {
+            padding: 5rem 1.5rem 8rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .section-features .section-art {
+            position: absolute;
+            left: -10px;
+            bottom: -50px;
+            width: 260px;
+            z-index: 3;
+            pointer-events: none;
+        }
+        .section-features .section-art img {
+            width: 100%;
+            height: auto;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        .feature-card {
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            transition: transform 0.2s ease;
+        }
+        .feature-card:hover { transform: translateY(-4px); }
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 1rem;
+            background: rgba(var(--accent-rgb), 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+        }
+        .feature-card h3 {
+            font-size: 1.375rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        .feature-card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ===== How It Works ===== */
+        .section-how {
+            padding: 5rem 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        .step {
+            text-align: center;
+        }
+        .step-number {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1rem;
+            font-family: var(--font-pixel);
+            font-size: 16px;
+            color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.1);
+            border: 2px solid rgba(var(--accent-rgb), 0.2);
+            /* pixel dotted border effect */
+            box-shadow:
+                -2px -2px 0 0 rgba(var(--accent-rgb), 0.15),
+                2px -2px 0 0 rgba(var(--accent-rgb), 0.15),
+                -2px 2px 0 0 rgba(var(--accent-rgb), 0.15),
+                2px 2px 0 0 rgba(var(--accent-rgb), 0.15);
+        }
+        .step h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .step p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===== Waitlist Section ===== */
+        .section-waitlist {
+            padding: 5rem 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .waitlist-card {
+            border-radius: 1.5rem;
+            padding: 3rem;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .waitlist-card h2 {
+            font-size: 2.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        .waitlist-card .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        .waitlist-form { display: flex; flex-direction: column; gap: 1rem; }
+        .waitlist-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border-radius: 0.875rem;
+            border: 1px solid var(--glass-border);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .waitlist-input::placeholder { color: var(--text-secondary); opacity: 0.6; }
+        .waitlist-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
+        }
+        .waitlist-select {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border-radius: 0.875rem;
+            border: 1px solid var(--glass-border);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .waitlist-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
+        }
+        .waitlist-submit {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.125rem;
+        }
+        .waitlist-note {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+        .waitlist-success {
+            display: none;
+            padding: 2rem 0;
+        }
+        .waitlist-success.visible { display: block; }
+        .success-check {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(var(--accent-rgb), 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .success-check svg { color: var(--accent); }
+
+        /* ===== Footer ===== */
+        .footer {
+            padding: 2rem 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .footer-copy {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== Pixel Corner Decorations ===== */
+        .pixel-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            opacity: 0.25;
+            pointer-events: none;
+        }
+        .pixel-corner--tl { top: 8px; left: 8px; }
+        .pixel-corner--tr { top: 8px; right: 8px; transform: scaleX(-1); }
+        .pixel-corner--bl { bottom: 8px; left: 8px; transform: scaleY(-1); }
+        .pixel-corner--br { bottom: 8px; right: 8px; transform: scale(-1); }
+        .pixel-corner svg { width: 100%; height: 100%; }
+
+        /* ===== Reduced Motion ===== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding-top: 7rem;
+                min-height: auto;
+            }
+            .hero-right { order: -1; }
+            .hero-character { max-width: 320px; }
+            .hero-card { max-width: 360px; margin: 0 auto; }
+            .features-grid { grid-template-columns: 1fr; }
+            .section-problem .section-art { width: 200px; right: -10px; bottom: -40px; }
+            .section-features .section-art { width: 180px; left: 0; bottom: -30px; }
+        }
+
+        @media (max-width: 768px) {
+            .problem-grid { grid-template-columns: 1fr; }
+            .steps-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .hero h1 { font-size: 2.25rem; }
+            .hero-badge { font-size: 8px; }
+            .hero-character { max-width: 280px; }
+            .waitlist-card { padding: 2rem 1.5rem; }
+            .footer-inner { flex-direction: column; gap: 0.75rem; }
+            .nav-cta-desktop { display: none; }
+            .section-problem .section-art { width: 160px; right: 0; bottom: -30px; }
+            .section-features .section-art { width: 140px; bottom: -25px; }
+        }
+
+        @media (max-width: 375px) {
+            .hero { padding-top: 6rem; padding-left: 1rem; padding-right: 1rem; }
+            .hero-ctas { flex-direction: column; }
+            .hero-character { max-width: 240px; }
+            .section-problem,
+            .section-features,
+            .section-how,
+            .section-waitlist { padding-left: 1rem; padding-right: 1rem; }
+            .section-problem .section-art,
+            .section-features .section-art { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== Navbar ========== -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="20" height="20" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                </div>
+                <span class="logo-name">DealFlow</span>
+            </div>
+            <div class="navbar-actions">
+                <div class="theme-toggle" onclick="toggleTheme()" role="button" tabindex="0" aria-label="Toggle light/dark theme">
+                    <span class="theme-icon theme-icon--sun">☀️</span>
+                    <span class="theme-icon theme-icon--moon">🌙</span>
+                </div>
+                <a href="#waitlist" class="nav-cta nav-cta-desktop">Get early access</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+
+        <!-- ========== Hero ========== -->
+        <section class="hero">
+            <!-- Decorative orbs -->
+            <div class="orb" style="width: 400px; height: 400px; top: -80px; left: -100px; background: rgba(232,120,138,0.35);"></div>
+            <div class="orb" style="width: 300px; height: 300px; bottom: -60px; right: -60px; background: rgba(184,169,232,0.3);"></div>
+
+            <div class="hero-left">
+                <div class="hero-badge">The business side of being a creator, handled</div>
+                <h1>Built for <em>creators,</em> not accountants.</h1>
+                <p class="hero-subhead">
+                    Brands love your content. But the invoices, follow-ups, and payment tracking? Not exactly your vibe.
+                    DealFlow organizes every brand deal and nudges you only when it matters — so you stay in your flow.
+                </p>
+                <div class="hero-ctas">
+                    <a href="#waitlist" class="btn-primary">Get early access</a>
+                    <a href="#how-it-works" class="btn-ghost">See how it works</a>
+                </div>
+                <p class="hero-trust">Built by creators, for creators.</p>
+            </div>
+
+            <div class="hero-right">
+                <div class="hero-visual">
+                    <!-- Main hero character: creator with corgi (large, central) -->
+                    <div class="hero-character">
+                        <img src="img/problem-creator.png" alt="Pixel art creator relaxing with corgi dog and laptop" class="pixel-art-img">
+                    </div>
+
+                    <!-- Deal tracker card overlapping below the character -->
+                    <div class="hero-card glass-elevated">
+                        <!-- Pixel corner decorations -->
+                        <div class="pixel-corner pixel-corner--tl">
+                            <svg viewBox="0 0 24 24" fill="var(--accent)" opacity="0.4">
+                                <rect x="0" y="0" width="4" height="4"/><rect x="4" y="0" width="4" height="4"/><rect x="8" y="0" width="4" height="4"/>
+                                <rect x="0" y="4" width="4" height="4"/><rect x="0" y="8" width="4" height="4"/>
+                            </svg>
+                        </div>
+                        <div class="pixel-corner pixel-corner--br">
+                            <svg viewBox="0 0 24 24" fill="var(--accent)" opacity="0.4">
+                                <rect x="0" y="0" width="4" height="4"/><rect x="4" y="0" width="4" height="4"/><rect x="8" y="0" width="4" height="4"/>
+                                <rect x="0" y="4" width="4" height="4"/><rect x="0" y="8" width="4" height="4"/>
+                            </svg>
+                        </div>
+
+                        <p class="hero-card-title">Your brand deals, organized</p>
+
+                        <div class="deal-row">
+                            <div class="deal-left">
+                                <div class="deal-avatar" style="background: var(--mint);">FC</div>
+                                <span class="deal-info-name">FashionCo</span>
+                            </div>
+                            <span class="deal-status status-mint">Content delivered</span>
+                        </div>
+                        <div class="deal-row">
+                            <div class="deal-left">
+                                <div class="deal-avatar" style="background: var(--peach);">TB</div>
+                                <span class="deal-info-name">TechBrand</span>
+                            </div>
+                            <span class="deal-status status-peach">Waiting for payment</span>
+                        </div>
+                        <div class="deal-row">
+                            <div class="deal-left">
+                                <div class="deal-avatar" style="background: var(--lavender);">SB</div>
+                                <span class="deal-info-name">SnackBox</span>
+                            </div>
+                            <span class="deal-status status-lavender">Briefing received</span>
+                        </div>
+                        <div class="deal-row">
+                            <div class="deal-left">
+                                <div class="deal-avatar" style="background: var(--sky);">FG</div>
+                                <span class="deal-info-name">FitGear</span>
+                            </div>
+                            <span class="deal-status status-sky">Shooting next week</span>
+                        </div>
+
+                        <p class="hero-card-footer">Always up to date — DealFlow handles the tracking</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== Problem Section ========== -->
+        <section class="section-problem">
+            <div class="orb" style="width: 350px; height: 350px; bottom: -100px; right: -80px; background: rgba(126,207,179,0.25);"></div>
+
+            <div class="section-header">
+                <h2>Sound familiar?</h2>
+            </div>
+
+            <div class="problem-grid">
+                <div class="problem-card glass">
+                    <div class="problem-stat">68%</div>
+                    <p class="problem-text">of creators say admin kills their creative flow</p>
+                </div>
+                <div class="problem-card glass">
+                    <div class="problem-stat">1 in 3</div>
+                    <p class="problem-text">brand deals has payment issues creators never follow up on</p>
+                </div>
+                <div class="problem-card glass">
+                    <div class="problem-stat">5+</div>
+                    <p class="problem-text">brand conversations the average creator juggles at once</p>
+                </div>
+            </div>
+
+            <!-- Pixel art: creator filming with phone — large, overlapping -->
+            <div class="section-art">
+                <img src="img/hero-creator.png" alt="Pixel art creator filming with phone" class="pixel-art-img">
+            </div>
+        </section>
+
+        <!-- ========== Features Section ========== -->
+        <section class="section-features">
+            <div class="section-header">
+                <h2>What DealFlow does</h2>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card glass">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
+                    </div>
+                    <h3>Brands pay you on time — automatically</h3>
+                    <p>DealFlow tracks every payment deadline and sends gentle nudges to brands before invoices go overdue. No more awkward follow-up emails — we handle the reminders, you keep creating.</p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="feature-icon">
+                        <svg width="28" height="28" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z"/>
+                        </svg>
+                    </div>
+                    <h3>Every brand deal, one calm dashboard</h3>
+                    <p>See what's negotiated, what's in progress, and what's been delivered — all in one clean view. Replace messy spreadsheets and endless email threads with a dashboard that just makes sense.</p>
+                </div>
+            </div>
+
+            <!-- Pixel art: creator holding product — large, overlapping -->
+            <div class="section-art">
+                <img src="img/features-creator.png" alt="Pixel art creator holding product" class="pixel-art-img">
+            </div>
+        </section>
+
+        <!-- ========== How It Works ========== -->
+        <section class="section-how" id="how-it-works">
+            <div class="section-header">
+                <h2>How it works</h2>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Sign up in 2 minutes</h3>
+                    <p>Create your account, tell us about your niche and active brand deals. No credit card needed.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>We organize your brand deals</h3>
+                    <p>DealFlow pulls together your active collaborations into a single calm dashboard with status tracking.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>You create, we handle the rest</h3>
+                    <p>Payment reminders, deadline nudges, status updates — all on autopilot while you focus on content.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== Waitlist Form ========== -->
+        <section class="section-waitlist" id="waitlist">
+            <div class="orb" style="width: 300px; height: 300px; top: -60px; left: -80px; background: rgba(232,120,138,0.2);"></div>
+
+            <div class="waitlist-card glass-elevated">
+                <h2>Get early access</h2>
+                <p class="subtitle">Join the waitlist and be first to try DealFlow. No spam, just updates.</p>
+
+                <form action="https://formspree.io/f/xpwzgkvl" method="POST" class="waitlist-form" id="waitlist-form">
+                    <input type="hidden" name="_subject" value="DealFlow Waitlist Signup">
+                    <input
+                        type="email"
+                        name="email"
+                        required
+                        placeholder="your@email.com"
+                        class="waitlist-input"
+                        autocomplete="email"
+                    >
+                    <select name="role" class="waitlist-select">
+                        <option value="" disabled selected>I am a...</option>
+                        <option value="content-creator">Content creator</option>
+                        <option value="micro-influencer">Micro-influencer (5K–50K followers)</option>
+                        <option value="mid-influencer">Mid-tier creator (50K+ followers)</option>
+                        <option value="brand">Brand / Agency</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <button type="submit" class="btn-primary waitlist-submit">Get early access</button>
+                    <p class="waitlist-note">No spam. Unsubscribe anytime.</p>
+                </form>
+
+                <div class="waitlist-success" id="waitlist-success">
+                    <div class="success-check">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <h3 style="font-family: var(--font-headline); font-size: 1.5rem; margin-bottom: 0.5rem;">You're on the list!</h3>
+                    <p style="color: var(--text-secondary);">We'll reach out when DealFlow is ready for you.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========== Footer ========== -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="logo" style="gap: 0.5rem;">
+                <div style="width: 24px; height: 24px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="14" height="14" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                </div>
+                <span style="font-family: var(--font-headline); font-size: 1rem; color: var(--text-primary);">DealFlow</span>
+            </div>
+            <p class="footer-copy">&copy; 2026 DealFlow. Built for creators, not accountants.</p>
+        </div>
+    </footer>
+
+    <!-- ========== JavaScript ========== -->
+    <script>
+        // --- Theme ---
+        function getStoredTheme() {
+            try { return localStorage.getItem('df-theme'); } catch { return null; }
+        }
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            try { localStorage.setItem('df-theme', theme); } catch {}
+        }
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        }
+        // Init: respect stored preference, else system, else light (default)
+        (function() {
+            const stored = getStoredTheme();
+            if (stored) { setTheme(stored); return; }
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme('dark');
+            }
+            // else default is light (set in HTML)
+        })();
+
+        // Keyboard support for theme toggle
+        document.querySelector('.theme-toggle').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleTheme();
+            }
+        });
+
+        // --- Smooth scroll for anchor links ---
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // --- Waitlist form ---
+        const form = document.getElementById('waitlist-form');
+        const successEl = document.getElementById('waitlist-success');
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = new FormData(form);
+            try {
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    body: data,
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    form.style.display = 'none';
+                    successEl.classList.add('visible');
+                }
+            } catch {
+                // Fallback: native submit
+                form.submit();
+            }
+        });
+    </script>
+
+</body>
+</html>
