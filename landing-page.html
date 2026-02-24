@@ -408,7 +408,7 @@
             .video-ornament--bl, .video-ornament--br { display: none; }
         }
 
-        /* ===== Problem Section ===== */
+        /* ===== Problem Section — Stage & Spotlight ===== */
         .section-problem {
             padding: 5rem 1.5rem;
             max-width: 1200px;
@@ -417,7 +417,7 @@
         }
         .section-header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
         .section-header h2 {
             font-size: clamp(2rem, 4vw, 2.75rem);
@@ -429,45 +429,71 @@
             font-size: 1.125rem;
         }
 
-        .problem-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: center;
+        .problem-stage {
+            position: relative;
+            max-width: 960px;
+            margin: 0 auto;
+            border-radius: 2rem;
+            overflow: hidden;
+            background: #FFB8C6;
+            box-shadow:
+                0 8px 40px rgba(45, 31, 45, 0.08),
+                0 0 80px rgba(232, 120, 138, 0.1);
         }
-        .problem-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
+        .problem-illustration {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .problem-cards-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding: 1.5rem 2rem 2rem;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(45, 31, 45, 0.04) 40%,
+                rgba(45, 31, 45, 0.18) 100%
+            );
+            z-index: 2;
         }
         .problem-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             border-radius: 1.25rem;
-            padding: 1.75rem 2rem;
+            padding: 1.5rem 1.25rem;
             text-align: center;
-            transition: transform 0.2s ease;
+            box-shadow:
+                0 4px 24px rgba(45, 31, 45, 0.08),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .problem-card:hover { transform: translateY(-4px); }
+        .problem-card:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 8px 40px rgba(45, 31, 45, 0.12),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+            cursor: default;
+        }
         .problem-stat {
             font-family: var(--font-headline);
             font-size: 2.75rem;
             color: var(--accent);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.375rem;
+            line-height: 1.1;
         }
         .problem-text {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-        .problem-art {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .problem-art img {
-            width: 100%;
-            max-width: 400px;
-            height: auto;
-            filter: drop-shadow(0 20px 40px rgba(45, 31, 45, 0.1));
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-weight: 500;
         }
 
         /* ===== Features Section ===== */
@@ -707,9 +733,10 @@
             .hero-character { max-width: 320px; }
             .hero-card { max-width: 360px; margin: 0 auto; }
             .features-grid { grid-template-columns: 1fr; }
-            .problem-layout { grid-template-columns: 1fr; gap: 2rem; }
-            .problem-art { order: -1; }
-            .problem-art img { max-width: 300px; }
+            .problem-stage { border-radius: 1.5rem; }
+            .problem-cards-overlay { gap: 0.75rem; padding: 1rem 1.25rem 1.5rem; }
+            .problem-stat { font-size: 2.25rem; }
+            .problem-text { font-size: 0.8rem; }
             .section-features .section-art { width: 180px; left: 0; bottom: -30px; }
         }
 
@@ -721,7 +748,25 @@
             .waitlist-card { padding: 2rem 1.5rem; }
             .footer-inner { flex-direction: column; gap: 0.75rem; }
             .nav-cta-desktop { display: none; }
-            .problem-art img { max-width: 250px; }
+            .problem-stage {
+                border-radius: 1.25rem;
+                overflow: visible;
+                background: transparent;
+            }
+            .problem-illustration {
+                border-radius: 1.25rem;
+                box-shadow: 0 8px 40px rgba(45, 31, 45, 0.1);
+            }
+            .problem-cards-overlay {
+                position: relative;
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                padding: 0 0.5rem;
+                margin-top: -3rem;
+                background: none;
+            }
+            .problem-stat { font-size: 2rem; }
+            .problem-text { font-size: 0.875rem; }
             .section-features .section-art { width: 140px; bottom: -25px; }
         }
 
@@ -733,6 +778,10 @@
             .section-features,
             .section-how,
             .section-waitlist { padding-left: 1rem; padding-right: 1rem; }
+            .problem-stage { margin: 0 -0.5rem; border-radius: 1rem; }
+            .problem-illustration { border-radius: 1rem; }
+            .problem-cards-overlay { margin-top: -2rem; padding: 0 0.25rem; }
+            .problem-stat { font-size: 1.75rem; }
             .section-features .section-art { display: none; }
         }
     </style>
@@ -959,24 +1008,28 @@
                 <h2>Sound familiar?</h2>
             </div>
 
-            <div class="problem-layout">
-                <div class="problem-cards">
-                    <div class="problem-card glass">
+            <div class="problem-stage">
+                <img
+                    src="img/problem-creator-new.png"
+                    alt="Voxel art creator sitting with corgi dog and laptop in a cozy workspace"
+                    class="problem-illustration"
+                    loading="lazy"
+                    width="1500"
+                    height="800"
+                >
+                <div class="problem-cards-overlay">
+                    <div class="problem-card">
                         <div class="problem-stat">68%</div>
                         <p class="problem-text">of creators say admin kills their creative flow</p>
                     </div>
-                    <div class="problem-card glass">
+                    <div class="problem-card">
                         <div class="problem-stat">1 in 3</div>
                         <p class="problem-text">brand deals has payment issues creators never follow up on</p>
                     </div>
-                    <div class="problem-card glass">
+                    <div class="problem-card">
                         <div class="problem-stat">5+</div>
                         <p class="problem-text">brand conversations the average creator juggles at once</p>
                     </div>
-                </div>
-
-                <div class="problem-art">
-                    <img src="img/hero-creator.png" alt="Pixel art creator filming with phone" class="pixel-art-img">
                 </div>
             </div>
         </section>
