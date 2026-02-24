@@ -410,22 +410,10 @@
 
         /* ===== Problem Section ===== */
         .section-problem {
-            padding: 5rem 1.5rem 8rem;
+            padding: 5rem 1.5rem;
             max-width: 1200px;
             margin: 0 auto;
             position: relative;
-        }
-        .section-problem .section-art {
-            position: absolute;
-            right: -20px;
-            bottom: -60px;
-            width: 280px;
-            z-index: 3;
-            pointer-events: none;
-        }
-        .section-problem .section-art img {
-            width: 100%;
-            height: auto;
         }
         .section-header {
             text-align: center;
@@ -441,30 +429,45 @@
             font-size: 1.125rem;
         }
 
-        .problem-grid {
+        .problem-layout {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            position: relative;
-            z-index: 2;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        .problem-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
         }
         .problem-card {
             border-radius: 1.25rem;
-            padding: 2rem;
+            padding: 1.75rem 2rem;
             text-align: center;
             transition: transform 0.2s ease;
         }
         .problem-card:hover { transform: translateY(-4px); }
         .problem-stat {
             font-family: var(--font-headline);
-            font-size: 3rem;
+            font-size: 2.75rem;
             color: var(--accent);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
         .problem-text {
             font-size: 0.95rem;
             color: var(--text-secondary);
             line-height: 1.6;
+        }
+        .problem-art {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .problem-art img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            filter: drop-shadow(0 20px 40px rgba(45, 31, 45, 0.1));
         }
 
         /* ===== Features Section ===== */
@@ -704,12 +707,13 @@
             .hero-character { max-width: 320px; }
             .hero-card { max-width: 360px; margin: 0 auto; }
             .features-grid { grid-template-columns: 1fr; }
-            .section-problem .section-art { width: 200px; right: -10px; bottom: -40px; }
+            .problem-layout { grid-template-columns: 1fr; gap: 2rem; }
+            .problem-art { order: -1; }
+            .problem-art img { max-width: 300px; }
             .section-features .section-art { width: 180px; left: 0; bottom: -30px; }
         }
 
         @media (max-width: 768px) {
-            .problem-grid { grid-template-columns: 1fr; }
             .steps-grid { grid-template-columns: 1fr; gap: 2.5rem; }
             .hero h1 { font-size: 2.25rem; }
             .hero-badge { font-size: 8px; }
@@ -717,7 +721,7 @@
             .waitlist-card { padding: 2rem 1.5rem; }
             .footer-inner { flex-direction: column; gap: 0.75rem; }
             .nav-cta-desktop { display: none; }
-            .section-problem .section-art { width: 160px; right: 0; bottom: -30px; }
+            .problem-art img { max-width: 250px; }
             .section-features .section-art { width: 140px; bottom: -25px; }
         }
 
@@ -729,7 +733,6 @@
             .section-features,
             .section-how,
             .section-waitlist { padding-left: 1rem; padding-right: 1rem; }
-            .section-problem .section-art,
             .section-features .section-art { display: none; }
         }
     </style>
@@ -950,30 +953,31 @@
 
         <!-- ========== Problem Section ========== -->
         <section class="section-problem">
-            <div class="orb" style="width: 350px; height: 350px; bottom: -100px; right: -80px; background: rgba(126,207,179,0.25);"></div>
+            <div class="orb" style="width: 350px; height: 350px; bottom: -100px; left: -120px; background: rgba(184,169,232,0.2);"></div>
 
             <div class="section-header">
                 <h2>Sound familiar?</h2>
             </div>
 
-            <div class="problem-grid">
-                <div class="problem-card glass">
-                    <div class="problem-stat">68%</div>
-                    <p class="problem-text">of creators say admin kills their creative flow</p>
+            <div class="problem-layout">
+                <div class="problem-cards">
+                    <div class="problem-card glass">
+                        <div class="problem-stat">68%</div>
+                        <p class="problem-text">of creators say admin kills their creative flow</p>
+                    </div>
+                    <div class="problem-card glass">
+                        <div class="problem-stat">1 in 3</div>
+                        <p class="problem-text">brand deals has payment issues creators never follow up on</p>
+                    </div>
+                    <div class="problem-card glass">
+                        <div class="problem-stat">5+</div>
+                        <p class="problem-text">brand conversations the average creator juggles at once</p>
+                    </div>
                 </div>
-                <div class="problem-card glass">
-                    <div class="problem-stat">1 in 3</div>
-                    <p class="problem-text">brand deals has payment issues creators never follow up on</p>
-                </div>
-                <div class="problem-card glass">
-                    <div class="problem-stat">5+</div>
-                    <p class="problem-text">brand conversations the average creator juggles at once</p>
-                </div>
-            </div>
 
-            <!-- Pixel art: creator filming with phone — large, overlapping -->
-            <div class="section-art">
-                <img src="img/hero-creator.png" alt="Pixel art creator filming with phone" class="pixel-art-img">
+                <div class="problem-art">
+                    <img src="img/hero-creator.png" alt="Pixel art creator filming with phone" class="pixel-art-img">
+                </div>
             </div>
         </section>
 
