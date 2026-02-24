@@ -1,0 +1,256 @@
+Implement the following plan:
+
+# Plan: DealFlow — Pixel Art Pastel Landing Page Redesign
+
+## Context
+
+A/B/C testing phase is complete. Team chose **Version B** with messaging reframed for creators: "Built for creators, not accountants." Now doing a full visual redesign — from dark glassmorphism to a **light pastel pixel art / isometric voxel** style inspired by Minecraft but in soft tones. Light theme is default, dark mode available via toggle.
+
+**Live URL**: https://baranskyi.github.io/influencer-platform/
+**Repo**: github.com/baranskyi/influencer-platform
+
+---
+
+## Design System
+
+### Typography
+- **Headlines**: `DM Serif Display` — wide, elegant serif with personality. Girly-creative feel without being childish.
+- **Body**: `Inter` — clean, readable sans-serif (already in use)
+- **Pixel accents** (badges, labels): `Press Start 2P` — used sparingly for pixel-art flavor on small UI elements only
+- Google Fonts: `DM Serif Display:wght@400` + `Inter:wght@300..800` + `Press Start 2P`
+
+### Color Palette (Light Default)
+
+| Token | Light | Dark | Usage |
+|-------|-------|------|-------|
+| `--bg` | `#FFF5F7` (rose white) | `#1A1118` | Page background |
+| `--surface` | `rgba(255,255,255,0.7)` | `rgba(30,20,28,0.7)` | Glass cards |
+| `--surface-solid` | `#FFFFFF` | `#241C22` | Solid cards |
+| `--accent` | `#E8788A` (soft rose) | `#E8788A` | Primary accent (buttons, links) |
+| `--accent-hover` | `#D4556A` | `#F09DAA` | Hover state |
+| `--mint` | `#7ECFB3` | `#7ECFB3` | Status: done/delivered |
+| `--lavender` | `#B8A9E8` | `#B8A9E8` | Status: in progress |
+| `--peach` | `#FFB088` | `#FFB088` | Status: waiting |
+| `--sky` | `#8AC4F4` | `#8AC4F4` | Status: upcoming |
+| `--text-primary` | `#2D1F2D` | `#F5EEF2` | Headlines, body |
+| `--text-secondary` | `#7A6B7A` | `#A89BA6` | Muted text |
+| `--border` | `rgba(0,0,0,0.06)` | `rgba(255,255,255,0.08)` | Borders |
+
+### Glassmorphism (Light-adapted)
+- `glass`: `bg: rgba(255,255,255,0.55)`, `backdrop-filter: blur(20px)`, `border: 1px solid rgba(0,0,0,0.06)`, `box-shadow: 0 4px 24px rgba(45,31,45,0.06)`
+- `glass-elevated`: stronger blur (28px), subtle rose glow shadow
+- Dark mode: swap to dark rgba values, white border alphas
+
+### Pixel Art Integration
+- Decorative pixel-art characters as `<img>` tags (generated via Gemini, placed as PNGs)
+- Pixel-style decorative elements via CSS `box-shadow` pixel patterns (corner decorations)
+- `image-rendering: pixelated` on character images to maintain crispness
+- Small pixel-art dotted borders on some cards
+
+---
+
+## Messaging (Final — Hook 2, no Gmail)
+
+- **Badge** (Press Start 2P, 10px): "The business side of being a creator, handled"
+- **Headline** (DM Serif Display, ~56px): "Built for **creators,** not accountants."
+- **Subhead** (Inter, 18px): "Brands love your content. But the invoices, follow-ups, and payment tracking? Not exactly your vibe. DealFlow organizes every brand deal and nudges you only when it matters — so you stay in your flow."
+- **CTA Primary**: "Get early access" (rose accent, rounded-xl)
+- **CTA Secondary**: "See how it works" (ghost button, scrolls to #how-it-works)
+- **Trust**: "Built by creators, for creators."
+
+---
+
+## Page Structure
+
+### 1. Navbar (fixed, glass)
+- DealFlow logo + name
+- Theme toggle (sun/moon icon)
+- "Get early access" CTA button
+
+### 2. Hero Section
+- **Left**: Badge → H1 → Subhead → CTA buttons → Trust line
+- **Right**: Glass card "Your brand deals, organized"
+  - 4 rows: FashionCo "Content delivered" (mint), TechBrand "Waiting for payment" (peach), SnackBox "Briefing received" (lavender), FitGear "Shooting next week" (sky)
+  - Footer: "Always up to date — DealFlow handles the tracking"
+  - NO dollar amounts, NO stats
+- **Pixel art character**: placeholder `<img>` for creator filming with phone (positioned floating near the card)
+
+### 3. Problem Section
+- Header: "Sound familiar?" (DM Serif Display)
+- 3 glass cards:
+  - "68%" — "of creators say admin kills their creative flow"
+  - "1 in 3" — "brand deals has payment issues creators never follow up on"
+  - "5+" — "brand conversations the average creator juggles at once"
+- Pixel art character: placeholder for creator with dog
+
+### 4. Features Section
+- Header: "What DealFlow does"
+- 2 glass cards:
+  - "Brands pay you on time — automatically" + description
+  - "Every brand deal, one calm dashboard" + description
+- Pixel art character: placeholder for creator holding product
+
+### 5. How It Works (#how-it-works)
+- 3 steps with pixel-style number badges:
+  1. "Sign up in 2 minutes"
+  2. "We organize your brand deals"
+  3. "You create, we handle the rest"
+
+### 6. Waitlist Form (#waitlist)
+- Glass-elevated card with rose glow
+- Email input + role select + submit button
+- Formspree action: `https://formspree.io/f/xpwzgkvl`
+- Success state with checkmark
+
+### 7. Footer
+- DealFlow logo + copyright
+
+---
+
+## Pixel Art Images (3 placeholders)
+
+Generate via `nano-banana-pro` skill after landing page is built:
+1. **Hero**: Isometric pixel-art creator filming selfie with phone, pastel colors, Minecraft voxel style, pink/mint/lavender tones, white background
+2. **Problem section**: Isometric pixel-art creator sitting with cute dog, laptop nearby, pastel voxel style
+3. **Features section**: Isometric pixel-art creator holding product/unboxing, pastel voxel style
+
+Images saved to `Projects/influencer-platform/img/` and referenced in HTML.
+
+---
+
+## Files to Modify
+- `Projects/influencer-platform/landing-page.html` — full rewrite
+
+## Deployment
+- Push to `github.com/baranskyi/influencer-platform` (as `index.html` + `img/` folder)
+- GitHub Pages already enabled
+
+## Verification
+- [ ] Light theme is default, dark mode via toggle
+- [ ] DM Serif Display renders for headlines
+- [ ] Pixel art character placeholders visible
+- [ ] No A/B/C tabs — single version
+- [ ] No dollar amounts or stats in hero card
+- [ ] Formspree waitlist submits correctly
+- [ ] Responsive: 375px, 768px, 1440px
+- [ ] `prefers-reduced-motion` respected
+- [ ] All clickable elements have `cursor-pointer`
+- [ ] Text contrast ≥ 4.5:1 in both themes
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/slavabaranskyi/.REDACTED.jsonl
+
+---
+
+Base directory for this skill: /Users/slavabaranskyi/.claude/skills/nano-banana-pro
+
+# Nano Banana Pro — Image Generation
+
+Generate images using Google Gemini 3 Pro Image model via the `google-genai` Python SDK.
+
+## Quick Start
+
+Generate a single image:
+```bash
+~/Personal-Super-Agent/config/analytics_env/bin/python3 {baseDir}/scripts/generate.py --prompt "A pixel art robot sitting at a desk" --output "/path/to/output.png"
+```
+
+Generate multiple images in parallel:
+```bash
+~/Personal-Super-Agent/config/analytics_env/bin/python3 {baseDir}/scripts/generate.py \
+  --prompts-json '[{"filename": "hero1.png", "prompt": "A sunset over mountains"}, {"filename": "hero2.png", "prompt": "A forest at dawn"}]' \
+  --output-dir "/path/to/output/"
+```
+
+## Options
+
+- `--prompt TEXT`: Single image prompt
+- `--output PATH`: Output file path for single image (default: `./generated.png`)
+- `--prompts-json JSON`: JSON array of `{"filename", "prompt"}` objects for batch generation
+- `--output-dir PATH`: Output directory for batch generation
+- `--style-prefix TEXT`: Shared style prefix prepended to all prompts
+- `--api-key KEY`: Override GEMINI_API_KEY env variable
+
+## Style Prefix Example
+
+For consistent visual style across multiple images:
+```bash
+~/Personal-Super-Agent/config/analytics_env/bin/python3 {baseDir}/scripts/generate.py \
+  --style-prefix "Pixel art style illustration on dark navy background with neon glows." \
+  --prompts-json '[{"filename": "img1.png", "prompt": "Robot at desk"}, {"filename": "img2.png", "prompt": "Robot flying"}]' \
+  --output-dir "./images/"
+```
+
+## Setup
+
+1. Install dependencies (once):
+```bash
+~/Personal-Super-Agent/config/analytics_env/bin/pip install google-genai Pillow
+```
+
+2. Set API key:
+```bash
+export GEMINI_API_KEY="your-gemini-api-key"
+```
+
+Or pass via `--api-key` flag.
+
+## Model
+
+Uses `gemini-3-pro-image-preview` with `response_modalities=["TEXT", "IMAGE"]`.
+
+## Notes
+
+- Output format: PNG
+- Supports parallel generation for batch requests (threaded)
+- Each prompt can optionally include a style prefix for visual consistency
+- Requires `google-genai` and `Pillow` Python packages
+
+
+ARGUMENTS: batch generate 3 images, save to Projects/influencer-platform/img/:
+
+1. hero-creator.png — Isometric pixel-art creator girl filming selfie with smartphone, pastel colors, Minecraft voxel style, pink/mint/lavender tones, white background, cute character design, low-poly 3D pixel art
+
+2. problem-creator.png — Isometric pixel-art creator girl sitting relaxed with cute small dog, laptop nearby on the floor, pastel voxel style, pink/peach/sky blue tones, white background, cozy scene
+
+3. features-creator.png — Isometric pixel-art creator girl holding product box/unboxing, pastel voxel style, mint/lavender/rose tones, white background, happy expression
+
+---
+
+REDACTED
+
+---
+
+[Request interrupted by user]
+
+---
+
+gemini api key REDACTED
+
+---
+
+деплой
+
+---
+
+Готово. Заканчивай деплой.
+
+---
+
+Замените главную картинку на эту картинку.
+
+---
+
+[Image: source: /Users/slavabaranskyi/Downloads/Gemini_Generated_Image_11mqqw11mqqw11mq.png]
+
+---
+
+Как-то картинку с прозрачным типом подложка я вижу очень странно, какими-то кубиками. Давай сделаем, чтобы она была по-настоящему прозрачной.
+
+---
+
+[Image: source: /Users/slavabaranskyi/Desktop/Screenshot 2026-02-24 at 23.58.32.png]
+
+---
+
+Давай уберем черную тему, переключатели, вообще откажемся от темной темы. Оставим только светлую.
