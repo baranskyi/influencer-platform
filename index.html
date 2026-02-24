@@ -342,6 +342,72 @@
             pointer-events: none;
             z-index: 0;
         }
+        /* ===== Video Section ===== */
+        .section-video {
+            padding: 3rem 1.5rem 5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .video-wrapper {
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        .video-frame {
+            position: relative;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow:
+                0 8px 40px rgba(232, 120, 138, 0.15),
+                0 2px 12px rgba(45, 31, 45, 0.08);
+            border: 3px solid rgba(232, 120, 138, 0.2);
+        }
+        .video-frame video {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 1.25rem;
+        }
+        /* Pixel art romantic ornaments around video */
+        .video-ornament {
+            position: absolute;
+            pointer-events: none;
+            z-index: 3;
+        }
+        .video-ornament svg { display: block; }
+        .video-ornament--tl { top: -18px; left: -18px; }
+        .video-ornament--tr { top: -18px; right: -18px; }
+        .video-ornament--bl { bottom: -18px; left: -18px; }
+        .video-ornament--br { bottom: -18px; right: -18px; }
+
+        /* Pixel heart decorations floating */
+        .pixel-hearts {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .pixel-heart {
+            position: absolute;
+            opacity: 0.25;
+        }
+
+        .video-caption {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .video-wrapper { max-width: 360px; }
+            .video-ornament--tl, .video-ornament--tr,
+            .video-ornament--bl, .video-ornament--br { display: none; }
+        }
+
         /* ===== Problem Section ===== */
         .section-problem {
             padding: 5rem 1.5rem 8rem;
@@ -766,6 +832,119 @@
                         <p class="hero-card-footer">Always up to date — DealFlow handles the tracking</p>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ========== Video Section ========== -->
+        <section class="section-video">
+            <!-- Floating pixel hearts background -->
+            <div class="pixel-hearts">
+                <!-- Heart 1 - top left -->
+                <svg class="pixel-heart" style="top: 8%; left: 12%; width: 28px;" viewBox="0 0 16 14" fill="var(--accent)">
+                    <rect x="2" y="0" width="4" height="2"/><rect x="8" y="0" width="4" height="2"/>
+                    <rect x="0" y="2" width="16" height="2"/><rect x="0" y="4" width="16" height="2"/>
+                    <rect x="2" y="6" width="12" height="2"/><rect x="4" y="8" width="8" height="2"/>
+                    <rect x="6" y="10" width="4" height="2"/>
+                </svg>
+                <!-- Heart 2 - top right -->
+                <svg class="pixel-heart" style="top: 15%; right: 8%; width: 20px; opacity: 0.18;" viewBox="0 0 16 14" fill="var(--lavender)">
+                    <rect x="2" y="0" width="4" height="2"/><rect x="8" y="0" width="4" height="2"/>
+                    <rect x="0" y="2" width="16" height="2"/><rect x="0" y="4" width="16" height="2"/>
+                    <rect x="2" y="6" width="12" height="2"/><rect x="4" y="8" width="8" height="2"/>
+                    <rect x="6" y="10" width="4" height="2"/>
+                </svg>
+                <!-- Heart 3 - bottom left -->
+                <svg class="pixel-heart" style="bottom: 18%; left: 6%; width: 22px; opacity: 0.2;" viewBox="0 0 16 14" fill="var(--mint)">
+                    <rect x="2" y="0" width="4" height="2"/><rect x="8" y="0" width="4" height="2"/>
+                    <rect x="0" y="2" width="16" height="2"/><rect x="0" y="4" width="16" height="2"/>
+                    <rect x="2" y="6" width="12" height="2"/><rect x="4" y="8" width="8" height="2"/>
+                    <rect x="6" y="10" width="4" height="2"/>
+                </svg>
+                <!-- Heart 4 - mid right -->
+                <svg class="pixel-heart" style="top: 45%; right: 14%; width: 16px; opacity: 0.15;" viewBox="0 0 16 14" fill="var(--peach)">
+                    <rect x="2" y="0" width="4" height="2"/><rect x="8" y="0" width="4" height="2"/>
+                    <rect x="0" y="2" width="16" height="2"/><rect x="0" y="4" width="16" height="2"/>
+                    <rect x="2" y="6" width="12" height="2"/><rect x="4" y="8" width="8" height="2"/>
+                    <rect x="6" y="10" width="4" height="2"/>
+                </svg>
+                <!-- Heart 5 - bottom right -->
+                <svg class="pixel-heart" style="bottom: 10%; right: 10%; width: 24px; opacity: 0.2;" viewBox="0 0 16 14" fill="var(--accent)">
+                    <rect x="2" y="0" width="4" height="2"/><rect x="8" y="0" width="4" height="2"/>
+                    <rect x="0" y="2" width="16" height="2"/><rect x="0" y="4" width="16" height="2"/>
+                    <rect x="2" y="6" width="12" height="2"/><rect x="4" y="8" width="8" height="2"/>
+                    <rect x="6" y="10" width="4" height="2"/>
+                </svg>
+                <!-- Star 1 -->
+                <svg class="pixel-heart" style="top: 30%; left: 18%; width: 14px; opacity: 0.2;" viewBox="0 0 8 8" fill="var(--sky)">
+                    <rect x="3" y="0" width="2" height="2"/><rect x="0" y="3" width="2" height="2"/>
+                    <rect x="3" y="3" width="2" height="2"/><rect x="6" y="3" width="2" height="2"/>
+                    <rect x="3" y="6" width="2" height="2"/>
+                </svg>
+                <!-- Star 2 -->
+                <svg class="pixel-heart" style="bottom: 30%; right: 20%; width: 12px; opacity: 0.15;" viewBox="0 0 8 8" fill="var(--lavender)">
+                    <rect x="3" y="0" width="2" height="2"/><rect x="0" y="3" width="2" height="2"/>
+                    <rect x="3" y="3" width="2" height="2"/><rect x="6" y="3" width="2" height="2"/>
+                    <rect x="3" y="6" width="2" height="2"/>
+                </svg>
+            </div>
+
+            <div class="video-wrapper">
+                <div class="video-frame">
+                    <!-- Pixel corner ornaments -->
+                    <div class="video-ornament video-ornament--tl">
+                        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                            <rect x="0" y="0" width="4" height="4" fill="var(--accent)" opacity="0.5"/>
+                            <rect x="4" y="0" width="4" height="4" fill="var(--lavender)" opacity="0.4"/>
+                            <rect x="0" y="4" width="4" height="4" fill="var(--lavender)" opacity="0.4"/>
+                            <rect x="8" y="0" width="4" height="4" fill="var(--mint)" opacity="0.3"/>
+                            <rect x="0" y="8" width="4" height="4" fill="var(--mint)" opacity="0.3"/>
+                            <rect x="4" y="4" width="4" height="4" fill="var(--accent)" opacity="0.25"/>
+                            <rect x="12" y="0" width="4" height="4" fill="var(--peach)" opacity="0.2"/>
+                            <rect x="0" y="12" width="4" height="4" fill="var(--peach)" opacity="0.2"/>
+                        </svg>
+                    </div>
+                    <div class="video-ornament video-ornament--tr">
+                        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                            <rect x="32" y="0" width="4" height="4" fill="var(--accent)" opacity="0.5"/>
+                            <rect x="28" y="0" width="4" height="4" fill="var(--lavender)" opacity="0.4"/>
+                            <rect x="32" y="4" width="4" height="4" fill="var(--lavender)" opacity="0.4"/>
+                            <rect x="24" y="0" width="4" height="4" fill="var(--mint)" opacity="0.3"/>
+                            <rect x="32" y="8" width="4" height="4" fill="var(--mint)" opacity="0.3"/>
+                            <rect x="28" y="4" width="4" height="4" fill="var(--accent)" opacity="0.25"/>
+                            <rect x="20" y="0" width="4" height="4" fill="var(--peach)" opacity="0.2"/>
+                            <rect x="32" y="12" width="4" height="4" fill="var(--peach)" opacity="0.2"/>
+                        </svg>
+                    </div>
+                    <div class="video-ornament video-ornament--bl">
+                        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                            <rect x="0" y="32" width="4" height="4" fill="var(--accent)" opacity="0.5"/>
+                            <rect x="4" y="32" width="4" height="4" fill="var(--lavender)" opacity="0.4"/>
+                            <rect x="0" y="28" width="4" height="4" fill="var(--lavender)" opacity="0.4"/>
+                            <rect x="8" y="32" width="4" height="4" fill="var(--mint)" opacity="0.3"/>
+                            <rect x="0" y="24" width="4" height="4" fill="var(--mint)" opacity="0.3"/>
+                            <rect x="4" y="28" width="4" height="4" fill="var(--accent)" opacity="0.25"/>
+                            <rect x="12" y="32" width="4" height="4" fill="var(--peach)" opacity="0.2"/>
+                            <rect x="0" y="20" width="4" height="4" fill="var(--peach)" opacity="0.2"/>
+                        </svg>
+                    </div>
+                    <div class="video-ornament video-ornament--br">
+                        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                            <rect x="32" y="32" width="4" height="4" fill="var(--accent)" opacity="0.5"/>
+                            <rect x="28" y="32" width="4" height="4" fill="var(--lavender)" opacity="0.4"/>
+                            <rect x="32" y="28" width="4" height="4" fill="var(--lavender)" opacity="0.4"/>
+                            <rect x="24" y="32" width="4" height="4" fill="var(--mint)" opacity="0.3"/>
+                            <rect x="32" y="24" width="4" height="4" fill="var(--mint)" opacity="0.3"/>
+                            <rect x="28" y="28" width="4" height="4" fill="var(--accent)" opacity="0.25"/>
+                            <rect x="20" y="32" width="4" height="4" fill="var(--peach)" opacity="0.2"/>
+                            <rect x="32" y="20" width="4" height="4" fill="var(--peach)" opacity="0.2"/>
+                        </svg>
+                    </div>
+
+                    <video controls playsinline preload="metadata" poster="">
+                        <source src="img/dealflow-creator.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <p class="video-caption">"I love creating — I hate chasing invoices."</p>
             </div>
         </section>
 
