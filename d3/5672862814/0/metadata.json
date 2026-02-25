@@ -1,0 +1,33 @@
+{
+  "cli_version": "0.4.5",
+  "checkpoint_id": "d35672862814",
+  "session_id": "108b571a-1804-4487-9912-e111f70b6ef0",
+  "strategy": "manual-commit",
+  "created_at": "2026-02-25T12:49:46.777591Z",
+  "branch": "main",
+  "checkpoints_count": 0,
+  "files_touched": [
+    "landing-page.html"
+  ],
+  "agent": "Claude Code",
+  "turn_id": "b982e9f8be45",
+  "checkpoint_transcript_start": 651,
+  "transcript_lines_at_start": 651,
+  "token_usage": {
+    "input_tokens": 15,
+    "cache_creation_tokens": 13228,
+    "cache_read_tokens": 1266839,
+    "output_tokens": 87,
+    "api_call_count": 11
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-02-25T12:49:45.777057Z",
+    "agent_lines": 203,
+    "human_added": 203,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 406,
+    "agent_percentage": 50
+  },
+  "transcript_path": ".claude/projects/-Users-slavabaranskyi-Personal-Super-Agent/108b571a-1804-4487-9912-e111f70b6ef0.jsonl"
+}
