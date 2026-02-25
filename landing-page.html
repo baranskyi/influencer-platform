@@ -698,24 +698,116 @@
             margin: 0;
         }
 
-        /* ===== How It Works ===== */
+        /* ===== How It Works — Stage & Spotlight (3-card sibling variant) ===== */
         .section-how {
-            padding: 5rem 1.5rem;
+            padding: 5rem 1.5rem 4rem;
             max-width: 1200px;
             margin: 0 auto;
         }
-        .steps-grid {
+
+        /*
+         * Stage: matches features-stage exactly —
+         * overflow: visible so the step-cards-row can bleed below.
+         * Background color #FFB0B8 matches the pink floor tiles in
+         * the voxel ballet illustration so the container edge is seamless.
+         */
+        .how-stage {
+            position: relative;
+            max-width: 960px;
+            margin: 0 auto;
+            border-radius: 2rem;
+            overflow: visible;
+            background: #FFB0B8;
+            box-shadow:
+                0 8px 40px rgba(45, 31, 45, 0.08),
+                0 0 80px rgba(232, 120, 138, 0.1);
+        }
+
+        .how-illustration {
+            display: block;
+            width: 100%;
+            height: auto;
+            /* Border-radius applied to the img itself — this is the clipping surface
+               because the container uses overflow: visible */
+            border-radius: 2rem;
+        }
+
+        /*
+         * Very subtle bottom scrim — identical formula to features-stage::after.
+         * 80px tall, light darkening only. Its job is to visually "ground" the cards
+         * that emerge below, not to create a text-legibility mask (cards are siblings).
+         */
+        .how-stage::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            border-radius: 0 0 2rem 2rem;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(45, 31, 45, 0.06) 70%,
+                rgba(45, 31, 45, 0.14) 100%
+            );
+            pointer-events: none;
+        }
+
+        /*
+         * Card row: sibling of how-stage, pulled up with negative margin.
+         * -5rem matches features-cards-row exactly — consistent visual language
+         * across both Stage & Spotlight sections.
+         * 3-column grid mirrors the original steps-grid column count.
+         */
+        .step-cards-row {
+            position: relative;
+            max-width: 960px;
+            margin: -5rem auto 0;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
+            gap: 1.25rem;
+            padding: 0 2rem;
+            z-index: 3;
         }
-        .step {
-            text-align: center;
+
+        /*
+         * Step card: same glassmorphism recipe as feature-card.
+         * Using 0.72 alpha + blur(24px) — one notch more opaque than
+         * problem-card (0.65 + blur(20px)) because the content is denser
+         * and needs stronger contrast for the paragraph text.
+         */
+        .step-card {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 1.5rem;
+            padding: 1.75rem 1.5rem 2rem;
+            box-shadow:
+                0 6px 32px rgba(45, 31, 45, 0.10),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 12px 48px rgba(45, 31, 45, 0.14),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+            cursor: default;
+        }
+
+        /*
+         * Step number badge: keep the existing .step-number visual treatment
+         * (pixel font, accent tint, dotted corner box-shadow) but remove the
+         * centering margin — inside a left-aligned card it anchors to the left.
+         * 56x56 with border-radius: 1rem matches the pixel-grid aesthetic.
+         */
         .step-number {
             width: 56px;
             height: 56px;
-            margin: 0 auto 1.25rem;
+            margin: 0 0 1.25rem;          /* left-aligned within card */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -725,22 +817,28 @@
             color: var(--accent);
             background: rgba(var(--accent-rgb), 0.1);
             border: 2px solid rgba(var(--accent-rgb), 0.2);
-            /* pixel dotted border effect */
+            /* Pixel-art corner dot effect — preserved from original design */
             box-shadow:
                 -2px -2px 0 0 rgba(var(--accent-rgb), 0.15),
                 2px -2px 0 0 rgba(var(--accent-rgb), 0.15),
                 -2px 2px 0 0 rgba(var(--accent-rgb), 0.15),
                 2px 2px 0 0 rgba(var(--accent-rgb), 0.15);
+            flex-shrink: 0;
         }
-        .step h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
+
+        .step-card h3 {
+            font-size: 1.125rem;          /* slightly smaller than feature-card h3
+                                             (1.25rem) — 3 columns are narrower */
+            line-height: 1.3;
+            margin-bottom: 0.625rem;
             color: var(--text-primary);
         }
-        .step p {
-            font-size: 0.95rem;
+
+        .step-card p {
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.65;
+            margin: 0;
         }
 
         /* ===== Waitlist Section ===== */
@@ -891,10 +989,26 @@
             .features-illustration { border-radius: 1.5rem; }
             .features-stage::after { border-radius: 0 0 1.5rem 1.5rem; }
             .features-cards-row { padding: 0 1.25rem 0; gap: 1rem; margin-top: -4rem; }
+            /*
+             * How it works — tablet (≤1024px):
+             * Tighten corner radius to match sibling stages.
+             * Reduce negative overlap to -4rem so narrower cards
+             * don't create an uncomfortably deep bite into the illustration.
+             * Gap drops to 1rem to compensate for narrower column width.
+             */
+            .how-stage { border-radius: 1.5rem; }
+            .how-illustration { border-radius: 1.5rem; }
+            .how-stage::after { border-radius: 0 0 1.5rem 1.5rem; }
+            .step-cards-row {
+                padding: 0 1.25rem;
+                gap: 1rem;
+                margin-top: -4rem;
+            }
+            .step-card { padding: 1.5rem 1.25rem 1.75rem; }
+            .step-card h3 { font-size: 1.0625rem; }
         }
 
         @media (max-width: 768px) {
-            .steps-grid { grid-template-columns: 1fr; gap: 2.5rem; }
             .hero h1 { font-size: 2.25rem; }
             .hero-badge { font-size: 8px; }
             .hero-character { max-width: 280px; }
@@ -921,11 +1035,8 @@
             .problem-stat { font-size: 2rem; }
             .problem-text { font-size: 0.875rem; }
             /*
-             * Mobile (≤768px): cards stack in single column below the illustration.
-             * Overlap stays at -3.5rem — enough to anchor to the scene visually
-             * without covering the corgi at the bottom of the image.
-             * Stage gets background: transparent so the pink container doesn't
-             * create a visual artifact against the page background.
+             * Features — mobile: single column, reduced overlap.
+             * Background transparent to avoid pink stage artifact on page bg.
              */
             .features-stage {
                 border-radius: 1.25rem;
@@ -945,6 +1056,39 @@
             .feature-card {
                 padding: 1.5rem 1.5rem 1.75rem;
             }
+            /*
+             * How it works — mobile (≤768px):
+             * Cards collapse from 3-col to 1-col.
+             * Overlap reduced to -3rem — the ballet dancer and corgi are the
+             * primary subjects; we don't want the badge to overlap their faces.
+             * Background transparent (same reason as features-stage mobile).
+             * The step-number badge gets margin: 0 auto so it re-centers in
+             * the single-column layout, matching the original .step design intent.
+             */
+            .how-stage {
+                border-radius: 1.25rem;
+                background: transparent;
+            }
+            .how-illustration {
+                border-radius: 1.25rem;
+                box-shadow: 0 8px 40px rgba(45, 31, 45, 0.1);
+            }
+            .how-stage::after { border-radius: 0 0 1.25rem 1.25rem; }
+            .step-cards-row {
+                grid-template-columns: 1fr;
+                padding: 0 0.5rem;
+                gap: 0.875rem;
+                margin-top: -3rem;
+            }
+            .step-card {
+                padding: 1.5rem 1.5rem 1.75rem;
+                text-align: center;
+            }
+            /* Re-center badge when card becomes single-column */
+            .step-card .step-number {
+                margin: 0 auto 1.25rem;
+            }
+            .step-card h3 { font-size: 1.125rem; }
         }
 
         @media (max-width: 375px) {
@@ -959,8 +1103,20 @@
             .problem-illustration { border-radius: 1rem; }
             .problem-cards-overlay { margin-top: -2rem; padding: 0 0.25rem; }
             .problem-stat { font-size: 1.75rem; }
-            /* At 375px, reduce the negative margin so cards don't cover the corgi's face */
+            /* Features: at 375px pull back the overlap so corgi stays visible */
             .features-cards-row { margin-top: -2.5rem; padding: 0 0.25rem; }
+            /*
+             * How it works — 375px:
+             * Minimal overlap (-2rem) — at this width the illustration is
+             * only ~335px tall; any deeper bite starts covering the characters.
+             * stage bleeds edge-to-edge with -0.5rem negative margin (same as problem-stage).
+             */
+            .how-stage { margin: 0 -0.5rem; border-radius: 1rem; }
+            .how-illustration { border-radius: 1rem; }
+            .step-cards-row { margin-top: -2rem; padding: 0 0.25rem; }
+            .step-card { padding: 1.25rem 1.25rem 1.5rem; }
+            .step-card h3 { font-size: 1.0625rem; }
+            .step-card p { font-size: 0.875rem; }
         }
     </style>
 </head>
@@ -1321,24 +1477,45 @@
             </div>
         </section>
 
-        <!-- ========== How It Works ========== -->
+        <!-- ========== How It Works — Stage & Spotlight (3-card sibling variant) ========== -->
         <section class="section-how" id="how-it-works">
             <div class="section-header">
                 <h2>How it works</h2>
             </div>
 
-            <div class="steps-grid">
-                <div class="step">
+            <!--
+                Stage: overflow: visible so step-cards-row can bleed below.
+                Background #FFB0B8 matches the pink checkered floor in the
+                ballet illustration — the container-to-image boundary disappears.
+            -->
+            <div class="how-stage">
+                <img
+                    src="img/how-it-works-creator.png"
+                    alt="Voxel art girl in ballet tutu dancing with a corgi, camera tripod and softbox light on a pink checkered floor"
+                    class="how-illustration"
+                    loading="lazy"
+                    width="1500"
+                    height="850"
+                >
+            </div>
+
+            <!--
+                Step cards row: sibling of how-stage, pulled into the illustration
+                with negative margin-top: -5rem. z-index: 3 ensures cards sit
+                visually above the stage's ::after scrim gradient.
+            -->
+            <div class="step-cards-row">
+                <div class="step-card">
                     <div class="step-number">1</div>
                     <h3>Sign up in 2 minutes</h3>
                     <p>Create your account, tell us about your niche and active brand deals. No credit card needed.</p>
                 </div>
-                <div class="step">
+                <div class="step-card">
                     <div class="step-number">2</div>
                     <h3>We organize your brand deals</h3>
                     <p>DealFlow pulls together your active collaborations into a single calm dashboard with status tracking.</p>
                 </div>
-                <div class="step">
+                <div class="step-card">
                     <div class="step-number">3</div>
                     <h3>You create, we handle the rest</h3>
                     <p>Payment reminders, deadline nudges, status updates — all on autopilot while you focus on content.</p>
