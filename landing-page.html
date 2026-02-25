@@ -182,7 +182,13 @@
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            /*
+             * Left column (text) gets slightly less space than right (stage).
+             * The 5fr/7fr split gives the stage ~58% of the width — enough
+             * to make the character image the dominant visual element while
+             * keeping the headline comfortably readable at ~480px.
+             */
+            grid-template-columns: 5fr 7fr;
             gap: 3rem;
             align-items: center;
             min-height: 90vh;
@@ -235,35 +241,102 @@
             color: var(--text-secondary);
         }
 
-        /* Hero visual: pixel character + floating card */
-        .hero-visual {
+        /*
+         * Hero Stage — mirrors the Stage & Spotlight pattern used in
+         * .problem-stage, .features-stage, and .how-stage.
+         *
+         * Key design decisions:
+         * 1. The image's native pink background (#FFB8C6) becomes the
+         *    container's background color — the boundary between container
+         *    and image disappears, creating one unified visual block.
+         * 2. border-radius: 2rem matches all other stages on the page.
+         * 3. overflow: visible allows the deal card to bleed outside
+         *    the container's bottom edge for a layered, dimensional feel.
+         * 4. The box-shadow matches the exact formula used on problem-stage
+         *    and features-stage — consistent depth language across the page.
+         */
+        .hero-stage {
             position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .hero-character {
             width: 100%;
-            max-width: 420px;
-            margin-bottom: -2rem;
-            position: relative;
-            z-index: 2;
-        }
-        .hero-character img {
-            width: 100%;
-            height: auto;
-            image-rendering: auto;
-            filter: drop-shadow(0 20px 40px rgba(45, 31, 45, 0.12));
+            border-radius: 2rem;
+            overflow: visible;
+            background: #FFB8C6;
+            box-shadow:
+                0 8px 40px rgba(45, 31, 45, 0.08),
+                0 0 80px rgba(232, 120, 138, 0.1);
         }
 
-        /* Hero card */
-        .hero-card {
-            border-radius: 1.25rem;
-            padding: 1.5rem;
-            position: relative;
-            z-index: 3;
+        .hero-stage-img {
+            display: block;
             width: 100%;
-            max-width: 400px;
+            height: auto;
+            border-radius: 2rem;
+            image-rendering: auto;
+        }
+
+        /*
+         * Subtle bottom scrim — identical to features-stage::after.
+         * Grounds the floating deal card visually against the image.
+         */
+        .hero-stage::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            border-radius: 0 0 2rem 2rem;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(45, 31, 45, 0.06) 70%,
+                rgba(45, 31, 45, 0.14) 100%
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /*
+         * Deal tracker card — positioned as an absolute overlay on
+         * the bottom-right of the hero stage. This is the "Spotlight"
+         * in the Stage & Spotlight pattern.
+         *
+         * Positioning rationale:
+         * - bottom: -1.5rem — bleeds slightly below the stage container,
+         *   creating a layered depth effect (the card "emerges" from the scene)
+         * - right: -1rem — slight overhang past the stage edge for dynamism
+         * - width: 72% — wide enough to show deal data legibly but not so
+         *   wide that it covers the character's face/body
+         *
+         * The glassmorphism values (0.72 alpha, 24px blur) match
+         * feature-card and step-card exactly — same system, same tokens.
+         */
+        .hero-card {
+            position: absolute;
+            bottom: -1.5rem;
+            right: -1rem;
+            z-index: 4;
+            width: 72%;
+            max-width: 340px;
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            box-shadow:
+                0 8px 40px rgba(45, 31, 45, 0.12),
+                0 0 60px rgba(232, 120, 138, 0.08),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hero-card:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 12px 48px rgba(45, 31, 45, 0.16),
+                0 0 60px rgba(232, 120, 138, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.35);
         }
         .hero-card-title {
             font-family: var(--font-body);
@@ -977,8 +1050,21 @@
                 min-height: auto;
             }
             .hero-right { order: -1; }
-            .hero-character { max-width: 320px; }
-            .hero-card { max-width: 360px; margin: 0 auto; }
+            /*
+             * Tablet: the stage goes full-width in a single column layout.
+             * Constrain to 560px so it doesn't stretch across the entire
+             * viewport — this maintains the "bounded object" feel.
+             */
+            .hero-stage {
+                max-width: 560px;
+                margin: 0 auto;
+            }
+            .hero-card {
+                width: 68%;
+                max-width: 320px;
+                right: -0.5rem;
+                bottom: -1.25rem;
+            }
             .testimonials-grid { grid-template-columns: 1fr; max-width: 540px; margin: 0 auto; }
             .problem-stage { border-radius: 1.5rem; }
             .problem-cards-overlay { gap: 0.75rem; padding: 1rem 1.25rem 1.5rem; }
@@ -1011,7 +1097,29 @@
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.25rem; }
             .hero-badge { font-size: 8px; }
-            .hero-character { max-width: 280px; }
+            /*
+             * Mobile: stage narrows to 440px max.
+             * The deal card repositions to centered at bottom,
+             * bleeding further below the stage to avoid covering
+             * too much of the character at narrow widths.
+             * Border-radius tightens to 1.5rem to match other
+             * mobile stage treatments on this page.
+             */
+            .hero-stage {
+                max-width: 440px;
+                border-radius: 1.5rem;
+            }
+            .hero-stage-img { border-radius: 1.5rem; }
+            .hero-stage::after { border-radius: 0 0 1.5rem 1.5rem; }
+            .hero-card {
+                /* Switch from right-anchored to centered at bottom */
+                position: relative;
+                bottom: auto;
+                right: auto;
+                width: 92%;
+                max-width: 360px;
+                margin: -2.5rem auto 0;
+            }
             .waitlist-card { padding: 2rem 1.5rem; }
             .footer-inner { flex-direction: column; gap: 0.75rem; }
             .nav-cta-desktop { display: none; }
@@ -1094,7 +1202,23 @@
         @media (max-width: 375px) {
             .hero { padding-top: 6rem; padding-left: 1rem; padding-right: 1rem; }
             .hero-ctas { flex-direction: column; }
-            .hero-character { max-width: 240px; }
+            /*
+             * 375px: tighten stage radius to 1.25rem (matches problem-stage
+             * and how-stage at this breakpoint). Stage stretches edge-to-edge
+             * with negative margin for maximum visual impact on small screens.
+             */
+            .hero-stage {
+                max-width: none;
+                margin: 0 -0.5rem;
+                border-radius: 1.25rem;
+            }
+            .hero-stage-img { border-radius: 1.25rem; }
+            .hero-stage::after { border-radius: 0 0 1.25rem 1.25rem; }
+            .hero-card {
+                width: 94%;
+                margin-top: -2rem;
+                padding: 1rem;
+            }
             .section-problem,
             .section-features,
             .section-how,
@@ -1162,14 +1286,23 @@
             </div>
 
             <div class="hero-right">
-                <div class="hero-visual">
-                    <!-- Main hero character: creator with corgi (large, central) -->
-                    <div class="hero-character">
-                        <img src="img/problem-creator.png" alt="Pixel art creator relaxing with corgi dog and laptop" class="pixel-art-img">
-                    </div>
+                <!--
+                    Hero Stage & Spotlight — same pattern as problem-stage,
+                    features-stage, and how-stage. The character image fills the
+                    rounded container. The deal tracker card floats as a
+                    glassmorphism spotlight overlay on the bottom-right.
+                -->
+                <div class="hero-stage">
+                    <img
+                        src="img/problem-creator.png"
+                        alt="Pixel art creator relaxing with corgi dog and laptop"
+                        class="hero-stage-img"
+                        width="1500"
+                        height="800"
+                    >
 
-                    <!-- Deal tracker card overlapping below the character -->
-                    <div class="hero-card glass-elevated">
+                    <!-- Deal tracker card — Spotlight overlay on the stage -->
+                    <div class="hero-card">
                         <!-- Pixel corner decorations -->
                         <div class="pixel-corner pixel-corner--tl">
                             <svg viewBox="0 0 24 24" fill="var(--accent)" opacity="0.4">
