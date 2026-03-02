@@ -1,0 +1,30 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Research data (not code)
+influencer-data/
+
+# Claude Code session data
+.entire/
+
+# Design mockups
+mockup-design.png
+mockup-perspective.png
+silent-dating-frame.png
+
+# Next.js app (inside /app/)
+app/node_modules/
+app/.next/
+app/out/
+app/.env
+app/.env.local
+app/.env.production.local
+app/.turbo/
+app/.vercel/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
