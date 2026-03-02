@@ -173,11 +173,22 @@ export default async function DealDetailPage({
           </Card>
 
           {/* Deliverables */}
-          {deliverables.length > 0 && (
+          {deliverables.length > 0 ? (
             <DeliverablesChecklist
               dealId={deal.id}
               deliverables={deliverables}
             />
+          ) : (
+            <Card variant="glass">
+              <CardContent className="p-6 text-center text-muted-foreground">
+                <p className="text-sm">No deliverables added to this deal.</p>
+                <Link href={`/deals/${deal.id}/edit`}>
+                  <Button variant="glass" size="sm" className="mt-2">
+                    Add Deliverables
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           )}
 
           {/* Notes & Requirements */}

@@ -64,13 +64,14 @@ import {
    from DashboardShell bleeds through the translucent surfaces.
    ============================================================ */
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
+function makeCurrencyFormatter(currency: string) {
+  return (amount: number): string =>
+    new Intl.NumberFormat("en", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
 }
 
 export default async function DashboardPage() {
@@ -107,10 +108,10 @@ export default async function DashboardPage() {
   const sixMonthsAgo = startOfMonth(subMonths(now, 5));
 
   // Typed row shapes coming back from Supabase
-  type DealRow = { amount: number | null; status: DealStatus; created_at: string };
+  type DealRow = { amount: number | null; status: DealStatus; created_at: string; currency: string };
   type InvoiceRow = { total: number; status: InvoiceStatus; paid_date: string | null; issue_date: string };
   type ContentEventRow = { platform: Platform | null; scheduled_at: string };
-  type DealHistoryRow = { amount: number | null; status: DealStatus; created_at: string };
+  type DealHistoryRow = { amount: number | null; status: DealStatus; created_at: string; currency: string };
 
   let dealsThisMonth: DealRow[] = [];
   let allInvoices: InvoiceRow[] = [];
@@ -122,7 +123,7 @@ export default async function DashboardPage() {
       // KPI: deals created this calendar month
       supabase
         .from("deals")
-        .select("amount, status, created_at")
+        .select("amount, status, created_at, currency")
         .eq("user_id", user.id)
         .gte("created_at", monthStart)
         .lt("created_at", monthEnd),
@@ -145,7 +146,7 @@ export default async function DashboardPage() {
       // Campaign Analytics: deals from last 6 months
       supabase
         .from("deals")
-        .select("amount, status, created_at")
+        .select("amount, status, created_at, currency")
         .eq("user_id", user.id)
         .gte("created_at", sixMonthsAgo.toISOString()),
     ]);
@@ -154,6 +155,7 @@ export default async function DashboardPage() {
       amount: d.amount != null ? Number(d.amount) : null,
       status: d.status as DealStatus,
       created_at: d.created_at as string,
+      currency: (d.currency as string) ?? "EUR",
     }));
 
     allInvoices = (invoicesRes.data ?? []).map((i: Record<string, unknown>) => ({
@@ -172,8 +174,19 @@ export default async function DashboardPage() {
       amount: d.amount != null ? Number(d.amount) : null,
       status: d.status as DealStatus,
       created_at: d.created_at as string,
+      currency: (d.currency as string) ?? "EUR",
     }));
   }
+
+  // ---- Determine primary currency from all fetched deals ----
+  const currencyCounts: Record<string, number> = {};
+  [...dealsThisMonth, ...dealsHistory].forEach((d) => {
+    const c = d.currency ?? "EUR";
+    currencyCounts[c] = (currencyCounts[c] || 0) + 1;
+  });
+  const primaryCurrency =
+    Object.entries(currencyCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "EUR";
+  const formatCurrency = makeCurrencyFormatter(primaryCurrency);
 
   // ---- KPI calculations ----
 

@@ -20,8 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DealStatusBadge, getPlatformEmoji } from "./deal-status-badge";
-import { Search } from "lucide-react";
+import { Search, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import type { Deal } from "@/types/database";
+
+type SortColumn = "title" | "amount" | "status" | "created_at";
+type SortDirection = "asc" | "desc";
 
 const ALL_STATUSES = [
   { value: "all", label: "All Statuses" },
@@ -56,6 +59,26 @@ export function DealsTable({ deals }: { deals: Deal[] }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
+  const [sortColumn, setSortColumn] = useState<SortColumn>("created_at");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  function handleSort(column: SortColumn) {
+    if (sortColumn === column) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortColumn(column);
+      setSortDirection(column === "amount" ? "desc" : "asc");
+    }
+  }
+
+  function SortIcon({ column }: { column: SortColumn }) {
+    if (sortColumn !== column) {
+      return <ChevronsUpDown className="ml-1 inline h-3.5 w-3.5 text-muted-foreground/50" />;
+    }
+    return sortDirection === "asc"
+      ? <ChevronUp className="ml-1 inline h-3.5 w-3.5" />
+      : <ChevronDown className="ml-1 inline h-3.5 w-3.5" />;
+  }
 
   const filtered = deals.filter((deal) => {
     const matchesSearch =
@@ -67,6 +90,21 @@ export function DealsTable({ deals }: { deals: Deal[] }) {
     const matchesPlatform =
       platformFilter === "all" || deal.platform === platformFilter;
     return matchesSearch && matchesStatus && matchesPlatform;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    let cmp = 0;
+    if (sortColumn === "title") {
+      cmp = a.title.localeCompare(b.title);
+    } else if (sortColumn === "amount") {
+      cmp = (a.amount ?? 0) - (b.amount ?? 0);
+    } else if (sortColumn === "status") {
+      cmp = a.status.localeCompare(b.status);
+    } else if (sortColumn === "created_at") {
+      cmp =
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    }
+    return sortDirection === "asc" ? cmp : -cmp;
   });
 
   return (
@@ -120,19 +158,41 @@ export function DealsTable({ deals }: { deals: Deal[] }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Deal</TableHead>
+                <TableHead
+                  className="cursor-pointer select-none hover:text-foreground"
+                  onClick={() => handleSort("title")}
+                >
+                  Deal
+                  <SortIcon column="title" />
+                </TableHead>
                 <TableHead className="hidden sm:table-cell">
                   Platform
                 </TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead className="hidden md:table-cell">
+                <TableHead
+                  className="cursor-pointer select-none hover:text-foreground"
+                  onClick={() => handleSort("status")}
+                >
+                  Status
+                  <SortIcon column="status" />
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none text-right hover:text-foreground"
+                  onClick={() => handleSort("amount")}
+                >
+                  Amount
+                  <SortIcon column="amount" />
+                </TableHead>
+                <TableHead
+                  className="hidden cursor-pointer select-none md:table-cell hover:text-foreground"
+                  onClick={() => handleSort("created_at")}
+                >
                   Deadline
+                  <SortIcon column="created_at" />
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((deal) => (
+              {sorted.map((deal) => (
                 <TableRow key={deal.id} className="cursor-pointer">
                   <TableCell>
                     <Link
@@ -170,11 +230,11 @@ export function DealsTable({ deals }: { deals: Deal[] }) {
       )}
 
       {/* Summary */}
-      {filtered.length > 0 && (
+      {sorted.length > 0 && (
         <div className="text-sm text-muted-foreground">
-          {filtered.length} deal{filtered.length !== 1 ? "s" : ""} · Total:{" "}
+          {sorted.length} deal{sorted.length !== 1 ? "s" : ""} · Total:{" "}
           {formatCurrency(
-            filtered.reduce((sum, d) => sum + (d.amount ?? 0), 0),
+            sorted.reduce((sum, d) => sum + (d.amount ?? 0), 0),
             "EUR"
           )}
         </div>

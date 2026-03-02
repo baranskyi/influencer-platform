@@ -29,20 +29,44 @@ export default async function ClientsPage() {
   let clients: ClientRow[] = [];
 
   if (user) {
-    const { data } = await supabase
-      .from("clients")
-      .select("id, name, category, contact_email, total_deals, total_revenue")
-      .eq("user_id", user.id)
-      .order("name");
+    const [clientsRes, dealsRes] = await Promise.all([
+      supabase
+        .from("clients")
+        .select("id, name, category, contact_email")
+        .eq("user_id", user.id)
+        .order("name"),
+      supabase
+        .from("deals")
+        .select("client_id, amount, status")
+        .eq("user_id", user.id),
+    ]);
 
-    clients = (data ?? []).map((c: Record<string, unknown>) => ({
-      id: c.id as string,
-      name: c.name as string,
-      category: (c.category as string) ?? null,
-      contact_email: (c.contact_email as string) ?? null,
-      total_deals: Number(c.total_deals ?? 0),
-      total_revenue: Number(c.total_revenue ?? 0),
-    }));
+    // Build a map of client_id → computed totals from actual deals
+    type DealTotals = { dealCount: number; totalRevenue: number };
+    const dealTotalsMap = new Map<string, DealTotals>();
+
+    for (const deal of dealsRes.data ?? []) {
+      const clientId = deal.client_id as string | null;
+      if (!clientId) continue;
+      const existing = dealTotalsMap.get(clientId) ?? { dealCount: 0, totalRevenue: 0 };
+      existing.dealCount += 1;
+      if (["paid", "completed"].includes(deal.status as string)) {
+        existing.totalRevenue += Number(deal.amount ?? 0);
+      }
+      dealTotalsMap.set(clientId, existing);
+    }
+
+    clients = (clientsRes.data ?? []).map((c: Record<string, unknown>) => {
+      const totals = dealTotalsMap.get(c.id as string);
+      return {
+        id: c.id as string,
+        name: c.name as string,
+        category: (c.category as string) ?? null,
+        contact_email: (c.contact_email as string) ?? null,
+        total_deals: totals?.dealCount ?? 0,
+        total_revenue: totals?.totalRevenue ?? 0,
+      };
+    });
   }
 
   return (

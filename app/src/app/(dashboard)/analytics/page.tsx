@@ -66,6 +66,22 @@ export default async function AnalyticsPage() {
     }));
   }
 
+  // Determine primary currency (most common among deals)
+  const currencyCounts: Record<string, number> = {};
+  deals.forEach((d) => {
+    const c = d.currency ?? "EUR";
+    currencyCounts[c] = (currencyCounts[c] || 0) + 1;
+  });
+  const primaryCurrency =
+    Object.entries(currencyCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "EUR";
+
+  const fmt = (n: number) =>
+    new Intl.NumberFormat("en", {
+      style: "currency",
+      currency: primaryCurrency,
+      minimumFractionDigits: 0,
+    }).format(n);
+
   // Calculate KPIs
   const totalRevenue = deals
     .filter((d) => ["paid", "completed"].includes(d.status))
@@ -131,14 +147,14 @@ export default async function AnalyticsPage() {
       <DashboardStatsRow className="mb-6">
         <StatCard
           label="Total Revenue"
-          value={`$${totalRevenue.toLocaleString()}`}
+          value={fmt(totalRevenue)}
           trend={`${paidInvoices.length} paid`}
           trendDirection="up"
           icon={<DollarSign className="h-4 w-4" />}
         />
         <StatCard
           label="Pipeline"
-          value={`$${pendingRevenue.toLocaleString()}`}
+          value={fmt(pendingRevenue)}
           trend="in progress"
           trendDirection="neutral"
           icon={<TrendingUp className="h-4 w-4" />}
@@ -150,7 +166,7 @@ export default async function AnalyticsPage() {
         />
         <StatCard
           label="Invoiced"
-          value={`$${invoiceRevenue.toLocaleString()}`}
+          value={fmt(invoiceRevenue)}
           trend={`${totalInvoices} invoices`}
           trendDirection="neutral"
           icon={<FileText className="h-4 w-4" />}
@@ -190,7 +206,7 @@ export default async function AnalyticsPage() {
                   </p>
                   <p className="text-2xl font-bold">{p.deals}</p>
                   <p className="text-xs text-muted-foreground">
-                    deals &middot; ${p.revenue.toLocaleString()}
+                    deals &middot; {fmt(p.revenue)}
                   </p>
                 </div>
               );

@@ -102,7 +102,16 @@ export default async function ClientDetailPage({
         />
         <StatCard
           label="Total Revenue"
-          value={`$${Number(client.total_revenue ?? 0).toLocaleString()}`}
+          value={`$${deals
+            .filter((d: Record<string, unknown>) =>
+              ["paid", "completed"].includes(d.status as string)
+            )
+            .reduce(
+              (sum: number, d: Record<string, unknown>) =>
+                sum + Number(d.amount ?? 0),
+              0
+            )
+            .toLocaleString()}`}
           icon={<DollarSign className="h-4 w-4" />}
         />
         <StatCard
