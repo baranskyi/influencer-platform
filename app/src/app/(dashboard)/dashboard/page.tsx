@@ -27,7 +27,17 @@ import {
   TrendingUp,
   ChevronRight,
 } from "lucide-react";
-import type { DealStatus, InvoiceStatus } from "@/types/database";
+import type { DealStatus, InvoiceStatus, Platform } from "@/types/database";
+import {
+  startOfDay,
+  addDays,
+  getDay,
+  parseISO,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  format,
+} from "date-fns";
 
 /* ============================================================
    Dashboard Page — "Creator Hub" / "Influencer Dashboard"
@@ -81,30 +91,62 @@ export default async function DashboardPage() {
     }
   }
 
-  // Current month boundaries (ISO strings for Supabase gte/lt)
+  // ---- Date boundaries ----
   const now = new Date();
+
+  // Current month
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
 
+  // Content Calendar: next 7 days (Mon–Sun of current week view)
+  const weekStart = startOfDay(now);
+  const weekEnd = startOfDay(addDays(now, 7));
+
+  // Last 6 months: for Invoice bar chart and Campaign Analytics
+  const sixMonthsAgo = startOfMonth(subMonths(now, 5));
+
   // Typed row shapes coming back from Supabase
   type DealRow = { amount: number | null; status: DealStatus; created_at: string };
-  type InvoiceRow = { total: number; status: InvoiceStatus };
+  type InvoiceRow = { total: number; status: InvoiceStatus; paid_date: string | null; issue_date: string };
+  type ContentEventRow = { platform: Platform | null; scheduled_at: string };
+  type DealHistoryRow = { amount: number | null; status: DealStatus; created_at: string };
 
   let dealsThisMonth: DealRow[] = [];
   let allInvoices: InvoiceRow[] = [];
+  let contentEvents: ContentEventRow[] = [];
+  let dealsHistory: DealHistoryRow[] = [];
 
   if (user) {
-    const [dealsRes, invoicesRes] = await Promise.all([
+    const [dealsRes, invoicesRes, eventsRes, dealsHistoryRes] = await Promise.all([
+      // KPI: deals created this calendar month
       supabase
         .from("deals")
         .select("amount, status, created_at")
         .eq("user_id", user.id)
         .gte("created_at", monthStart)
         .lt("created_at", monthEnd),
+
+      // All invoices (for KPI and bar chart)
       supabase
         .from("invoices")
-        .select("total, status")
+        .select("total, status, paid_date, issue_date")
         .eq("user_id", user.id),
+
+      // Content Calendar: events in next 7 days
+      supabase
+        .from("content_events")
+        .select("platform, scheduled_at")
+        .eq("user_id", user.id)
+        .gte("scheduled_at", weekStart.toISOString())
+        .lt("scheduled_at", weekEnd.toISOString())
+        .order("scheduled_at", { ascending: true }),
+
+      // Campaign Analytics: deals from last 6 months
+      supabase
+        .from("deals")
+        .select("amount, status, created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", sixMonthsAgo.toISOString()),
     ]);
 
     dealsThisMonth = (dealsRes.data ?? []).map((d: Record<string, unknown>) => ({
@@ -116,6 +158,19 @@ export default async function DashboardPage() {
     allInvoices = (invoicesRes.data ?? []).map((i: Record<string, unknown>) => ({
       total: Number(i.total),
       status: i.status as InvoiceStatus,
+      paid_date: (i.paid_date as string | null) ?? null,
+      issue_date: i.issue_date as string,
+    }));
+
+    contentEvents = (eventsRes.data ?? []).map((e: Record<string, unknown>) => ({
+      platform: (e.platform as Platform | null) ?? null,
+      scheduled_at: e.scheduled_at as string,
+    }));
+
+    dealsHistory = (dealsHistoryRes.data ?? []).map((d: Record<string, unknown>) => ({
+      amount: d.amount != null ? Number(d.amount) : null,
+      status: d.status as DealStatus,
+      created_at: d.created_at as string,
     }));
   }
 
@@ -145,6 +200,96 @@ export default async function DashboardPage() {
   const invoiceRevenue = allInvoices
     .filter((i) => i.status === "paid")
     .reduce((sum, i) => sum + i.total, 0);
+
+  // ---- Content Calendar: group events by day-of-week index (0=Mon…6=Sun) ----
+  // We render a Mon-Sun week starting from today's week.
+  // Map JS getDay() (0=Sun…6=Sat) to our Mon-first index (0=Mon…6=Sun)
+  type PlatformLabel = "IG" | "TT" | "YT" | "Multi";
+  type CalendarSlot = { label: PlatformLabel; color: "coral" | "lavender" | "mint" | "orange" };
+
+  function platformToSlot(platform: Platform | null): CalendarSlot {
+    switch (platform) {
+      case "instagram": return { label: "IG", color: "coral" };
+      case "tiktok":    return { label: "TT", color: "lavender" };
+      case "youtube":   return { label: "YT", color: "mint" };
+      default:          return { label: "Multi", color: "orange" };
+    }
+  }
+
+  // Build a 7-element array (index 0=today, 6=today+6 days)
+  const calendarDays: CalendarSlot[][] = Array.from({ length: 7 }, () => []);
+  for (const event of contentEvents) {
+    const eventDate = startOfDay(parseISO(event.scheduled_at));
+    // day index relative to weekStart (0–6)
+    const diffMs = eventDate.getTime() - weekStart.getTime();
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays >= 0 && diffDays < 7) {
+      calendarDays[diffDays].push(platformToSlot(event.platform));
+    }
+  }
+
+  // Day-of-week labels: use Mon-Sun ordering anchored to today
+  // 0 = today's weekday name
+  const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const calendarDayLabels = Array.from({ length: 7 }, (_, i) => {
+    const d = addDays(now, i);
+    return DAY_NAMES[getDay(d)];
+  });
+
+  const hasAnyCalendarEvents = calendarDays.some((slots) => slots.length > 0);
+
+  // ---- Invoice bar chart: last 6 months paid totals ----
+  // Build array of { monthKey: "YYYY-MM", total: number } for 6 months
+  const invoiceMonthlyTotals: number[] = Array(6).fill(0);
+  const invoiceMonthLabels: string[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const monthDate = subMonths(now, i);
+    invoiceMonthLabels.push(format(monthDate, "MMM"));
+    const mStart = startOfMonth(monthDate);
+    const mEnd = endOfMonth(monthDate);
+    const total = allInvoices
+      .filter((inv) => {
+        if (inv.status !== "paid" || !inv.paid_date) return false;
+        const paidAt = parseISO(inv.paid_date);
+        return paidAt >= mStart && paidAt <= mEnd;
+      })
+      .reduce((sum, inv) => sum + inv.total, 0);
+    invoiceMonthlyTotals[5 - i] = total;
+  }
+  const invoiceMaxMonthly = Math.max(...invoiceMonthlyTotals, 1); // avoid div/0
+  const invoiceBarHeights = invoiceMonthlyTotals.map((t) =>
+    Math.max(Math.round((t / invoiceMaxMonthly) * 100), 4)
+  );
+
+  // ---- Campaign Analytics: last 6 months deal revenue ----
+  const dealMonthlyRevenue: number[] = Array(6).fill(0);
+  const dealMonthLabels: string[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const monthDate = subMonths(now, i);
+    dealMonthLabels.push(format(monthDate, "MMM"));
+    const mStart = startOfMonth(monthDate);
+    const mEnd = endOfMonth(monthDate);
+    const revenue = dealsHistory
+      .filter((d) => {
+        if (!["paid", "completed"].includes(d.status)) return false;
+        const createdAt = parseISO(d.created_at);
+        return createdAt >= mStart && createdAt <= mEnd;
+      })
+      .reduce((sum, d) => sum + (d.amount ?? 0), 0);
+    dealMonthlyRevenue[5 - i] = revenue;
+  }
+  const dealMaxMonthly = Math.max(...dealMonthlyRevenue, 1);
+  const dealBarHeights = dealMonthlyRevenue.map((r) =>
+    Math.max(Math.round((r / dealMaxMonthly) * 100), 4)
+  );
+
+  // Total revenue across all 6 months (paid/completed deals)
+  const totalRevenue6Months = dealMonthlyRevenue.reduce((s, v) => s + v, 0);
+
+  // Active deals count across all 6-month history (not just this month)
+  const activeDealsTotal = dealsHistory.filter(
+    (d) => !["paid", "completed", "cancelled"].includes(d.status)
+  ).length;
 
   return (
     <DashboardShell>
@@ -221,73 +366,79 @@ export default async function DashboardPage() {
             </CardAction>
           </CardHeader>
           <CardContent>
-            {/* Weekly grid — 7 columns for days */}
-            <div className="grid grid-cols-7 gap-1.5">
-              {/* Day headers */}
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <div
-                  key={day}
-                  className="pb-2 text-center text-xs font-medium text-muted-foreground"
-                >
-                  {day}
-                </div>
-              ))}
+            {hasAnyCalendarEvents ? (
+              <>
+                {/* Weekly grid — 7 columns for days anchored to today */}
+                <div className="grid grid-cols-7 gap-1.5">
+                  {/* Day headers */}
+                  {calendarDayLabels.map((day, idx) => (
+                    <div
+                      key={idx}
+                      className="pb-2 text-center text-xs font-medium text-muted-foreground"
+                    >
+                      {day}
+                    </div>
+                  ))}
 
-              {/* Content blocks — colored by platform (from mockup) */}
-              {/* Monday: Instagram post (coral) */}
-              <div className="space-y-1">
-                <div className="h-8 rounded-md bg-coral/20 border border-coral/30 flex items-center justify-center">
-                  <span className="text-[10px] font-medium text-coral">IG</span>
+                  {/* Content event blocks per day */}
+                  {calendarDays.map((slots, dayIdx) => (
+                    <div key={dayIdx} className="space-y-1">
+                      {slots.length > 0 ? (
+                        slots.map((slot, slotIdx) => (
+                          <div
+                            key={slotIdx}
+                            className={`h-8 rounded-md border flex items-center justify-center
+                              ${slot.color === "coral"    ? "bg-coral/20 border-coral/30"       : ""}
+                              ${slot.color === "lavender" ? "bg-lavender/20 border-lavender/30" : ""}
+                              ${slot.color === "mint"     ? "bg-mint/20 border-mint/30"         : ""}
+                              ${slot.color === "orange"   ? "bg-orange/20 border-orange/30"     : ""}
+                            `}
+                          >
+                            <span
+                              className={`text-[10px] font-medium
+                                ${slot.color === "coral"    ? "text-coral"    : ""}
+                                ${slot.color === "lavender" ? "text-lavender" : ""}
+                                ${slot.color === "mint"     ? "text-mint"     : ""}
+                                ${slot.color === "orange"   ? "text-orange"   : ""}
+                              `}
+                            >
+                              {slot.label}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div />
+                      )}
+                    </div>
+                  ))}
                 </div>
-              </div>
-              {/* Tuesday: empty */}
-              <div />
-              {/* Wednesday: TikTok (lavender) + YouTube (mint) */}
-              <div className="space-y-1">
-                <div className="h-8 rounded-md bg-lavender/20 border border-lavender/30 flex items-center justify-center">
-                  <span className="text-[10px] font-medium text-lavender">TT</span>
-                </div>
-                <div className="h-8 rounded-md bg-mint/20 border border-mint/30 flex items-center justify-center">
-                  <span className="text-[10px] font-medium text-mint">YT</span>
-                </div>
-              </div>
-              {/* Thursday: Instagram story (coral) */}
-              <div className="space-y-1">
-                <div className="h-8 rounded-md bg-coral/20 border border-coral/30 flex items-center justify-center">
-                  <span className="text-[10px] font-medium text-coral">IG</span>
-                </div>
-              </div>
-              {/* Friday: TikTok (lavender) */}
-              <div className="space-y-1">
-                <div className="h-8 rounded-md bg-lavender/20 border border-lavender/30 flex items-center justify-center">
-                  <span className="text-[10px] font-medium text-lavender">TT</span>
-                </div>
-              </div>
-              {/* Saturday: empty */}
-              <div />
-              {/* Sunday: YouTube (mint) */}
-              <div className="space-y-1">
-                <div className="h-8 rounded-md bg-mint/20 border border-mint/30 flex items-center justify-center">
-                  <span className="text-[10px] font-medium text-mint">YT</span>
-                </div>
-              </div>
-            </div>
 
-            {/* Platform legend */}
-            <div className="mt-4 flex gap-4 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-coral" />
-                Instagram
+                {/* Platform legend */}
+                <div className="mt-4 flex gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-coral" />
+                    Instagram
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-lavender" />
+                    TikTok
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-mint" />
+                    YouTube
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-orange" />
+                    Multi
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex h-40 flex-col items-center justify-center gap-2 text-muted-foreground">
+                <CalendarDays className="h-8 w-8 opacity-30" />
+                <p className="text-sm">No content scheduled this week</p>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-lavender" />
-                TikTok
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-mint" />
-                YouTube
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
@@ -369,17 +520,27 @@ export default async function DashboardPage() {
             </CardAction>
           </CardHeader>
           <CardContent>
-            {/* Revenue bar chart placeholder — matches mockup's bar visualization */}
-            <div className="mb-4 flex items-end gap-2" style={{ height: "120px" }}>
-              {[65, 45, 80, 55, 90, 70, 40, 85, 60, 75, 50, 95].map(
-                (height, i) => (
+            {/* Bar chart — real paid invoice totals for last 6 months */}
+            <div className="mb-1 flex items-end gap-2" style={{ height: "100px" }}>
+              {invoiceBarHeights.map((height, i) => (
+                <div key={i} className="flex flex-1 flex-col items-center gap-1">
                   <div
-                    key={i}
-                    className="flex-1 rounded-t-sm bg-gradient-to-t from-mint/60 to-mint/20 transition-all hover:from-mint/80 hover:to-mint/40"
+                    className="w-full rounded-t-sm bg-gradient-to-t from-mint/60 to-mint/20 transition-all hover:from-mint/80 hover:to-mint/40"
                     style={{ height: `${height}%` }}
                   />
-                )
-              )}
+                </div>
+              ))}
+            </div>
+            {/* Month labels below the bars */}
+            <div className="mb-3 flex gap-2">
+              {invoiceMonthLabels.map((label, i) => (
+                <div
+                  key={i}
+                  className="flex-1 text-center text-[9px] text-muted-foreground"
+                >
+                  {label}
+                </div>
+              ))}
             </div>
 
             {/* Status legend — real numbers from invoices */}
@@ -415,57 +576,54 @@ export default async function DashboardPage() {
             </CardTitle>
             <CardAction>
               <Button variant="glass" size="xs">
-                Campaign
+                6 months
                 <ChevronRight className="h-3 w-3" />
               </Button>
             </CardAction>
           </CardHeader>
           <CardContent>
-            {/* Mixed chart placeholder — bar + line as in mockup */}
-            <div className="relative mb-4" style={{ height: "120px" }}>
-              {/* Bar chart layer */}
-              <div className="absolute inset-0 flex items-end gap-2">
-                {[40, 60, 35, 75, 50, 85, 65, 45, 70, 55, 80, 90].map(
-                  (height, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-t-sm bg-gradient-to-t from-coral/40 to-coral/10"
-                      style={{ height: `${height}%` }}
-                    />
-                  )
-                )}
-              </div>
-              {/* Line chart overlay — SVG path for the trend line */}
-              <svg
-                className="absolute inset-0 h-full w-full"
-                viewBox="0 0 300 120"
-                preserveAspectRatio="none"
-              >
-                <path
-                  d="M0,80 Q25,60 50,65 T100,45 T150,35 T200,50 T250,30 T300,20"
-                  fill="none"
-                  stroke="var(--color-orange)"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
+            {/* Bar chart — real deal revenue for last 6 months */}
+            <div className="mb-1 flex items-end gap-2" style={{ height: "100px" }}>
+              {dealBarHeights.map((height, i) => (
+                <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                  <div
+                    className="w-full rounded-t-sm bg-gradient-to-t from-coral/50 to-coral/10 transition-all hover:from-coral/70 hover:to-coral/20"
+                    style={{ height: `${height}%` }}
+                  />
+                </div>
+              ))}
+            </div>
+            {/* Month labels */}
+            <div className="mb-3 flex gap-2">
+              {dealMonthLabels.map((label, i) => (
+                <div
+                  key={i}
+                  className="flex-1 text-center text-[9px] text-muted-foreground"
+                >
+                  {label}
+                </div>
+              ))}
             </div>
 
-            {/* Metrics row — Total Revenue from real data, Engagement Rate stays static */}
+            {/* Metrics row — real data */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg bg-white/5 p-3">
                 <p className="text-[10px] font-medium text-muted-foreground">
                   Total Revenue
                 </p>
-                <p className="text-lg font-bold">{formatCurrency(earnedThisMonth)}</p>
-                <p className="text-xs text-mint">this month</p>
+                <p className="text-lg font-bold">
+                  {formatCurrency(totalRevenue6Months)}
+                </p>
+                <p className="text-xs text-mint">last 6 months</p>
               </div>
               <div className="rounded-lg bg-white/5 p-3">
                 <p className="text-[10px] font-medium text-muted-foreground">
-                  Engagement Rate
+                  Active Deals
                 </p>
-                <p className="text-lg font-bold">98.8%</p>
-                <p className="text-xs text-orange">Top 5% creators</p>
+                <p className="text-lg font-bold">{activeDealsTotal}</p>
+                <p className="text-xs text-orange">
+                  {activeDealsTotal === 1 ? "deal in progress" : "deals in progress"}
+                </p>
               </div>
             </div>
           </CardContent>

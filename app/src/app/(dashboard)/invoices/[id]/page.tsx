@@ -11,6 +11,9 @@ import { InvoiceStatusSelect } from "@/components/invoices/invoice-status-select
 import { DeleteInvoiceButton } from "@/components/invoices/delete-invoice-button";
 import { MarkPaidButton } from "@/components/invoices/mark-paid-button";
 import { SendInvoiceButton } from "@/components/invoices/send-invoice-button";
+import { DownloadPdfButton } from "@/components/invoices/download-pdf-button";
+import { EmailInvoiceButton } from "@/components/invoices/email-invoice-button";
+import { SendReminderButton } from "@/components/invoices/send-reminder-button";
 import {
   ArrowLeft,
   FileText,
@@ -74,6 +77,10 @@ export default async function InvoiceDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <EmailInvoiceButton
+            invoiceId={invoice.id}
+            clientEmail={client?.contact_email}
+          />
           <SendInvoiceButton
             invoiceId={invoice.id}
             currentStatus={invoice.status as InvoiceStatus}
@@ -86,6 +93,7 @@ export default async function InvoiceDetailPage({
             invoiceId={invoice.id}
             currentStatus={invoice.status as InvoiceStatus}
           />
+          <DownloadPdfButton invoiceId={invoice.id} />
           <DeleteInvoiceButton invoiceId={invoice.id} />
         </div>
       </div>
@@ -213,6 +221,14 @@ export default async function InvoiceDetailPage({
                   <p className="text-sm">{invoice.notes}</p>
                 </div>
               )}
+
+              {/* Send Reminder */}
+              <SendReminderButton
+                invoiceId={invoice.id}
+                clientEmail={client?.contact_email}
+                currentStatus={invoice.status as InvoiceStatus}
+                reminderCount={Number(invoice.reminder_sent_count ?? 0)}
+              />
             </div>
           </CardContent>
         </Card>
