@@ -1,0 +1,130 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+export type CreateInvoiceInput = {
+  deal_id: string | null;
+  client_id: string | null;
+  subtotal: number;
+  tax_rate: number;
+  irpf_rate: number;
+  currency: string;
+  issue_date: string;
+  due_date: string;
+  notes: string;
+};
+
+export async function createInvoice(input: CreateInvoiceInput) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Generate invoice number: INV-YYYYMM-NNN
+  const now = new Date();
+  const prefix = `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+  const { count } = await supabase
+    .from("invoices")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .like("invoice_number", `${prefix}%`);
+
+  const seq = String((count ?? 0) + 1).padStart(3, "0");
+  const invoiceNumber = `${prefix}-${seq}`;
+
+  // Calculate tax amounts
+  const taxAmount = +(input.subtotal * (input.tax_rate / 100)).toFixed(2);
+  const irpfAmount = +(input.subtotal * (input.irpf_rate / 100)).toFixed(2);
+  const total = +(input.subtotal + taxAmount - irpfAmount).toFixed(2);
+
+  const { data, error } = await supabase
+    .from("invoices")
+    .insert({
+      user_id: user.id,
+      deal_id: input.deal_id || null,
+      client_id: input.client_id || null,
+      invoice_number: invoiceNumber,
+      subtotal: input.subtotal,
+      tax_rate: input.tax_rate,
+      tax_amount: taxAmount,
+      irpf_rate: input.irpf_rate,
+      irpf_amount: irpfAmount,
+      total,
+      currency: input.currency,
+      status: "draft",
+      issue_date: input.issue_date,
+      due_date: input.due_date || null,
+      notes: input.notes || null,
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/invoices");
+  redirect(`/invoices/${data.id}`);
+}
+
+export async function updateInvoiceStatus(invoiceId: string, status: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const updateData: Record<string, unknown> = { status };
+
+  if (status === "paid") {
+    updateData.paid_date = new Date().toISOString().split("T")[0];
+  }
+
+  const { error } = await supabase
+    .from("invoices")
+    .update(updateData)
+    .eq("id", invoiceId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/invoices");
+  revalidatePath(`/invoices/${invoiceId}`);
+  return { success: true };
+}
+
+export async function deleteInvoice(invoiceId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const { error } = await supabase
+    .from("invoices")
+    .delete()
+    .eq("id", invoiceId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/invoices");
+  redirect("/invoices");
+}
