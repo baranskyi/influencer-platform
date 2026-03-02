@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InvoiceStatusSelect } from "@/components/invoices/invoice-status-select";
 import { DeleteInvoiceButton } from "@/components/invoices/delete-invoice-button";
+import { MarkPaidButton } from "@/components/invoices/mark-paid-button";
+import { SendInvoiceButton } from "@/components/invoices/send-invoice-button";
 import {
   ArrowLeft,
   FileText,
@@ -72,6 +74,14 @@ export default async function InvoiceDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <SendInvoiceButton
+            invoiceId={invoice.id}
+            currentStatus={invoice.status as InvoiceStatus}
+          />
+          <MarkPaidButton
+            invoiceId={invoice.id}
+            currentStatus={invoice.status as InvoiceStatus}
+          />
           <InvoiceStatusSelect
             invoiceId={invoice.id}
             currentStatus={invoice.status as InvoiceStatus}

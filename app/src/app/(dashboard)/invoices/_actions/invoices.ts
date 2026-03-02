@@ -105,6 +105,32 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
   return { success: true };
 }
 
+export async function markInvoiceSent(invoiceId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const { error } = await supabase
+    .from("invoices")
+    .update({ status: "sent" })
+    .eq("id", invoiceId)
+    .eq("user_id", user.id)
+    .eq("status", "draft");
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/invoices");
+  revalidatePath(`/invoices/${invoiceId}`);
+  return { success: true };
+}
+
 export async function deleteInvoice(invoiceId: string) {
   const supabase = await createClient();
   const {

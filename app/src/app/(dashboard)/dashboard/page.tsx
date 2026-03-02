@@ -1,3 +1,4 @@
+import { createClient } from "@/lib/supabase/server";
 import {
   DashboardShell,
   DashboardGrid,
@@ -25,6 +26,7 @@ import {
   TrendingUp,
   ChevronRight,
 } from "lucide-react";
+import type { DealStatus, InvoiceStatus } from "@/types/database";
 
 /* ============================================================
    Dashboard Page — "Creator Hub" / "Influencer Dashboard"
@@ -40,7 +42,7 @@ import {
    2. Bento Grid (2x2):
       - Content Calendar (weekly view with colored blocks)
       - Contract Generator (templates list)
-      - Invoice Tracking (bar chart + status legend)
+      - Invoice Tracking (bar chart + status legend — real data)
       - Campaign Analytics (line chart + metrics)
 
    3. Quick Actions row at top-right
@@ -50,7 +52,86 @@ import {
    from DashboardShell bleeds through the translucent surfaces.
    ============================================================ */
 
-export default function DashboardPage() {
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export default async function DashboardPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Current month boundaries (ISO strings for Supabase gte/lt)
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+
+  // Typed row shapes coming back from Supabase
+  type DealRow = { amount: number | null; status: DealStatus; created_at: string };
+  type InvoiceRow = { total: number; status: InvoiceStatus };
+
+  let dealsThisMonth: DealRow[] = [];
+  let allInvoices: InvoiceRow[] = [];
+
+  if (user) {
+    const [dealsRes, invoicesRes] = await Promise.all([
+      supabase
+        .from("deals")
+        .select("amount, status, created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", monthStart)
+        .lt("created_at", monthEnd),
+      supabase
+        .from("invoices")
+        .select("total, status")
+        .eq("user_id", user.id),
+    ]);
+
+    dealsThisMonth = (dealsRes.data ?? []).map((d: Record<string, unknown>) => ({
+      amount: d.amount != null ? Number(d.amount) : null,
+      status: d.status as DealStatus,
+      created_at: d.created_at as string,
+    }));
+
+    allInvoices = (invoicesRes.data ?? []).map((i: Record<string, unknown>) => ({
+      total: Number(i.total),
+      status: i.status as InvoiceStatus,
+    }));
+  }
+
+  // ---- KPI calculations ----
+
+  // "Earned This Month" — deals created this month that are paid or completed
+  const earnedThisMonth = dealsThisMonth
+    .filter((d) => ["paid", "completed"].includes(d.status))
+    .reduce((sum, d) => sum + (d.amount ?? 0), 0);
+
+  // "Active Deals" — deals this month NOT in terminal/paid statuses
+  const activeDeals = dealsThisMonth.filter(
+    (d) => !["paid", "completed", "cancelled"].includes(d.status)
+  ).length;
+
+  // "Pending Payment" — invoices with status sent or viewed
+  const pendingInvoices = allInvoices.filter((i) =>
+    ["sent", "viewed"].includes(i.status)
+  );
+  const pendingPaymentTotal = pendingInvoices.reduce((sum, i) => sum + i.total, 0);
+
+  // "Overdue" — invoices with status overdue
+  const overdueInvoices = allInvoices.filter((i) => i.status === "overdue");
+  const overdueTotal = overdueInvoices.reduce((sum, i) => sum + i.total, 0);
+
+  // Invoice Tracking card — revenue (paid invoices) + pending + overdue
+  const invoiceRevenue = allInvoices
+    .filter((i) => i.status === "paid")
+    .reduce((sum, i) => sum + i.total, 0);
+
   return (
     <DashboardShell>
       {/* --- Page Header --- */}
@@ -74,30 +155,37 @@ export default function DashboardPage() {
       <DashboardStatsRow className="mb-6">
         <StatCard
           label="Earned This Month"
-          value="$8,373"
-          trend="+12.5%"
+          value={formatCurrency(earnedThisMonth)}
+          trend={activeDeals > 0 ? `${activeDeals} active` : undefined}
           trendDirection="up"
           icon={<DollarSign className="h-4 w-4" />}
         />
         <StatCard
           label="Pending Payment"
-          value="$1,790"
-          trend="3 invoices"
+          value={formatCurrency(pendingPaymentTotal)}
+          trend={
+            pendingInvoices.length > 0
+              ? `${pendingInvoices.length} invoice${pendingInvoices.length !== 1 ? "s" : ""}`
+              : "none"
+          }
           trendDirection="neutral"
           icon={<Clock className="h-4 w-4" />}
         />
         <StatCard
           label="Active Deals"
-          value="7"
-          trend="+2 this week"
+          value={String(activeDeals)}
           trendDirection="up"
           icon={<Handshake className="h-4 w-4" />}
         />
         <StatCard
           label="Overdue"
-          value="$425"
-          trend="1 invoice"
-          trendDirection="down"
+          value={formatCurrency(overdueTotal)}
+          trend={
+            overdueInvoices.length > 0
+              ? `${overdueInvoices.length} invoice${overdueInvoices.length !== 1 ? "s" : ""}`
+              : "none"
+          }
+          trendDirection={overdueTotal > 0 ? "down" : "neutral"}
           icon={<AlertTriangle className="h-4 w-4" />}
         />
       </DashboardStatsRow>
@@ -253,7 +341,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* ---- Invoice Tracking Card ---- */}
+        {/* ---- Invoice Tracking Card (real data) ---- */}
         <Card variant="glass" className="min-h-[320px]">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -280,19 +368,25 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* Status legend — matches mockup's $250 amounts and status dots */}
+            {/* Status legend — real numbers from invoices */}
             <div className="grid grid-cols-3 gap-3">
               <div className="rounded-lg bg-white/5 p-2.5">
                 <p className="text-[10px] font-medium text-muted-foreground">Revenue</p>
-                <p className="text-sm font-bold text-mint">$1,790</p>
+                <p className="text-sm font-bold text-mint">
+                  {formatCurrency(invoiceRevenue)}
+                </p>
               </div>
               <div className="rounded-lg bg-white/5 p-2.5">
                 <p className="text-[10px] font-medium text-muted-foreground">Pending</p>
-                <p className="text-sm font-bold text-orange">$425</p>
+                <p className="text-sm font-bold text-orange">
+                  {formatCurrency(pendingPaymentTotal)}
+                </p>
               </div>
               <div className="rounded-lg bg-white/5 p-2.5">
                 <p className="text-[10px] font-medium text-muted-foreground">Overdue</p>
-                <p className="text-sm font-bold text-coral">$250</p>
+                <p className="text-sm font-bold text-coral">
+                  {formatCurrency(overdueTotal)}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -343,14 +437,14 @@ export default function DashboardPage() {
               </svg>
             </div>
 
-            {/* Metrics row — matches mockup's Total + Metrics display */}
+            {/* Metrics row — Total Revenue from real data, Engagement Rate stays static */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg bg-white/5 p-3">
                 <p className="text-[10px] font-medium text-muted-foreground">
                   Total Revenue
                 </p>
-                <p className="text-lg font-bold">$8,373</p>
-                <p className="text-xs text-mint">+12.5% vs last month</p>
+                <p className="text-lg font-bold">{formatCurrency(earnedThisMonth)}</p>
+                <p className="text-xs text-mint">this month</p>
               </div>
               <div className="rounded-lg bg-white/5 p-3">
                 <p className="text-[10px] font-medium text-muted-foreground">

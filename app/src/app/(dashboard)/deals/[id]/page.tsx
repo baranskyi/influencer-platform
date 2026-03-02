@@ -13,7 +13,8 @@ import { Separator } from "@/components/ui/separator";
 import { DealStatusSelect } from "@/components/deals/deal-status-select";
 import { DeleteDealButton } from "@/components/deals/delete-deal-button";
 import { getPlatformEmoji } from "@/components/deals/deal-status-badge";
-import { ArrowLeft, Calendar, CreditCard, FileText, Users } from "lucide-react";
+import { DeliverablesChecklist } from "@/components/deals/deliverables-checklist";
+import { ArrowLeft, Calendar, CreditCard, Users } from "lucide-react";
 
 function formatCurrency(amount: number | null, currency: string) {
   if (amount === null) return "—";
@@ -52,7 +53,9 @@ export default async function DealDetailPage({
     category: string | null;
   } | null;
 
-  const deliverables = (deal.deliverables as { type: string; count: number }[] | null) ?? [];
+  const deliverables = (
+    deal.deliverables as { type: string; count: number; specs?: string; completed?: boolean }[] | null
+  ) ?? [];
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -164,25 +167,10 @@ export default async function DealDetailPage({
 
           {/* Deliverables */}
           {deliverables.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <FileText className="h-5 w-5" />
-                  Deliverables
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {deliverables.map(
-                    (d: { type: string; count: number }, i: number) => (
-                      <Badge key={i} variant="secondary" className="px-3 py-1.5">
-                        {d.count}x {d.type}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <DeliverablesChecklist
+              dealId={deal.id}
+              deliverables={deliverables}
+            />
           )}
 
           {/* Notes & Requirements */}

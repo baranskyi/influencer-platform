@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { InvoiceStatusBadge } from "@/components/invoices/invoice-status-badge";
+import { MarkPaidButton } from "@/components/invoices/mark-paid-button";
 import {
   Plus,
   FileText,
@@ -160,6 +161,7 @@ export default async function InvoicesPage() {
                   <TableHead>Status</TableHead>
                   <TableHead>Issued</TableHead>
                   <TableHead>Due</TableHead>
+                  <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -192,6 +194,12 @@ export default async function InvoicesPage() {
                       {inv.due_date
                         ? format(new Date(inv.due_date), "MMM d, yyyy")
                         : "—"}
+                    </TableCell>
+                    <TableCell>
+                      <MarkPaidButton
+                        invoiceId={inv.id}
+                        currentStatus={inv.status}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}

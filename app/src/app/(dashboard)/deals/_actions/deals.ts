@@ -118,6 +118,54 @@ export async function updateDealStatus(dealId: string, status: string) {
   return { success: true };
 }
 
+export async function toggleDeliverable(
+  dealId: string,
+  index: number,
+  completed: boolean
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Fetch current deliverables
+  const { data: deal, error: fetchError } = await supabase
+    .from("deals")
+    .select("deliverables")
+    .eq("id", dealId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (fetchError || !deal) {
+    return { error: "Deal not found" };
+  }
+
+  const deliverables = (
+    deal.deliverables as { type: string; count: number; specs?: string; completed?: boolean }[] | null
+  ) ?? [];
+
+  const updated = deliverables.map((item, i) =>
+    i === index ? { ...item, completed } : item
+  );
+
+  const { error } = await supabase
+    .from("deals")
+    .update({ deliverables: updated })
+    .eq("id", dealId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath(`/deals/${dealId}`);
+  return { success: true };
+}
+
 export async function deleteDeal(dealId: string) {
   const supabase = await createClient();
   const {
