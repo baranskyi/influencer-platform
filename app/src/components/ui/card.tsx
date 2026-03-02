@@ -1,15 +1,48 @@
 import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+/* ============================================================
+   Card Component — with glassmorphism variant
+   ============================================================
+   Variants:
+   - default: Standard opaque card (Mockup 1 light theme style)
+   - glass:   Frosted glassmorphism (Mockup 2 dark theme style)
+              Uses backdrop-blur + semi-transparent background
+              + subtle white border + layered shadow
+   ============================================================ */
+
+const cardVariants = cva(
+  "flex flex-col gap-6 rounded-xl py-6 text-card-foreground transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "border bg-card shadow-sm",
+        glass: [
+          /* Frosted glass surface */
+          "glass glass-highlight",
+          /* Elevated, rounded corners for premium feel */
+          "rounded-2xl",
+        ].join(" "),
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+function Card({
+  className,
+  variant = "default",
+  ...props
+}: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
   return (
     <div
       data-slot="card"
-      className={cn(
-        "flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm",
-        className
-      )}
+      data-variant={variant}
+      className={cn(cardVariants({ variant }), className)}
       {...props}
     />
   )
@@ -89,4 +122,5 @@ export {
   CardAction,
   CardDescription,
   CardContent,
+  cardVariants,
 }

@@ -4,6 +4,18 @@ import { Slot } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
+/* ============================================================
+   Button Component — Extended with accent & gradient variants
+   ============================================================
+   New variants from mockup analysis:
+   - accent:   Orange CTA buttons (Mockup 2 dark theme)
+               Uses --color-orange with subtle glow
+   - gradient: Premium gradient button (coral-to-orange)
+               For high-emphasis actions like "Generate", "Sign"
+   - glass:    Glassmorphism button for secondary actions on
+               glass card surfaces
+   ============================================================ */
+
 const buttonVariants = cva(
   "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
@@ -19,12 +31,44 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+
+        /* --- New: Orange accent CTA (Mockup 2 buttons) ---
+           High-contrast orange on dark backgrounds.
+           Subtle glow effect in dark mode for emphasis.
+           44x44px minimum touch target maintained via size variants. */
+        accent: [
+          "bg-orange text-white font-semibold",
+          "hover:bg-orange-dark",
+          "dark:glow-orange",
+          "focus-visible:ring-orange/50",
+        ].join(" "),
+
+        /* --- New: Gradient premium button ---
+           Coral-to-orange gradient for primary CTAs.
+           Used for "Generate Invoice", "Sign Contract" etc. */
+        gradient: [
+          "bg-gradient-to-r from-coral to-orange text-white font-semibold",
+          "hover:opacity-90",
+          "dark:glow-orange",
+          "focus-visible:ring-orange/50",
+        ].join(" "),
+
+        /* --- New: Glass button for card surfaces ---
+           Semi-transparent background matching glassmorphism cards.
+           Good for secondary actions sitting on glass cards. */
+        glass: [
+          "glass border-white/10",
+          "text-foreground hover:bg-white/10",
+          "dark:text-white dark:hover:bg-white/15",
+        ].join(" "),
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
         xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        /* Extra-large for prominent dashboard CTAs */
+        xl: "h-12 rounded-lg px-8 text-base has-[>svg]:px-6",
         icon: "size-9",
         "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "size-8",

@@ -4,40 +4,63 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   DealFlow Design System — Design Tokens
+   ============================================================
+   Primary theme: Dark with glassmorphism (Mockup 2)
+   Secondary theme: Light clean (Mockup 1)
+
+   Color philosophy:
+   - Purple/orange gradient background creates depth
+   - Glassmorphism cards float above the gradient
+   - Coral remains the brand primary action color
+   - Orange is the accent for CTAs in dark mode
+   - Mint/lavender serve as semantic status colors
+   ============================================================ */
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* --- Typography --- */
   --font-sans: var(--font-inter);
   --font-serif: var(--font-dm-serif);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
+
+  /* --- Tailwind color bindings (shadcn compatibility) --- */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* --- Chart palette (5 colors for Recharts) --- */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* --- Sidebar --- */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* --- Border radius scale --- */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -45,40 +68,84 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  /* DealFlow brand colors */
+
+  /* ========================================================
+     DealFlow Brand Colors (static, theme-independent)
+     ======================================================== */
   --color-coral: #E8788A;
+  --color-coral-light: #F2A3AE;
+  --color-coral-dark: #C95A6C;
   --color-mint: #7ECFB3;
+  --color-mint-light: #A8E0CB;
+  --color-mint-dark: #5AB896;
   --color-lavender: #B8A9E8;
+  --color-lavender-light: #D1C7F0;
+  --color-lavender-dark: #9480D6;
+
+  /* --- Gradient accent colors (from Mockup 2) --- */
+  --color-orange: #F5A623;
+  --color-orange-light: #FBCB6E;
+  --color-orange-dark: #D98E14;
+  --color-purple: #7C3AED;
+  --color-purple-light: #A78BFA;
+  --color-purple-dark: #5B21B6;
+  --color-violet: #8B5CF6;
+
+  /* --- Semantic status colors --- */
+  --color-success: #22C55E;
+  --color-warning: #F5A623;
+  --color-info: #3B82F6;
+  --color-paid: var(--color-mint);
+  --color-pending: var(--color-orange);
+  --color-overdue: var(--color-coral);
 }
 
+/* ============================================================
+   LIGHT THEME (Mockup 1 — "Creator Hub" clean style)
+   ============================================================ */
 :root {
-  --radius: 0.625rem;
+  --radius: 0.75rem;
+
+  /* Surface colors */
   --background: oklch(0.985 0.002 247);
   --foreground: oklch(0.145 0.005 247);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0.005 247);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0.005 247);
-  /* Coral as primary */
+
+  /* Coral as primary action color */
   --primary: oklch(0.65 0.14 12);
   --primary-foreground: oklch(1 0 0);
+
+  /* Neutral secondary */
   --secondary: oklch(0.97 0.002 247);
   --secondary-foreground: oklch(0.205 0.005 247);
+
+  /* Muted surfaces */
   --muted: oklch(0.965 0.002 247);
   --muted-foreground: oklch(0.5 0.01 247);
+
+  /* Accent — subtle coral tint */
   --accent: oklch(0.97 0.002 247);
   --accent-foreground: oklch(0.205 0.005 247);
+
+  /* Destructive */
   --destructive: oklch(0.577 0.245 27.325);
+
+  /* Borders and inputs */
   --border: oklch(0.91 0.004 247);
   --input: oklch(0.91 0.004 247);
   --ring: oklch(0.65 0.14 12);
-  /* Chart colors: coral, mint, lavender, amber, teal */
+
+  /* Chart palette: coral, mint, lavender, amber, teal */
   --chart-1: oklch(0.65 0.14 12);
   --chart-2: oklch(0.76 0.1 165);
   --chart-3: oklch(0.72 0.1 295);
   --chart-4: oklch(0.78 0.15 75);
   --chart-5: oklch(0.7 0.12 195);
-  /* Sidebar */
+
+  /* Sidebar — clean light */
   --sidebar: oklch(0.98 0.002 247);
   --sidebar-foreground: oklch(0.145 0.005 247);
   --sidebar-primary: oklch(0.65 0.14 12);
@@ -87,47 +154,211 @@
   --sidebar-accent-foreground: oklch(0.205 0.005 247);
   --sidebar-border: oklch(0.91 0.004 247);
   --sidebar-ring: oklch(0.65 0.14 12);
+
+  /* Glassmorphism tokens (light — minimal glass effect) */
+  --glass-bg: oklch(1 0 0 / 70%);
+  --glass-border: oklch(0 0 0 / 8%);
+  --glass-shadow: 0 1px 3px oklch(0 0 0 / 5%), 0 4px 16px oklch(0 0 0 / 5%);
+  --glass-blur: 12px;
+
+  /* Dashboard gradient background (light — subtle) */
+  --gradient-start: #F8F6FF;
+  --gradient-mid: #FFF5F5;
+  --gradient-end: #F0FDF4;
 }
 
+/* ============================================================
+   DARK THEME (PRIMARY — Mockup 2 "Influencer Dashboard")
+   Purple/orange gradient + glassmorphism cards
+   ============================================================ */
 .dark {
-  --background: oklch(0.13 0.005 247);
+  /* Deep dark surface with slight purple undertone */
+  --background: oklch(0.13 0.015 285);
   --foreground: oklch(0.97 0.002 247);
-  --card: oklch(0.18 0.005 247);
+
+  /* Cards: semi-transparent for glassmorphism */
+  --card: oklch(0.18 0.012 280 / 60%);
   --card-foreground: oklch(0.97 0.002 247);
-  --popover: oklch(0.18 0.005 247);
+
+  /* Popover */
+  --popover: oklch(0.18 0.015 280 / 80%);
   --popover-foreground: oklch(0.97 0.002 247);
+
+  /* Primary remains coral-toned for brand consistency */
   --primary: oklch(0.7 0.14 12);
   --primary-foreground: oklch(0.13 0.005 247);
-  --secondary: oklch(0.22 0.005 247);
+
+  /* Secondary — muted dark surface */
+  --secondary: oklch(0.22 0.01 280 / 50%);
   --secondary-foreground: oklch(0.97 0.002 247);
-  --muted: oklch(0.22 0.005 247);
+
+  /* Muted */
+  --muted: oklch(0.22 0.01 280 / 40%);
   --muted-foreground: oklch(0.65 0.01 247);
-  --accent: oklch(0.22 0.005 247);
+
+  /* Accent — orange-tinted for CTAs (from Mockup 2 buttons) */
+  --accent: oklch(0.75 0.15 60 / 15%);
   --accent-foreground: oklch(0.97 0.002 247);
+
+  /* Destructive */
   --destructive: oklch(0.704 0.191 22.216);
+
+  /* Borders: white transparency for glass effect */
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.7 0.14 12);
-  --chart-1: oklch(0.7 0.14 12);
-  --chart-2: oklch(0.76 0.1 165);
-  --chart-3: oklch(0.72 0.1 295);
-  --chart-4: oklch(0.78 0.15 75);
-  --chart-5: oklch(0.7 0.12 195);
-  --sidebar: oklch(0.16 0.005 247);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.75 0.15 60);
+
+  /* Chart palette (brighter for dark background) */
+  --chart-1: oklch(0.72 0.15 12);
+  --chart-2: oklch(0.78 0.12 165);
+  --chart-3: oklch(0.75 0.12 295);
+  --chart-4: oklch(0.82 0.16 75);
+  --chart-5: oklch(0.72 0.13 195);
+
+  /* Sidebar — glassmorphism */
+  --sidebar: oklch(0.14 0.015 280 / 60%);
   --sidebar-foreground: oklch(0.97 0.002 247);
-  --sidebar-primary: oklch(0.7 0.14 12);
-  --sidebar-primary-foreground: oklch(0.97 0.002 247);
-  --sidebar-accent: oklch(0.22 0.005 247);
+  --sidebar-primary: oklch(0.75 0.15 60);
+  --sidebar-primary-foreground: oklch(0.13 0.005 247);
+  --sidebar-accent: oklch(0.75 0.15 60 / 15%);
   --sidebar-accent-foreground: oklch(0.97 0.002 247);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.7 0.14 12);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.75 0.15 60);
+
+  /* Glassmorphism tokens (dark — full glass effect) */
+  --glass-bg: oklch(0.18 0.012 280 / 40%);
+  --glass-border: oklch(1 0 0 / 12%);
+  --glass-shadow:
+    0 0 0 1px oklch(1 0 0 / 5%),
+    0 4px 24px oklch(0 0 0 / 20%),
+    0 8px 48px oklch(0 0 0 / 15%);
+  --glass-blur: 20px;
+
+  /* Dashboard gradient background (vivid purple-to-orange) */
+  --gradient-start: #1a0533;
+  --gradient-mid: #2d1b4e;
+  --gradient-end: #3d1f0a;
 }
 
+/* ============================================================
+   BASE LAYER
+   ============================================================ */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* ============================================================
+   UTILITY CLASSES — Glassmorphism & Dashboard Patterns
+   ============================================================ */
+@layer utilities {
+  /* --- Glassmorphism card surface --- */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* Intensified glass — for overlapping/layered cards */
+  .glass-heavy {
+    background: var(--glass-bg);
+    backdrop-filter: blur(32px) saturate(1.5);
+    -webkit-backdrop-filter: blur(32px) saturate(1.5);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* Subtle glass — for sidebar and nav elements */
+  .glass-subtle {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* --- Dashboard gradient background --- */
+  .bg-dashboard-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--gradient-start) 0%,
+      var(--gradient-mid) 50%,
+      var(--gradient-end) 100%
+    );
+  }
+
+  /* Animated mesh gradient (premium background) */
+  .bg-mesh-gradient {
+    background:
+      radial-gradient(ellipse at 20% 20%, oklch(0.35 0.12 285 / 60%) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, oklch(0.35 0.12 40 / 40%) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, oklch(0.20 0.02 280) 0%, oklch(0.13 0.015 285) 100%);
+  }
+
+  /* --- Glow effects for accent elements --- */
+  .glow-orange {
+    box-shadow: 0 0 20px oklch(0.75 0.15 60 / 25%);
+  }
+
+  .glow-coral {
+    box-shadow: 0 0 20px oklch(0.65 0.14 12 / 25%);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px oklch(0.55 0.2 285 / 25%);
+  }
+
+  /* --- Inner border highlight (top edge catch-light) --- */
+  .glass-highlight {
+    position: relative;
+  }
+
+  .glass-highlight::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      180deg,
+      oklch(1 0 0 / 15%) 0%,
+      oklch(1 0 0 / 0%) 50%
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+  }
+
+  /* --- Text gradient (for display headings) --- */
+  .text-gradient-brand {
+    background: linear-gradient(135deg, #E8788A 0%, #F5A623 50%, #B8A9E8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* --- Bento grid dashboard layout --- */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Full-width span for KPI row */
+  .dashboard-grid-full {
+    grid-column: 1 / -1;
   }
 }
