@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import type { DealStatus, InvoiceStatus } from "@/types/database";
+import { ClientDetailActions } from "@/components/clients/client-detail-actions";
 
 export default async function ClientDetailPage({
   params,
@@ -89,6 +90,7 @@ export default async function ClientDetailPage({
             </span>
           )}
         </div>
+        <ClientDetailActions client={client} />
       </div>
 
       {/* Stats */}

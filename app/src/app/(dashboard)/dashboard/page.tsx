@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import {
   DashboardShell,
   DashboardGrid,
@@ -299,14 +300,18 @@ export default async function DashboardPage() {
 
         {/* Quick actions — matches Mockup 1's top-right CTA buttons */}
         <div className="flex gap-2">
-          <Button variant="accent" size="sm">
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">New Deal</span>
-          </Button>
-          <Button variant="glass" size="sm">
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Invoice</span>
-          </Button>
+          <Link href="/deals/new">
+            <Button variant="accent" size="sm">
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">New Deal</span>
+            </Button>
+          </Link>
+          <Link href="/invoices/generate">
+            <Button variant="glass" size="sm">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">Invoice</span>
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -359,10 +364,12 @@ export default async function DashboardPage() {
               Content Calendar
             </CardTitle>
             <CardAction>
-              <Button variant="glass" size="xs">
-                This Week
-                <ChevronRight className="h-3 w-3" />
-              </Button>
+              <Link href="/calendar">
+                <Button variant="glass" size="xs">
+                  View All
+                  <ChevronRight className="h-3 w-3" />
+                </Button>
+              </Link>
             </CardAction>
           </CardHeader>
           <CardContent>
@@ -450,9 +457,11 @@ export default async function DashboardPage() {
               Contract Generator
             </CardTitle>
             <CardAction>
-              <Button variant="accent" size="xs">
-                Generate
-              </Button>
+              <Link href="/deals/new">
+                <Button variant="accent" size="xs">
+                  New Deal
+                </Button>
+              </Link>
             </CardAction>
           </CardHeader>
           <CardContent>
@@ -514,9 +523,11 @@ export default async function DashboardPage() {
               Invoice Tracking
             </CardTitle>
             <CardAction>
-              <Button variant="glass" size="xs">
-                View All
-              </Button>
+              <Link href="/invoices">
+                <Button variant="glass" size="xs">
+                  View All
+                </Button>
+              </Link>
             </CardAction>
           </CardHeader>
           <CardContent>
@@ -575,10 +586,12 @@ export default async function DashboardPage() {
               Campaign Analytics
             </CardTitle>
             <CardAction>
-              <Button variant="glass" size="xs">
-                6 months
-                <ChevronRight className="h-3 w-3" />
-              </Button>
+              <Link href="/analytics">
+                <Button variant="glass" size="xs">
+                  Details
+                  <ChevronRight className="h-3 w-3" />
+                </Button>
+              </Link>
             </CardAction>
           </CardHeader>
           <CardContent>

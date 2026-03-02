@@ -1,0 +1,59 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { DealForm } from "@/components/deals/deal-form";
+import { ArrowLeft } from "lucide-react";
+import type { Deal } from "@/types/database";
+
+export default async function EditDealPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    notFound();
+  }
+
+  const [dealRes, clientsRes] = await Promise.all([
+    supabase
+      .from("deals")
+      .select("*")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single(),
+    supabase
+      .from("clients")
+      .select("id, name")
+      .eq("user_id", user.id)
+      .order("name"),
+  ]);
+
+  if (!dealRes.data) {
+    notFound();
+  }
+
+  const deal = dealRes.data as Deal;
+  const clients = (clientsRes.data ?? []) as { id: string; name: string }[];
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div className="flex items-center gap-3">
+        <Link
+          href={`/deals/${id}`}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+        <h1 className="font-serif text-3xl">Edit Deal</h1>
+      </div>
+      <DealForm clients={clients} deal={deal} dealId={id} />
+    </div>
+  );
+}

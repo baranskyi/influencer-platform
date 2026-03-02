@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createDeal, type CreateDealInput } from "@/app/(dashboard)/deals/_actions/deals";
+import { createDeal, updateDeal, type CreateDealInput } from "@/app/(dashboard)/deals/_actions/deals";
+import type { Deal } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,13 +55,23 @@ const DELIVERABLE_TYPES = [
 
 type Client = { id: string; name: string };
 
-export function DealForm({ clients }: { clients: Client[] }) {
+export function DealForm({
+  clients,
+  deal,
+  dealId,
+}: {
+  clients: Client[];
+  deal?: Deal;
+  dealId?: string;
+}) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [showNewClient, setShowNewClient] = useState(false);
   const [deliverables, setDeliverables] = useState<
     { type: string; count: number }[]
-  >([]);
+  >(
+    deal?.deliverables?.map((d) => ({ type: d.type, count: d.count })) ?? []
+  );
   const [newDeliverableType, setNewDeliverableType] = useState("reel");
   const [newDeliverableCount, setNewDeliverableCount] = useState(1);
 
@@ -107,7 +118,9 @@ export function DealForm({ clients }: { clients: Client[] }) {
     };
 
     startTransition(async () => {
-      const result = await createDeal(input);
+      const result = dealId
+        ? await updateDeal(dealId, input)
+        : await createDeal(input);
       if (result?.error) {
         setError(result.error);
       }
@@ -134,6 +147,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
               id="title"
               name="title"
               placeholder="Summer Collection 2026"
+              defaultValue={deal?.title}
               required
             />
           </div>
@@ -143,12 +157,13 @@ export function DealForm({ clients }: { clients: Client[] }) {
               id="brand_name"
               name="brand_name"
               placeholder="GlowSkin Beauty"
+              defaultValue={deal?.brand_name}
               required
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="platform">Platform *</Label>
-            <Select name="platform" defaultValue="instagram">
+            <Select name="platform" defaultValue={deal?.platform ?? "instagram"}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -163,7 +178,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="deal_type">Deal Type</Label>
-            <Select name="deal_type" defaultValue="sponsored">
+            <Select name="deal_type" defaultValue={deal?.deal_type ?? "sponsored"}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -178,7 +193,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="status">Initial Status</Label>
-            <Select name="status" defaultValue="negotiation">
+            <Select name="status" defaultValue={deal?.status ?? "negotiation"}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -241,7 +256,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
           ) : (
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="client_id">Select Client</Label>
-              <Select name="client_id">
+              <Select name="client_id" defaultValue={deal?.client_id ?? undefined}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choose a client (optional)" />
                 </SelectTrigger>
@@ -278,11 +293,12 @@ export function DealForm({ clients }: { clients: Client[] }) {
               step="0.01"
               min="0"
               placeholder="1500.00"
+              defaultValue={deal?.amount ?? undefined}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="currency">Currency</Label>
-            <Select name="currency" defaultValue="EUR">
+            <Select name="currency" defaultValue={deal?.currency ?? "EUR"}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -299,6 +315,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
               id="payment_terms"
               name="payment_terms"
               placeholder="Net 30"
+              defaultValue={deal?.payment_terms ?? undefined}
             />
           </div>
         </CardContent>
@@ -312,11 +329,21 @@ export function DealForm({ clients }: { clients: Client[] }) {
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="start_date">Start Date</Label>
-            <Input id="start_date" name="start_date" type="date" />
+            <Input
+              id="start_date"
+              name="start_date"
+              type="date"
+              defaultValue={deal?.start_date ?? undefined}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="end_date">End Date</Label>
-            <Input id="end_date" name="end_date" type="date" />
+            <Input
+              id="end_date"
+              name="end_date"
+              type="date"
+              defaultValue={deal?.end_date ?? undefined}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="content_deadline">Content Deadline</Label>
@@ -324,6 +351,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
               id="content_deadline"
               name="content_deadline"
               type="date"
+              defaultValue={deal?.content_deadline ?? undefined}
             />
           </div>
           <div className="space-y-2">
@@ -332,6 +360,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
               id="payment_due_date"
               name="payment_due_date"
               type="date"
+              defaultValue={deal?.payment_due_date ?? undefined}
             />
           </div>
         </CardContent>
@@ -421,6 +450,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
               name="content_requirements"
               className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               placeholder="Brand guidelines, hashtags, messaging..."
+              defaultValue={deal?.content_requirements ?? undefined}
             />
           </div>
           <div className="space-y-2">
@@ -430,6 +460,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
               name="notes"
               className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               placeholder="Any additional notes..."
+              defaultValue={deal?.notes ?? undefined}
             />
           </div>
         </CardContent>
@@ -438,7 +469,7 @@ export function DealForm({ clients }: { clients: Client[] }) {
       <div className="flex gap-3 justify-end">
         <Button type="submit" disabled={isPending}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Create Deal
+          {dealId ? "Save Changes" : "Create Deal"}
         </Button>
       </div>
     </form>

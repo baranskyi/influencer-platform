@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { toast } from "sonner";
 
 export function LoginForm() {
   const router = useRouter();
@@ -71,10 +72,10 @@ export function LoginForm() {
     });
 
     if (error) {
-      setError(error.message);
+      toast.error(error.message);
     } else {
       setError(null);
-      alert("Check your email for the login link!");
+      toast.success("Check your email for the login link!");
     }
     setLoading(false);
   }

@@ -86,6 +86,69 @@ export async function createDeal(input: CreateDealInput) {
   redirect("/deals");
 }
 
+export async function updateDeal(dealId: string, input: CreateDealInput) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  let clientId = input.client_id;
+
+  // Create new client inline if needed
+  if (!clientId && input.new_client_name) {
+    const { data: client, error: clientError } = await supabase
+      .from("clients")
+      .insert({
+        user_id: user.id,
+        name: input.new_client_name,
+        contact_email: input.new_client_email || null,
+        category: input.new_client_category || null,
+      })
+      .select("id")
+      .single();
+
+    if (clientError) {
+      return { error: `Failed to create client: ${clientError.message}` };
+    }
+    clientId = client.id;
+  }
+
+  const { error } = await supabase
+    .from("deals")
+    .update({
+      client_id: clientId || null,
+      title: input.title,
+      brand_name: input.brand_name,
+      platform: input.platform,
+      deal_type: input.deal_type,
+      amount: input.amount,
+      currency: input.currency,
+      payment_terms: input.payment_terms || null,
+      status: input.status || "negotiation",
+      start_date: input.start_date || null,
+      end_date: input.end_date || null,
+      content_deadline: input.content_deadline || null,
+      payment_due_date: input.payment_due_date || null,
+      deliverables: input.deliverables.length > 0 ? input.deliverables : null,
+      content_requirements: input.content_requirements || null,
+      notes: input.notes || null,
+    })
+    .eq("id", dealId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/deals");
+  revalidatePath(`/deals/${dealId}`);
+  redirect(`/deals/${dealId}`);
+}
+
 export async function updateDealStatus(dealId: string, status: string) {
   const supabase = await createClient();
   const {
