@@ -140,7 +140,7 @@ export function InvoiceForm({ deals, clients }: InvoiceFormProps) {
             </div>
 
             {/* Dates */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="issue_date">Issue Date</Label>
                 <Input

@@ -116,7 +116,7 @@ export function DealsTable({ deals }: { deals: Deal[] }) {
             : "No deals match your filters."}
         </div>
       ) : (
-        <div className="rounded-lg border">
+        <div className="overflow-x-auto rounded-lg border">
           <Table>
             <TableHeader>
               <TableRow>

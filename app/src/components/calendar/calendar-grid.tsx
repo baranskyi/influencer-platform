@@ -193,7 +193,7 @@ export function CalendarGrid({
             <div
               key={idx}
               className={cn(
-                "group relative min-h-[100px] rounded-lg border p-1.5 transition-colors cursor-pointer",
+                "group relative min-h-[60px] md:min-h-[100px] rounded-lg border p-1.5 transition-colors cursor-pointer",
                 inMonth
                   ? "border-border/50 bg-white/5 hover:bg-white/10"
                   : "border-transparent bg-white/[0.02] opacity-40",
@@ -243,7 +243,9 @@ export function CalendarGrid({
                       )}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <span className="truncate flex-1">
+                      {/* Mobile: dot only. Desktop: platform label + title */}
+                      <span className={cn("h-1.5 w-1.5 rounded-full flex-shrink-0 md:hidden", colors.dot)} />
+                      <span className="hidden md:inline truncate flex-1">
                         {PLATFORM_LABELS[event.platform ?? "multi"]}{" "}
                         {event.title}
                       </span>

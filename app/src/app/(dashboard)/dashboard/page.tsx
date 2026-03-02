@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import {
   DashboardShell,
   DashboardGrid,
@@ -66,6 +67,19 @@ export default async function DashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Redirect new users to onboarding if profile has no full_name set
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+
+    if (profile && !profile.full_name) {
+      redirect("/onboarding");
+    }
+  }
 
   // Current month boundaries (ISO strings for Supabase gte/lt)
   const now = new Date();

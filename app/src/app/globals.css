@@ -362,3 +362,16 @@
     grid-column: 1 / -1;
   }
 }
+
+/* Touch-friendly improvements */
+@media (max-width: 768px) {
+  /* Larger touch targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+  }
+
+  /* Better spacing for mobile forms */
+  input, select, textarea {
+    font-size: 16px; /* prevents iOS zoom on focus */
+  }
+}

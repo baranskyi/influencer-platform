@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import {
   DashboardShell,
@@ -5,6 +6,10 @@ import {
   DashboardStatsRow,
   StatCard,
 } from "@/components/dashboard/dashboard-grid";
+
+export const metadata: Metadata = {
+  title: "Analytics",
+};
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnalyticsCharts } from "@/components/analytics/analytics-charts";
 import {

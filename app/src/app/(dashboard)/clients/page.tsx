@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import {
   DashboardShell,
   DashboardHeading,
 } from "@/components/dashboard/dashboard-grid";
 import { ClientsPageClient } from "@/components/clients/clients-page-client";
+
+export const metadata: Metadata = {
+  title: "Clients",
+};
 import { Building2 } from "lucide-react";
 
 export default async function ClientsPage() {

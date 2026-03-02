@@ -81,7 +81,7 @@ function DashboardStatsRow({
     <div
       className={cn(
         "dashboard-grid-full",
-        "grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4",
+        "grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-4",
         className
       )}
       {...props}

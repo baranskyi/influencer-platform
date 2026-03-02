@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardShell, DashboardHeading } from "@/components/dashboard/dashboard-grid";
+
+export const metadata: Metadata = {
+  title: "Content Calendar",
+};
 import { CalendarPageClient } from "@/components/calendar/calendar-page-client";
 import { CalendarDays } from "lucide-react";
 import type { ContentEvent } from "@/types/database";

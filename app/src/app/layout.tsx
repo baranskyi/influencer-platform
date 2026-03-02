@@ -32,9 +32,19 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "DealFlow — Influencer Business Platform",
+  title: {
+    default: "DealFlow — Influencer Business Platform",
+    template: "%s | DealFlow",
+  },
   description:
     "Stop doing admin. Get paid faster. Deal tracking, invoicing, and analytics for micro-influencers.",
+  keywords: ["influencer", "creator", "deals", "invoicing", "analytics", "content calendar"],
+  authors: [{ name: "DealFlow" }],
+  openGraph: {
+    title: "DealFlow — Influencer Business Platform",
+    description: "Deal tracking, invoicing, and analytics for micro-influencers.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

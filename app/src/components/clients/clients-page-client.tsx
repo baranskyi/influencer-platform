@@ -51,6 +51,7 @@ export function ClientsPageClient({ clients }: ClientsPageClientProps) {
               </p>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -94,6 +95,7 @@ export function ClientsPageClient({ clients }: ClientsPageClientProps) {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

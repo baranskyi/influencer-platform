@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import {
   DashboardShell,
   DashboardHeading,
 } from "@/components/dashboard/dashboard-grid";
 import { SettingsForm } from "@/components/settings/settings-form";
+
+export const metadata: Metadata = {
+  title: "Settings",
+};
 import { Settings } from "lucide-react";
 import type { Profile } from "@/types/database";
 
