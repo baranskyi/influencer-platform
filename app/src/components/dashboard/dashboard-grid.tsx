@@ -7,12 +7,10 @@ import { cn } from "@/lib/utils"
    Layout structure (desktop):
    ┌──────────────────────────────────────────┐
    │ KPI Stats Row (4 columns)               │
+   ├──────────────────────────────────────────┤
+   │ Content Calendar (full width)            │
    ├─────────────────────┬────────────────────┤
-   │ Content Calendar     │ Contract Generator │
-   │ (larger)            │                    │
-   ├─────────────────────┼────────────────────┤
    │ Invoice Tracking     │ Campaign Analytics │
-   │                     │                    │
    └─────────────────────┴────────────────────┘
 
    Mobile: Single column, cards stack vertically.

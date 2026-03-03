@@ -23,7 +23,6 @@ import {
   AlertTriangle,
   Plus,
   FileText,
-  CreditCard,
   CalendarDays,
   TrendingUp,
   ChevronRight,
@@ -51,9 +50,8 @@ import {
       - Active Deals
       - Overdue
 
-   2. Bento Grid (2x2):
-      - Content Calendar (weekly view with colored blocks)
-      - Contract Generator (templates list)
+   2. Bento Grid:
+      - Content Calendar (full-width weekly view with colored blocks)
       - Invoice Tracking (bar chart + status legend — real data)
       - Campaign Analytics (line chart + metrics)
 
@@ -369,8 +367,8 @@ export default async function DashboardPage() {
 
       {/* --- Main Bento Grid (2-column) --- */}
       <DashboardGrid>
-        {/* ---- Content Calendar Card ---- */}
-        <Card variant="glass" className="min-h-[320px]">
+        {/* ---- Content Calendar Card (full width) ---- */}
+        <Card variant="glass" className="min-h-[320px] md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CalendarDays className="h-5 w-5 text-lavender" />
@@ -459,72 +457,6 @@ export default async function DashboardPage() {
                 <p className="text-sm">No content scheduled this week</p>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* ---- Contract Generator Card ---- */}
-        <Card variant="glass" className="min-h-[320px]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-orange" />
-              Contract Generator
-            </CardTitle>
-            <CardAction>
-              <Link href="/deals/new">
-                <Button variant="accent" size="xs">
-                  New Deal
-                </Button>
-              </Link>
-            </CardAction>
-          </CardHeader>
-          <CardContent>
-            {/* Templates list — matches mockup's template rows */}
-            <div className="space-y-3">
-              {[
-                {
-                  name: "Sponsored Post Agreement",
-                  status: "Popular",
-                  statusColor: "bg-mint/20 text-mint",
-                },
-                {
-                  name: "Brand Ambassador Contract",
-                  status: "New",
-                  statusColor: "bg-orange/20 text-orange",
-                },
-                {
-                  name: "UGC Content License",
-                  status: "Popular",
-                  statusColor: "bg-mint/20 text-mint",
-                },
-                {
-                  name: "Affiliate Partnership",
-                  status: "",
-                  statusColor: "",
-                },
-              ].map((template) => (
-                <div
-                  key={template.name}
-                  className="flex items-center justify-between rounded-lg border border-border/50 bg-white/5 px-3 py-2.5 transition-colors hover:bg-white/10"
-                >
-                  <span className="text-sm font-medium">{template.name}</span>
-                  {template.status && (
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${template.statusColor}`}
-                    >
-                      {template.status}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* E-signature CTA */}
-            <div className="mt-4 flex items-center gap-2 rounded-lg bg-lavender/10 p-3">
-              <CreditCard className="h-4 w-4 text-lavender" />
-              <span className="text-xs text-muted-foreground">
-                E-signature included with all contracts
-              </span>
-            </div>
           </CardContent>
         </Card>
 
