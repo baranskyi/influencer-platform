@@ -38,7 +38,8 @@ export async function createEvent(input: CreateEventInput) {
   });
 
   if (error) {
-    return { error: error.message };
+    console.error("[createEvent]", error);
+    return { error: "Failed to create event. Please try again." };
   }
 
   revalidatePath("/calendar");
@@ -69,7 +70,8 @@ export async function updateEvent(input: UpdateEventInput) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[updateEvent]", error);
+    return { error: "Failed to update event. Please try again." };
   }
 
   revalidatePath("/calendar");
@@ -99,7 +101,8 @@ export async function updateEventStatus(eventId: string, status: string) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[updateEventStatus]", error);
+    return { error: "Failed to update event status. Please try again." };
   }
 
   revalidatePath("/calendar");
@@ -123,7 +126,8 @@ export async function deleteEvent(eventId: string) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[deleteEvent]", error);
+    return { error: "Failed to delete event. Please try again." };
   }
 
   revalidatePath("/calendar");

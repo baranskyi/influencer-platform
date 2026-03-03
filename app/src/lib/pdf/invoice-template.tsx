@@ -40,25 +40,22 @@ export type InvoicePDFProps = {
 };
 
 const colors = {
-  orange: "#F5A623",
-  dark: "#1a1225",
-  darkMid: "#251838",
-  darkLight: "#2d1f42",
+  black: "#000000",
+  darkGray: "#333333",
+  midGray: "#555555",
+  lightGray: "#666666",
+  border: "#e5e5e5",
+  headerBg: "#f5f5f5",
   white: "#ffffff",
-  offWhite: "#f0ebf8",
-  muted: "#9d8fb5",
-  mutedLight: "#c5b8d8",
-  border: "#3d2d54",
-  green: "#4ade80",
-  red: "#f87171",
+  totalBg: "#f0f0f0",
 };
 
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: colors.dark,
-    color: colors.white,
+    backgroundColor: colors.white,
+    color: colors.darkGray,
     fontFamily: "Helvetica",
-    padding: 48,
+    padding: 56,
     fontSize: 10,
   },
   // Header
@@ -66,107 +63,112 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 40,
+    marginBottom: 36,
     paddingBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.black,
   },
   headerLeft: {
     flexDirection: "column",
-    gap: 4,
   },
   invoiceLabel: {
-    fontSize: 28,
+    fontSize: 32,
     fontFamily: "Helvetica-Bold",
-    color: colors.orange,
-    letterSpacing: 3,
+    color: colors.black,
+    letterSpacing: 4,
   },
   headerTagline: {
     fontSize: 9,
-    color: colors.muted,
+    color: colors.lightGray,
     marginTop: 4,
+    letterSpacing: 1,
   },
   headerRight: {
     flexDirection: "column",
     alignItems: "flex-end",
-    gap: 6,
   },
   invoiceNumber: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: "Helvetica-Bold",
-    color: colors.white,
+    color: colors.black,
+    marginBottom: 6,
   },
   statusBadge: {
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginTop: 4,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: colors.midGray,
   },
   statusText: {
-    fontSize: 9,
+    fontSize: 8,
     fontFamily: "Helvetica-Bold",
+    color: colors.midGray,
     textTransform: "uppercase",
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
-  // From / To
+  // From / To parties
   partiesRow: {
     flexDirection: "row",
-    gap: 24,
-    marginBottom: 32,
+    gap: 32,
+    marginBottom: 28,
   },
-  partyCard: {
+  partyBlock: {
     flex: 1,
-    backgroundColor: colors.darkMid,
-    borderRadius: 8,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   partyLabel: {
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
-    color: colors.orange,
+    color: colors.lightGray,
     letterSpacing: 2,
     textTransform: "uppercase",
-    marginBottom: 8,
+    marginBottom: 6,
+    paddingBottom: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   partyName: {
     fontSize: 12,
     fontFamily: "Helvetica-Bold",
-    color: colors.white,
+    color: colors.black,
     marginBottom: 4,
   },
   partyDetail: {
     fontSize: 9,
-    color: colors.mutedLight,
+    color: colors.lightGray,
     marginBottom: 2,
   },
   // Dates row
   datesRow: {
     flexDirection: "row",
-    gap: 24,
+    gap: 0,
     marginBottom: 32,
-  },
-  dateCard: {
-    flex: 1,
-    backgroundColor: colors.darkMid,
-    borderRadius: 8,
-    padding: 14,
-    borderWidth: 1,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
     borderColor: colors.border,
+    paddingVertical: 12,
+  },
+  dateBlock: {
+    flex: 1,
+    paddingHorizontal: 12,
+    borderRightWidth: 1,
+    borderRightColor: colors.border,
+  },
+  dateBlockLast: {
+    flex: 1,
+    paddingHorizontal: 12,
   },
   dateLabel: {
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
-    color: colors.muted,
+    color: colors.lightGray,
     letterSpacing: 1,
     textTransform: "uppercase",
-    marginBottom: 4,
+    marginBottom: 3,
   },
   dateValue: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Helvetica-Bold",
-    color: colors.white,
+    color: colors.black,
   },
   // Financial table
   tableSection: {
@@ -175,111 +177,103 @@ const styles = StyleSheet.create({
   tableSectionTitle: {
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
-    color: colors.orange,
+    color: colors.lightGray,
     letterSpacing: 2,
     textTransform: "uppercase",
-    marginBottom: 12,
+    marginBottom: 10,
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: colors.darkLight,
-    borderRadius: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginBottom: 2,
+    backgroundColor: colors.headerBg,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderWidth: 1,
     borderColor: colors.border,
   },
   tableHeaderText: {
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
-    color: colors.muted,
+    color: colors.midGray,
     letterSpacing: 1,
     textTransform: "uppercase",
   },
   tableRow: {
     flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  tableRowAlt: {
-    backgroundColor: "#1e1530",
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: colors.border,
   },
   colDescription: {
     flex: 1,
     fontSize: 10,
-    color: colors.white,
+    color: colors.darkGray,
   },
   colAmount: {
-    width: 100,
+    width: 110,
     textAlign: "right",
     fontSize: 10,
-    color: colors.white,
-    fontFamily: "Helvetica",
+    color: colors.darkGray,
   },
-  colAmountPositive: {
-    color: colors.green,
-  },
-  colAmountNegative: {
-    color: colors.red,
+  colAmountMuted: {
+    color: colors.lightGray,
   },
   dividerRow: {
     height: 1,
     backgroundColor: colors.border,
-    marginHorizontal: 16,
-    marginVertical: 4,
+    marginTop: 8,
+    marginBottom: 0,
   },
   totalRow: {
     flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: colors.darkLight,
-    borderRadius: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    backgroundColor: colors.totalBg,
     borderWidth: 1,
-    borderColor: colors.orange,
-    marginTop: 4,
+    borderTopWidth: 2,
+    borderTopColor: colors.black,
+    borderColor: colors.border,
+    marginTop: 0,
   },
   totalLabel: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: "Helvetica-Bold",
-    color: colors.white,
+    color: colors.black,
   },
   totalAmount: {
-    width: 100,
+    width: 110,
     textAlign: "right",
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: "Helvetica-Bold",
-    color: colors.orange,
+    color: colors.black,
   },
   // Notes
   notesSection: {
-    backgroundColor: colors.darkMid,
-    borderRadius: 8,
-    padding: 16,
     borderWidth: 1,
     borderColor: colors.border,
+    padding: 14,
     marginBottom: 32,
   },
   notesLabel: {
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
-    color: colors.muted,
+    color: colors.lightGray,
     letterSpacing: 1,
     textTransform: "uppercase",
     marginBottom: 6,
   },
   notesText: {
     fontSize: 10,
-    color: colors.mutedLight,
-    lineHeight: 1.5,
+    color: colors.darkGray,
+    lineHeight: 1.6,
   },
   // Footer
   footer: {
     marginTop: "auto",
-    paddingTop: 24,
+    paddingTop: 20,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     flexDirection: "row",
@@ -288,12 +282,13 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 9,
-    color: colors.muted,
+    color: colors.lightGray,
   },
   footerBrand: {
     fontSize: 9,
-    color: colors.orange,
     fontFamily: "Helvetica-Bold",
+    color: colors.black,
+    letterSpacing: 1,
   },
 });
 
@@ -314,25 +309,8 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function getStatusColor(status: string): string {
-  switch (status) {
-    case "paid":
-      return "#16a34a";
-    case "sent":
-    case "viewed":
-      return "#2563eb";
-    case "overdue":
-      return "#dc2626";
-    case "cancelled":
-      return "#6b7280";
-    default:
-      return "#9333ea";
-  }
-}
-
 export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
   const currency = invoice.currency || "EUR";
-  const statusColor = getStatusColor(invoice.status);
 
   const addressParts = profile.address
     ? [
@@ -342,6 +320,8 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
         profile.address.country,
       ].filter(Boolean)
     : [];
+
+  const hasDueDate = Boolean(invoice.due_date);
 
   return (
     <Document>
@@ -354,13 +334,8 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.invoiceNumber}>{invoice.invoice_number}</Text>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: statusColor + "33" },
-              ]}
-            >
-              <Text style={[styles.statusText, { color: statusColor }]}>
+            <View style={styles.statusBadge}>
+              <Text style={styles.statusText}>
                 {invoice.status.toUpperCase()}
               </Text>
             </View>
@@ -370,8 +345,8 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
         {/* From / To */}
         <View style={styles.partiesRow}>
           {/* From */}
-          <View style={styles.partyCard}>
-            <Text style={styles.partyLabel}>FROM</Text>
+          <View style={styles.partyBlock}>
+            <Text style={styles.partyLabel}>From</Text>
             <Text style={styles.partyName}>
               {profile.legal_name || profile.full_name}
             </Text>
@@ -389,9 +364,9 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
             ))}
           </View>
 
-          {/* To */}
-          <View style={styles.partyCard}>
-            <Text style={styles.partyLabel}>BILL TO</Text>
+          {/* Bill To */}
+          <View style={styles.partyBlock}>
+            <Text style={styles.partyLabel}>Bill To</Text>
             {client ? (
               <>
                 <Text style={styles.partyName}>{client.name}</Text>
@@ -407,21 +382,21 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
 
         {/* Dates */}
         <View style={styles.datesRow}>
-          <View style={styles.dateCard}>
+          <View style={styles.dateBlock}>
             <Text style={styles.dateLabel}>Issue Date</Text>
             <Text style={styles.dateValue}>
               {formatDate(invoice.issue_date)}
             </Text>
           </View>
-          {invoice.due_date && (
-            <View style={styles.dateCard}>
+          {hasDueDate && (
+            <View style={styles.dateBlock}>
               <Text style={styles.dateLabel}>Due Date</Text>
               <Text style={styles.dateValue}>
-                {formatDate(invoice.due_date)}
+                {formatDate(invoice.due_date!)}
               </Text>
             </View>
           )}
-          <View style={styles.dateCard}>
+          <View style={hasDueDate ? styles.dateBlockLast : styles.dateBlock}>
             <Text style={styles.dateLabel}>Currency</Text>
             <Text style={styles.dateValue}>{currency}</Text>
           </View>
@@ -436,7 +411,12 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
             <Text style={[styles.tableHeaderText, { flex: 1 }]}>
               Description
             </Text>
-            <Text style={[styles.tableHeaderText, { width: 100, textAlign: "right" }]}>
+            <Text
+              style={[
+                styles.tableHeaderText,
+                { width: 110, textAlign: "right" },
+              ]}
+            >
               Amount
             </Text>
           </View>
@@ -450,11 +430,11 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
           </View>
 
           {/* IVA Row */}
-          <View style={[styles.tableRow, styles.tableRowAlt]}>
+          <View style={styles.tableRow}>
             <Text style={styles.colDescription}>
               IVA / VAT ({invoice.tax_rate}%)
             </Text>
-            <Text style={[styles.colAmount, styles.colAmountPositive]}>
+            <Text style={[styles.colAmount, styles.colAmountMuted]}>
               +{formatCurrency(invoice.tax_amount, currency)}
             </Text>
           </View>
@@ -465,14 +445,11 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
               <Text style={styles.colDescription}>
                 IRPF Withholding ({invoice.irpf_rate}%)
               </Text>
-              <Text style={[styles.colAmount, styles.colAmountNegative]}>
+              <Text style={[styles.colAmount, styles.colAmountMuted]}>
                 -{formatCurrency(invoice.irpf_amount, currency)}
               </Text>
             </View>
           )}
-
-          {/* Divider */}
-          <View style={styles.dividerRow} />
 
           {/* Total Row */}
           <View style={styles.totalRow}>

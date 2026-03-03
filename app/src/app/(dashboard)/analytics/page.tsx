@@ -83,31 +83,34 @@ export default async function AnalyticsPage() {
     }).format(n);
 
   // Calculate KPIs
-  const totalRevenue = deals
+  // Total Revenue = sum of paid/completed deals + paid invoices (whichever is higher)
+  const paidDealRevenue = deals
     .filter((d) => ["paid", "completed"].includes(d.status))
     .reduce((sum, d) => sum + (d.amount ?? 0), 0);
+  const paidInvoices = invoices.filter((i) => i.status === "paid");
+  const paidInvoiceRevenue = paidInvoices.reduce((sum, i) => sum + i.total, 0);
+  // Use the higher of the two to avoid undercounting
+  const totalRevenue = Math.max(paidDealRevenue, paidInvoiceRevenue);
+
   const pendingRevenue = deals
     .filter((d) =>
-      ["agreed", "in_progress", "content_submitted", "content_approved", "invoiced"].includes(
+      ["negotiation", "agreed", "in_progress", "content_submitted", "content_approved", "invoiced"].includes(
         d.status
       )
     )
     .reduce((sum, d) => sum + (d.amount ?? 0), 0);
   const totalDeals = deals.length;
   const totalInvoices = invoices.length;
-  const paidInvoices = invoices.filter((i) => i.status === "paid");
-  const invoiceRevenue = paidInvoices.reduce((sum, i) => sum + i.total, 0);
+  const invoiceRevenue = paidInvoiceRevenue;
 
-  // Platform breakdown
+  // Platform breakdown — show total deal value per platform (not just paid)
   const platformData = ["instagram", "tiktok", "youtube", "multi"].map(
     (platform) => {
       const platformDeals = deals.filter((d) => d.platform === platform);
       return {
         platform,
         deals: platformDeals.length,
-        revenue: platformDeals
-          .filter((d) => ["paid", "completed"].includes(d.status))
-          .reduce((sum, d) => sum + (d.amount ?? 0), 0),
+        revenue: platformDeals.reduce((sum, d) => sum + (d.amount ?? 0), 0),
       };
     }
   );
@@ -126,7 +129,6 @@ export default async function AnalyticsPage() {
 
     const monthDeals = deals.filter((d) => d.created_at.startsWith(monthKey));
     const monthRevenue = monthDeals
-      .filter((d) => ["paid", "completed"].includes(d.status))
       .reduce((sum, d) => sum + (d.amount ?? 0), 0);
 
     monthlyData.push({
@@ -148,7 +150,7 @@ export default async function AnalyticsPage() {
         <StatCard
           label="Total Revenue"
           value={fmt(totalRevenue)}
-          trend={`${paidInvoices.length} paid`}
+          trend={`${paidInvoices.length} paid invoice${paidInvoices.length !== 1 ? "s" : ""}`}
           trendDirection="up"
           icon={<DollarSign className="h-4 w-4" />}
         />

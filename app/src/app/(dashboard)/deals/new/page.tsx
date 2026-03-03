@@ -1,7 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  DashboardShell,
+  DashboardHeading,
+} from "@/components/dashboard/dashboard-grid";
 import { DealForm } from "@/components/deals/deal-form";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Handshake } from "lucide-react";
 
 export default async function NewDealPage() {
   const supabase = await createClient();
@@ -11,17 +16,19 @@ export default async function NewDealPage() {
     .order("name");
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <div className="flex items-center gap-3">
-        <Link
-          href="/deals"
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <h1 className="font-serif text-3xl">New Deal</h1>
+    <DashboardShell>
+      <div className="mx-auto max-w-3xl space-y-6">
+        <div className="flex items-center gap-3">
+          <Link href="/deals">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <Handshake className="h-7 w-7 text-orange" />
+          <DashboardHeading>New Deal</DashboardHeading>
+        </div>
+        <DealForm clients={clients ?? []} />
       </div>
-      <DealForm clients={clients ?? []} />
-    </div>
+    </DashboardShell>
   );
 }

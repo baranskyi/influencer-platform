@@ -77,7 +77,8 @@ export async function updateProfile(input: UpdateProfileInput) {
     .eq("id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[updateProfile]", error);
+    return { error: "Failed to update profile. Please try again." };
   }
 
   revalidatePath("/settings");
@@ -86,7 +87,22 @@ export async function updateProfile(input: UpdateProfileInput) {
 
 export async function changePassword(newPassword: string) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  if (newPassword.length < 8) {
+    return { error: "Password must be at least 8 characters long" };
+  }
+
   const { error } = await supabase.auth.updateUser({ password: newPassword });
-  if (error) return { error: error.message };
+  if (error) {
+    console.error("[changePassword]", error);
+    return { error: "Failed to change password. Please try again." };
+  }
   return { success: true };
 }

@@ -83,7 +83,8 @@ export async function sendInvoiceEmail(
   });
 
   if (sendError) {
-    return { error: sendError.message ?? "Failed to send email" };
+    console.error("[sendInvoiceEmail]", sendError);
+    return { error: "Failed to send email. Please try again." };
   }
 
   // Mark invoice as sent if it's still a draft
@@ -190,7 +191,8 @@ export async function sendPaymentReminder(
   });
 
   if (sendError) {
-    return { error: sendError.message ?? "Failed to send reminder" };
+    console.error("[sendPaymentReminder]", sendError);
+    return { error: "Failed to send reminder. Please try again." };
   }
 
   // Update reminder tracking fields

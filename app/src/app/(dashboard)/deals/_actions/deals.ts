@@ -53,7 +53,8 @@ export async function createDeal(input: CreateDealInput) {
       .single();
 
     if (clientError) {
-      return { error: `Failed to create client: ${clientError.message}` };
+      console.error("[createDeal] client creation", clientError);
+      return { error: "Failed to create client. Please try again." };
     }
     clientId = client.id;
   }
@@ -79,7 +80,8 @@ export async function createDeal(input: CreateDealInput) {
   });
 
   if (error) {
-    return { error: error.message };
+    console.error("[createDeal]", error);
+    return { error: "Failed to create deal. Please try again." };
   }
 
   revalidatePath("/deals");
@@ -112,7 +114,8 @@ export async function updateDeal(dealId: string, input: CreateDealInput) {
       .single();
 
     if (clientError) {
-      return { error: `Failed to create client: ${clientError.message}` };
+      console.error("[updateDeal] client creation", clientError);
+      return { error: "Failed to create client. Please try again." };
     }
     clientId = client.id;
   }
@@ -141,7 +144,8 @@ export async function updateDeal(dealId: string, input: CreateDealInput) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[updateDeal]", error);
+    return { error: "Failed to update deal. Please try again." };
   }
 
   revalidatePath("/deals");
@@ -173,7 +177,8 @@ export async function updateDealStatus(dealId: string, status: string) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[updateDealStatus]", error);
+    return { error: "Failed to update deal status. Please try again." };
   }
 
   revalidatePath("/deals");
@@ -222,7 +227,8 @@ export async function toggleDeliverable(
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[toggleDeliverable]", error);
+    return { error: "Failed to update deliverable. Please try again." };
   }
 
   revalidatePath(`/deals/${dealId}`);
@@ -246,7 +252,8 @@ export async function deleteDeal(dealId: string) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[deleteDeal]", error);
+    return { error: "Failed to delete deal. Please try again." };
   }
 
   revalidatePath("/deals");

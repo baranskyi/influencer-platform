@@ -3,6 +3,10 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import {
+  DashboardShell,
+  DashboardHeading,
+} from "@/components/dashboard/dashboard-grid";
+import {
   Card,
   CardContent,
   CardHeader,
@@ -14,7 +18,7 @@ import { DealStatusSelect } from "@/components/deals/deal-status-select";
 import { DeleteDealButton } from "@/components/deals/delete-deal-button";
 import { getPlatformEmoji } from "@/components/deals/deal-status-badge";
 import { DeliverablesChecklist } from "@/components/deals/deliverables-checklist";
-import { ArrowLeft, Calendar, CreditCard, Pencil, Users } from "lucide-react";
+import { ArrowLeft, Calendar, CreditCard, Handshake, Pencil, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function formatCurrency(amount: number | null, currency: string) {
@@ -59,18 +63,19 @@ export default async function DealDetailPage({
   ) ?? [];
 
   return (
+    <DashboardShell>
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Link
-            href="/deals"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-5 w-5" />
+          <Link href="/deals">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
           </Link>
+          <Handshake className="h-7 w-7 text-orange" />
           <div>
-            <h1 className="font-serif text-3xl">{deal.title}</h1>
+            <DashboardHeading>{deal.title}</DashboardHeading>
             <p className="text-muted-foreground">
               {deal.brand_name} · {getPlatformEmoji(deal.platform)}{" "}
               <span className="capitalize">{deal.platform}</span>
@@ -93,7 +98,7 @@ export default async function DealDetailPage({
         {/* Main content — 2 cols */}
         <div className="space-y-6 lg:col-span-2">
           {/* Financials */}
-          <Card>
+          <Card variant="glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <CreditCard className="h-5 w-5" />
@@ -123,7 +128,7 @@ export default async function DealDetailPage({
           </Card>
 
           {/* Dates */}
-          <Card>
+          <Card variant="glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Calendar className="h-5 w-5" />
@@ -193,7 +198,7 @@ export default async function DealDetailPage({
 
           {/* Notes & Requirements */}
           {(deal.content_requirements || deal.notes) && (
-            <Card>
+            <Card variant="glass">
               <CardHeader>
                 <CardTitle className="text-lg">Notes</CardTitle>
               </CardHeader>
@@ -225,7 +230,7 @@ export default async function DealDetailPage({
         {/* Sidebar — 1 col */}
         <div className="space-y-6">
           {/* Client */}
-          <Card>
+          <Card variant="glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Users className="h-5 w-5" />
@@ -254,7 +259,7 @@ export default async function DealDetailPage({
           </Card>
 
           {/* Created */}
-          <Card>
+          <Card variant="glass">
             <CardContent className="pt-6">
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -271,5 +276,6 @@ export default async function DealDetailPage({
         </div>
       </div>
     </div>
+    </DashboardShell>
   );
 }

@@ -11,41 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { DealStatusBadge, getPlatformEmoji } from "./deal-status-badge";
-import { Search, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronsUpDown, Handshake, Plus } from "lucide-react";
 import type { Deal } from "@/types/database";
 
 type SortColumn = "title" | "amount" | "status" | "created_at";
 type SortDirection = "asc" | "desc";
-
-const ALL_STATUSES = [
-  { value: "all", label: "All Statuses" },
-  { value: "negotiation", label: "Negotiation" },
-  { value: "agreed", label: "Agreed" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "content_submitted", label: "Submitted" },
-  { value: "content_approved", label: "Approved" },
-  { value: "invoiced", label: "Invoiced" },
-  { value: "paid", label: "Paid" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
-];
-
-const ALL_PLATFORMS = [
-  { value: "all", label: "All Platforms" },
-  { value: "instagram", label: "Instagram" },
-  { value: "tiktok", label: "TikTok" },
-  { value: "youtube", label: "YouTube" },
-  { value: "multi", label: "Multi" },
-];
 
 function formatCurrency(amount: number | null, currency: string) {
   if (amount === null) return "—";
@@ -55,10 +28,12 @@ function formatCurrency(amount: number | null, currency: string) {
   }).format(amount);
 }
 
-export function DealsTable({ deals }: { deals: Deal[] }) {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [platformFilter, setPlatformFilter] = useState("all");
+interface DealsTableProps {
+  deals: Deal[];
+  allDealsCount: number;
+}
+
+export function DealsTable({ deals, allDealsCount }: DealsTableProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>("created_at");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -80,19 +55,7 @@ export function DealsTable({ deals }: { deals: Deal[] }) {
       : <ChevronDown className="ml-1 inline h-3.5 w-3.5" />;
   }
 
-  const filtered = deals.filter((deal) => {
-    const matchesSearch =
-      search === "" ||
-      deal.title.toLowerCase().includes(search.toLowerCase()) ||
-      deal.brand_name.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || deal.status === statusFilter;
-    const matchesPlatform =
-      platformFilter === "all" || deal.platform === platformFilter;
-    return matchesSearch && matchesStatus && matchesPlatform;
-  });
-
-  const sorted = [...filtered].sort((a, b) => {
+  const sorted = [...deals].sort((a, b) => {
     let cmp = 0;
     if (sortColumn === "title") {
       cmp = a.title.localeCompare(b.title);
@@ -107,127 +70,114 @@ export function DealsTable({ deals }: { deals: Deal[] }) {
     return sortDirection === "asc" ? cmp : -cmp;
   });
 
-  return (
-    <div className="space-y-4">
-      {/* Filters */}
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search deals..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-44">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {ALL_STATUSES.map((s) => (
-              <SelectItem key={s.value} value={s.value}>
-                {s.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={platformFilter} onValueChange={setPlatformFilter}>
-          <SelectTrigger className="w-full sm:w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {ALL_PLATFORMS.map((p) => (
-              <SelectItem key={p.value} value={p.value}>
-                {p.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+  if (deals.length === 0) {
+    return (
+      <Card variant="glass">
+        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="mb-4 rounded-full bg-orange/10 p-4">
+            <Handshake className="h-10 w-10 text-orange" />
+          </div>
+          {allDealsCount === 0 ? (
+            <>
+              <h3 className="mb-2 text-lg font-semibold">No deals yet</h3>
+              <p className="mb-6 max-w-sm text-sm text-muted-foreground">
+                Start tracking your brand collaborations by creating your first deal.
+              </p>
+              <Link href="/deals/new">
+                <Button variant="accent">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create First Deal
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <h3 className="mb-2 text-lg font-semibold">No matches</h3>
+              <p className="text-sm text-muted-foreground">
+                Try adjusting your search or filters.
+              </p>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
 
-      {/* Table */}
-      {filtered.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
-          {deals.length === 0
-            ? "No deals yet. Create your first deal to get started."
-            : "No deals match your filters."}
-        </div>
-      ) : (
-        <div className="overflow-x-auto rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead
-                  className="cursor-pointer select-none hover:text-foreground"
-                  onClick={() => handleSort("title")}
-                >
-                  Deal
-                  <SortIcon column="title" />
-                </TableHead>
-                <TableHead className="hidden sm:table-cell">
-                  Platform
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer select-none hover:text-foreground"
-                  onClick={() => handleSort("status")}
-                >
-                  Status
-                  <SortIcon column="status" />
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer select-none text-right hover:text-foreground"
-                  onClick={() => handleSort("amount")}
-                >
-                  Amount
-                  <SortIcon column="amount" />
-                </TableHead>
-                <TableHead
-                  className="hidden cursor-pointer select-none md:table-cell hover:text-foreground"
-                  onClick={() => handleSort("created_at")}
-                >
-                  Deadline
-                  <SortIcon column="created_at" />
-                </TableHead>
+  return (
+    <>
+      <div className="overflow-x-auto rounded-lg border border-border/50">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead
+                className="cursor-pointer select-none hover:text-foreground"
+                onClick={() => handleSort("title")}
+              >
+                Deal
+                <SortIcon column="title" />
+              </TableHead>
+              <TableHead className="hidden sm:table-cell">
+                Platform
+              </TableHead>
+              <TableHead
+                className="cursor-pointer select-none hover:text-foreground"
+                onClick={() => handleSort("status")}
+              >
+                Status
+                <SortIcon column="status" />
+              </TableHead>
+              <TableHead
+                className="cursor-pointer select-none text-right hover:text-foreground"
+                onClick={() => handleSort("amount")}
+              >
+                Amount
+                <SortIcon column="amount" />
+              </TableHead>
+              <TableHead
+                className="hidden cursor-pointer select-none md:table-cell hover:text-foreground"
+                onClick={() => handleSort("created_at")}
+              >
+                Deadline
+                <SortIcon column="created_at" />
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sorted.map((deal) => (
+              <TableRow key={deal.id} className="cursor-pointer">
+                <TableCell>
+                  <Link
+                    href={`/deals/${deal.id}`}
+                    className="block space-y-1"
+                  >
+                    <div className="font-medium">{deal.title}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {deal.brand_name}
+                    </div>
+                  </Link>
+                </TableCell>
+                <TableCell className="hidden sm:table-cell">
+                  <span title={deal.platform}>
+                    {getPlatformEmoji(deal.platform)}{" "}
+                    <span className="capitalize">{deal.platform}</span>
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <DealStatusBadge status={deal.status} />
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  {formatCurrency(deal.amount, deal.currency)}
+                </TableCell>
+                <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+                  {deal.content_deadline
+                    ? format(new Date(deal.content_deadline), "MMM d, yyyy")
+                    : "—"}
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sorted.map((deal) => (
-                <TableRow key={deal.id} className="cursor-pointer">
-                  <TableCell>
-                    <Link
-                      href={`/deals/${deal.id}`}
-                      className="block space-y-1"
-                    >
-                      <div className="font-medium">{deal.title}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {deal.brand_name}
-                      </div>
-                    </Link>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    <span title={deal.platform}>
-                      {getPlatformEmoji(deal.platform)}{" "}
-                      <span className="capitalize">{deal.platform}</span>
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <DealStatusBadge status={deal.status} />
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {formatCurrency(deal.amount, deal.currency)}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                    {deal.content_deadline
-                      ? format(new Date(deal.content_deadline), "MMM d, yyyy")
-                      : "—"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       {/* Summary */}
       {sorted.length > 0 && (
@@ -239,6 +189,6 @@ export function DealsTable({ deals }: { deals: Deal[] }) {
           )}
         </div>
       )}
-    </div>
+    </>
   );
 }

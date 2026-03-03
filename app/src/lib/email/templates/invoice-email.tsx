@@ -1,3 +1,5 @@
+import { escapeHtml } from "../html-escape";
+
 export interface InvoiceEmailData {
   invoiceNumber: string;
   creatorName: string;
@@ -31,6 +33,11 @@ export function generateInvoiceEmail(data: InvoiceEmailData): {
   subject: string;
   html: string;
 } {
+  const safeClientName = escapeHtml(data.clientName);
+  const safeCreatorName = escapeHtml(data.creatorName);
+  const safeCreatorEmail = escapeHtml(data.creatorEmail);
+  const safeNotes = data.notes ? escapeHtml(data.notes) : null;
+
   const subject = `Invoice ${data.invoiceNumber} from ${data.creatorName}`;
 
   const html = `<!DOCTYPE html>
@@ -60,7 +67,7 @@ export function generateInvoiceEmail(data: InvoiceEmailData): {
 
               <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#111111;">You've received an invoice</h1>
               <p style="margin:0 0 32px;font-size:15px;color:#555555;">
-                Hi ${data.clientName}, <strong>${data.creatorName}</strong> has sent you an invoice for your review.
+                Hi ${safeClientName}, <strong>${safeCreatorName}</strong> has sent you an invoice for your review.
               </p>
 
               <!-- Invoice Summary Table -->
@@ -96,7 +103,7 @@ export function generateInvoiceEmail(data: InvoiceEmailData): {
                   ? `<!-- Notes -->
               <div style="background-color:#f9f9f9;border-radius:8px;padding:16px 20px;margin-bottom:32px;">
                 <p style="margin:0 0 6px;font-size:12px;font-weight:600;color:#888888;text-transform:uppercase;letter-spacing:0.5px;">Notes</p>
-                <p style="margin:0;font-size:14px;color:#555555;line-height:1.6;">${data.notes}</p>
+                <p style="margin:0;font-size:14px;color:#555555;line-height:1.6;">${safeNotes}</p>
               </div>`
                   : ""
               }
@@ -116,8 +123,8 @@ export function generateInvoiceEmail(data: InvoiceEmailData): {
           <!-- Footer -->
           <tr>
             <td style="background-color:#fafafa;border-top:1px solid #e5e5e5;padding:24px 40px;text-align:center;">
-              <p style="margin:0 0 4px;font-size:13px;color:#888888;">Sent by <strong style="color:#555555;">${data.creatorName}</strong></p>
-              <p style="margin:0;font-size:12px;color:#aaaaaa;">${data.creatorEmail}</p>
+              <p style="margin:0 0 4px;font-size:13px;color:#888888;">Sent by <strong style="color:#555555;">${safeCreatorName}</strong></p>
+              <p style="margin:0;font-size:12px;color:#aaaaaa;">${safeCreatorEmail}</p>
               <p style="margin:16px 0 0;font-size:11px;color:#cccccc;">Powered by DealFlow · Creator Business Management</p>
             </td>
           </tr>

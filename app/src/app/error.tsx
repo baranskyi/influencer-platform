@@ -23,7 +23,7 @@ export default function Error({
             Something went wrong
           </h1>
           <p className="text-muted-foreground text-sm">
-            {error.message || "An unexpected error occurred. Please try again."}
+            Something went wrong. Please try again.
           </p>
         </div>
 

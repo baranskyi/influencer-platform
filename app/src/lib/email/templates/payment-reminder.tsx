@@ -1,3 +1,5 @@
+import { escapeHtml } from "../html-escape";
+
 export interface PaymentReminderData {
   invoiceNumber: string;
   creatorName: string;
@@ -31,6 +33,10 @@ export function generatePaymentReminder(data: PaymentReminderData): {
   subject: string;
   html: string;
 } {
+  const safeClientName = escapeHtml(data.clientName);
+  const safeCreatorName = escapeHtml(data.creatorName);
+  const safeCreatorEmail = escapeHtml(data.creatorEmail);
+
   const subject = `Payment reminder: Invoice ${data.invoiceNumber} — ${data.daysOverdue} day${data.daysOverdue !== 1 ? "s" : ""} overdue`;
 
   const overdueText =
@@ -78,7 +84,7 @@ export function generatePaymentReminder(data: PaymentReminderData): {
 
               <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#111111;">Friendly Payment Reminder</h1>
               <p style="margin:0 0 24px;font-size:15px;color:#555555;line-height:1.6;">
-                Hi ${data.clientName}, this is a gentle reminder from <strong>${data.creatorName}</strong> regarding an outstanding invoice. ${overdueText}
+                Hi ${safeClientName}, this is a gentle reminder from <strong>${safeCreatorName}</strong> regarding an outstanding invoice. ${overdueText}
               </p>
 
               <!-- Invoice Summary Table -->
@@ -123,8 +129,8 @@ export function generatePaymentReminder(data: PaymentReminderData): {
           <!-- Footer -->
           <tr>
             <td style="background-color:#fafafa;border-top:1px solid #e5e5e5;padding:24px 40px;text-align:center;">
-              <p style="margin:0 0 4px;font-size:13px;color:#888888;">Sent by <strong style="color:#555555;">${data.creatorName}</strong></p>
-              <p style="margin:0;font-size:12px;color:#aaaaaa;">${data.creatorEmail}</p>
+              <p style="margin:0 0 4px;font-size:13px;color:#888888;">Sent by <strong style="color:#555555;">${safeCreatorName}</strong></p>
+              <p style="margin:0;font-size:12px;color:#aaaaaa;">${safeCreatorEmail}</p>
               ${data.reminderCount > 1 ? `<p style="margin:8px 0 0;font-size:11px;color:#cccccc;">Reminder ${data.reminderCount} of this invoice</p>` : ""}
               <p style="margin:16px 0 0;font-size:11px;color:#cccccc;">Powered by DealFlow · Creator Business Management</p>
             </td>

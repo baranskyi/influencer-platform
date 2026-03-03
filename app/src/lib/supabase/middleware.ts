@@ -9,12 +9,20 @@ export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // If Supabase is not configured, skip auth checks
+  // If Supabase is not configured, handle based on environment
   if (
     !supabaseUrl ||
     !supabaseKey ||
     supabaseUrl.includes("placeholder")
   ) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "Supabase is not configured. NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be set in production."
+      );
+    }
+    console.warn(
+      "[middleware] Supabase is not configured — skipping auth checks in development. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable auth."
+    );
     return supabaseResponse;
   }
 

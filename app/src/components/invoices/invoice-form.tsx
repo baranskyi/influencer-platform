@@ -87,12 +87,12 @@ export function InvoiceForm({ deals, clients }: InvoiceFormProps) {
             {/* Link to Deal */}
             <div className="space-y-2">
               <Label>Link to Deal (optional)</Label>
-              <Select value={selectedDeal} onValueChange={handleDealSelect}>
+              <Select value={selectedDeal || "__none__"} onValueChange={(v) => handleDealSelect(v === "__none__" ? "" : v)}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a deal" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No deal</SelectItem>
+                  <SelectItem value="__none__">No deal</SelectItem>
                   {deals.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
                       {d.title} — {d.brand_name}
@@ -107,14 +107,14 @@ export function InvoiceForm({ deals, clients }: InvoiceFormProps) {
             <div className="space-y-2">
               <Label>Client</Label>
               <Select
-                value={selectedClient}
-                onValueChange={setSelectedClient}
+                value={selectedClient || "__none__"}
+                onValueChange={(v) => setSelectedClient(v === "__none__" ? "" : v)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select client" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No client</SelectItem>
+                  <SelectItem value="__none__">No client</SelectItem>
                   {clients.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       {c.name}

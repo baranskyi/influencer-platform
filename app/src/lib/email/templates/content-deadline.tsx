@@ -1,3 +1,5 @@
+import { escapeHtml } from "../html-escape";
+
 export interface ContentDeadlineData {
   creatorName: string;
   eventTitle: string;
@@ -33,6 +35,12 @@ export function generateContentDeadlineEmail(data: ContentDeadlineData): {
   subject: string;
   html: string;
 } {
+  const safeCreatorName = escapeHtml(data.creatorName);
+  const safeEventTitle = escapeHtml(data.eventTitle);
+  const safeDealTitle = escapeHtml(data.dealTitle);
+  const safeBrandName = escapeHtml(data.brandName);
+  const safeDescription = data.description ? escapeHtml(data.description) : null;
+
   const subject = `Content deadline tomorrow: ${data.eventTitle}`;
 
   const html = `<!DOCTYPE html>
@@ -71,7 +79,7 @@ export function generateContentDeadlineEmail(data: ContentDeadlineData): {
 
               <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#111111;">Content Deadline Reminder</h1>
               <p style="margin:0 0 32px;font-size:15px;color:#555555;line-height:1.6;">
-                Hi ${data.creatorName}, you have content due tomorrow. Here are the details:
+                Hi ${safeCreatorName}, you have content due tomorrow. Here are the details:
               </p>
 
               <!-- Event Details Table -->
@@ -81,15 +89,15 @@ export function generateContentDeadlineEmail(data: ContentDeadlineData): {
                 </tr>
                 <tr>
                   <td style="padding:14px 20px;font-size:14px;color:#555555;border-bottom:1px solid #f0f0f0;">Event</td>
-                  <td style="padding:14px 20px;font-size:14px;font-weight:600;color:#111111;text-align:right;border-bottom:1px solid #f0f0f0;">${data.eventTitle}</td>
+                  <td style="padding:14px 20px;font-size:14px;font-weight:600;color:#111111;text-align:right;border-bottom:1px solid #f0f0f0;">${safeEventTitle}</td>
                 </tr>
                 <tr>
                   <td style="padding:14px 20px;font-size:14px;color:#555555;border-bottom:1px solid #f0f0f0;">Deal</td>
-                  <td style="padding:14px 20px;font-size:14px;color:#111111;text-align:right;border-bottom:1px solid #f0f0f0;">${data.dealTitle}</td>
+                  <td style="padding:14px 20px;font-size:14px;color:#111111;text-align:right;border-bottom:1px solid #f0f0f0;">${safeDealTitle}</td>
                 </tr>
                 <tr>
                   <td style="padding:14px 20px;font-size:14px;color:#555555;border-bottom:1px solid #f0f0f0;">Brand</td>
-                  <td style="padding:14px 20px;font-size:14px;color:#111111;text-align:right;border-bottom:1px solid #f0f0f0;">${data.brandName}</td>
+                  <td style="padding:14px 20px;font-size:14px;color:#111111;text-align:right;border-bottom:1px solid #f0f0f0;">${safeBrandName}</td>
                 </tr>
                 <tr>
                   <td style="padding:14px 20px;font-size:14px;color:#555555;border-bottom:1px solid #f0f0f0;">Platform</td>
@@ -106,7 +114,7 @@ export function generateContentDeadlineEmail(data: ContentDeadlineData): {
                   ? `<!-- Description -->
               <div style="background-color:#f9f9f9;border-radius:8px;padding:16px 20px;margin-bottom:32px;">
                 <p style="margin:0 0 6px;font-size:12px;font-weight:600;color:#888888;text-transform:uppercase;letter-spacing:0.5px;">Description</p>
-                <p style="margin:0;font-size:14px;color:#555555;line-height:1.6;">${data.description}</p>
+                <p style="margin:0;font-size:14px;color:#555555;line-height:1.6;">${safeDescription}</p>
               </div>`
                   : ""
               }

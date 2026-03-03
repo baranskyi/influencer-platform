@@ -69,7 +69,7 @@ export function EventForm({
       scheduled_at: new Date(
         formData.get("scheduled_at") as string
       ).toISOString(),
-      deal_id: (formData.get("deal_id") as string) || null,
+      deal_id: ((formData.get("deal_id") as string) === "__none__" ? null : (formData.get("deal_id") as string)) || null,
     };
 
     startTransition(async () => {
@@ -169,13 +169,13 @@ export function EventForm({
               <Label htmlFor="deal_id">Link to Deal (optional)</Label>
               <Select
                 name="deal_id"
-                defaultValue={event?.deal_id ?? ""}
+                defaultValue={event?.deal_id ?? "__none__"}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="No deal linked" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="__none__">None</SelectItem>
                   {deals.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
                       {d.title}

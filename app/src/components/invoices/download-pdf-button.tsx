@@ -34,8 +34,8 @@ export function DownloadPdfButton({ invoiceId }: { invoiceId: string }) {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("PDF download error:", err);
+    } catch {
+      // Silently handle PDF download errors; the button will re-enable for retry
     } finally {
       setIsLoading(false);
     }

@@ -42,7 +42,8 @@ export async function createClientAction(input: CreateClientInput) {
     .single();
 
   if (error) {
-    return { error: error.message };
+    console.error("[createClientAction]", error);
+    return { error: "Failed to create client. Please try again." };
   }
 
   revalidatePath("/clients");
@@ -74,7 +75,8 @@ export async function updateClientAction(input: UpdateClientInput) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[updateClientAction]", error);
+    return { error: "Failed to update client. Please try again." };
   }
 
   revalidatePath("/clients");
@@ -99,7 +101,8 @@ export async function deleteClientAction(clientId: string) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[deleteClientAction]", error);
+    return { error: "Failed to delete client. Please try again." };
   }
 
   revalidatePath("/clients");

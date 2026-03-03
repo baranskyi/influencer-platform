@@ -67,7 +67,8 @@ export async function createInvoice(input: CreateInvoiceInput) {
     .single();
 
   if (error) {
-    return { error: error.message };
+    console.error("[createInvoice]", error);
+    return { error: "Failed to create invoice. Please try again." };
   }
 
   revalidatePath("/invoices");
@@ -97,7 +98,8 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[updateInvoiceStatus]", error);
+    return { error: "Failed to update invoice status. Please try again." };
   }
 
   revalidatePath("/invoices");
@@ -123,7 +125,8 @@ export async function markInvoiceSent(invoiceId: string) {
     .eq("status", "draft");
 
   if (error) {
-    return { error: error.message };
+    console.error("[markInvoiceSent]", error);
+    return { error: "Failed to mark invoice as sent. Please try again." };
   }
 
   revalidatePath("/invoices");
@@ -148,7 +151,8 @@ export async function deleteInvoice(invoiceId: string) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("[deleteInvoice]", error);
+    return { error: "Failed to delete invoice. Please try again." };
   }
 
   revalidatePath("/invoices");

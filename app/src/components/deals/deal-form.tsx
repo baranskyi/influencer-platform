@@ -136,7 +136,7 @@ export function DealForm({
       )}
 
       {/* Basic Info */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle className="text-lg">Deal Info</CardTitle>
         </CardHeader>
@@ -210,7 +210,7 @@ export function DealForm({
       </Card>
 
       {/* Client */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Client</CardTitle>
@@ -279,7 +279,7 @@ export function DealForm({
       </Card>
 
       {/* Financials */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle className="text-lg">Financials</CardTitle>
         </CardHeader>
@@ -322,7 +322,7 @@ export function DealForm({
       </Card>
 
       {/* Dates */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle className="text-lg">Dates</CardTitle>
         </CardHeader>
@@ -367,7 +367,7 @@ export function DealForm({
       </Card>
 
       {/* Deliverables */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle className="text-lg">Deliverables</CardTitle>
         </CardHeader>
@@ -436,7 +436,7 @@ export function DealForm({
       </Card>
 
       {/* Notes */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle className="text-lg">Additional</CardTitle>
         </CardHeader>
@@ -467,7 +467,7 @@ export function DealForm({
       </Card>
 
       <div className="flex gap-3 justify-end">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" variant="accent" disabled={isPending}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {dealId ? "Save Changes" : "Create Deal"}
         </Button>
