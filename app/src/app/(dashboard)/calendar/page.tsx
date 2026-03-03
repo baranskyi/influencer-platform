@@ -29,13 +29,20 @@ export default async function CalendarPage() {
         .order("scheduled_at", { ascending: true }),
       supabase
         .from("deals")
-        .select("id, title, brand_name, platform, start_date, end_date")
+        .select("id, title, brand_name, platform, start_date, end_date, status")
         .eq("user_id", user.id)
         .order("title", { ascending: true }),
     ]);
 
-    events = eventsRes.data ?? [];
-    deals = dealsRes.data ?? [];
+    const allDeals = dealsRes.data ?? [];
+    const completedDealIds = new Set(
+      allDeals.filter((d) => d.status === "completed").map((d) => d.id),
+    );
+
+    deals = allDeals.filter((d) => d.status !== "completed");
+    events = (eventsRes.data ?? []).filter(
+      (e) => !e.deal_id || !completedDealIds.has(e.deal_id),
+    );
   }
 
   return (
