@@ -30,7 +30,7 @@ export async function syncDealCalendar(
     {
       dateField: startDate,
       eventType: "campaign_start",
-      titlePrefix: "Campaign Start",
+      titlePrefix: "Start Date",
     },
     {
       dateField: contentDeadline,
@@ -40,12 +40,12 @@ export async function syncDealCalendar(
     {
       dateField: endDate,
       eventType: "campaign_end",
-      titlePrefix: "Campaign End",
+      titlePrefix: "End Date",
     },
     {
       dateField: paymentDueDate,
       eventType: "payment_due",
-      titlePrefix: "Payment Due",
+      titlePrefix: "Payment Due Date",
     },
   ];
 

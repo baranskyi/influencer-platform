@@ -9,7 +9,7 @@ import { CalendarPageClient } from "@/components/calendar/calendar-page-client";
 import { CalendarDays } from "lucide-react";
 import type { ContentEvent } from "@/types/database";
 
-type DealOption = { id: string; title: string; brand_name: string; platform: string };
+type DealOption = { id: string; title: string; brand_name: string; platform: string; start_date: string | null; end_date: string | null };
 
 export default async function CalendarPage() {
   const supabase = await createClient();
@@ -29,7 +29,7 @@ export default async function CalendarPage() {
         .order("scheduled_at", { ascending: true }),
       supabase
         .from("deals")
-        .select("id, title, brand_name, platform")
+        .select("id, title, brand_name, platform, start_date, end_date")
         .eq("user_id", user.id)
         .order("title", { ascending: true }),
     ]);

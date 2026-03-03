@@ -32,10 +32,10 @@ const EVENT_TYPES = [
   { value: "reel", label: "Reel" },
   { value: "video", label: "Video" },
   { value: "review", label: "Review" },
-  { value: "deadline", label: "Deadline" },
-  { value: "payment_due", label: "Payment Due" },
-  { value: "campaign_start", label: "Campaign Start" },
-  { value: "campaign_end", label: "Campaign End" },
+  { value: "deadline", label: "Content Deadline" },
+  { value: "payment_due", label: "Payment Due Date" },
+  { value: "campaign_start", label: "Start Date" },
+  { value: "campaign_end", label: "End Date" },
 ];
 
 const PLATFORMS = [

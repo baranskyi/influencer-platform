@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import type { ContentEvent, Platform } from "@/types/database";
 
-type DealOption = { id: string; title: string };
+type DealOption = { id: string; title: string; brand_name: string; platform: string; start_date: string | null; end_date: string | null };
 
 type CalendarPageClientProps = {
   events: ContentEvent[];
