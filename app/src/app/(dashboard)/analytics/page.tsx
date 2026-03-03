@@ -129,6 +129,7 @@ export default async function AnalyticsPage() {
 
     const monthDeals = deals.filter((d) => d.created_at.startsWith(monthKey));
     const monthRevenue = monthDeals
+      .filter((d) => ["paid", "completed"].includes(d.status))
       .reduce((sum, d) => sum + (d.amount ?? 0), 0);
 
     monthlyData.push({

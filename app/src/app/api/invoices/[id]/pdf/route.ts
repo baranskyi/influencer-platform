@@ -35,7 +35,7 @@ export async function GET(
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select(
-      "full_name, email, legal_name, tax_id, address"
+      "full_name, email, legal_name, tax_id, address, bank_details"
     )
     .eq("id", user.id)
     .single();
@@ -77,6 +77,11 @@ export async function GET(
         city?: string;
         postal_code?: string;
         country?: string;
+      } | null,
+      bank_details: profile.bank_details as {
+        iban?: string;
+        swift?: string;
+        bank_name?: string;
       } | null,
     },
     client,

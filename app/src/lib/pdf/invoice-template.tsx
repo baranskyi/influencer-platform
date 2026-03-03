@@ -32,6 +32,11 @@ export type InvoicePDFProps = {
       postal_code?: string;
       country?: string;
     } | null;
+    bank_details?: {
+      iban?: string;
+      swift?: string;
+      bank_name?: string;
+    } | null;
   };
   client: {
     name: string;
@@ -250,6 +255,36 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica-Bold",
     color: colors.black,
   },
+  // Payment Details
+  paymentSection: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+    marginBottom: 20,
+  },
+  paymentLabel: {
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    color: colors.lightGray,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    marginBottom: 8,
+  },
+  paymentRow: {
+    flexDirection: "row",
+    marginBottom: 3,
+  },
+  paymentKey: {
+    width: 80,
+    fontSize: 9,
+    fontFamily: "Helvetica-Bold",
+    color: colors.midGray,
+  },
+  paymentValue: {
+    flex: 1,
+    fontSize: 9,
+    color: colors.darkGray,
+  },
   // Notes
   notesSection: {
     borderWidth: 1,
@@ -459,6 +494,35 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
             </Text>
           </View>
         </View>
+
+        {/* Payment Details */}
+        {profile.bank_details && (profile.bank_details.iban || profile.bank_details.swift || profile.bank_details.bank_name) && (
+          <View style={styles.paymentSection}>
+            <Text style={styles.paymentLabel}>Payment Details</Text>
+            {profile.bank_details.bank_name && (
+              <View style={styles.paymentRow}>
+                <Text style={styles.paymentKey}>Bank</Text>
+                <Text style={styles.paymentValue}>{profile.bank_details.bank_name}</Text>
+              </View>
+            )}
+            {profile.bank_details.iban && (
+              <View style={styles.paymentRow}>
+                <Text style={styles.paymentKey}>IBAN</Text>
+                <Text style={styles.paymentValue}>{profile.bank_details.iban}</Text>
+              </View>
+            )}
+            {profile.bank_details.swift && (
+              <View style={styles.paymentRow}>
+                <Text style={styles.paymentKey}>SWIFT/BIC</Text>
+                <Text style={styles.paymentValue}>{profile.bank_details.swift}</Text>
+              </View>
+            )}
+            <View style={styles.paymentRow}>
+              <Text style={styles.paymentKey}>Beneficiary</Text>
+              <Text style={styles.paymentValue}>{profile.legal_name || profile.full_name}</Text>
+            </View>
+          </View>
+        )}
 
         {/* Notes */}
         {invoice.notes && (

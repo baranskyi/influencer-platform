@@ -86,9 +86,10 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
   }
 
   const updateData: Record<string, unknown> = { status };
+  const today = new Date().toISOString().split("T")[0];
 
   if (status === "paid") {
-    updateData.paid_date = new Date().toISOString().split("T")[0];
+    updateData.paid_date = today;
   }
 
   const { error } = await supabase
@@ -100,6 +101,27 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
   if (error) {
     console.error("[updateInvoiceStatus]", error);
     return { error: "Failed to update invoice status. Please try again." };
+  }
+
+  // When invoice is marked paid, auto-update linked deal to "paid"
+  if (status === "paid") {
+    const { data: invoice } = await supabase
+      .from("invoices")
+      .select("deal_id")
+      .eq("id", invoiceId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (invoice?.deal_id) {
+      await supabase
+        .from("deals")
+        .update({ status: "paid", paid_date: today })
+        .eq("id", invoice.deal_id)
+        .eq("user_id", user.id);
+
+      revalidatePath("/deals");
+      revalidatePath(`/deals/${invoice.deal_id}`);
+    }
   }
 
   revalidatePath("/invoices");

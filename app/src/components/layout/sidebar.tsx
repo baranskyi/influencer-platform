@@ -14,16 +14,20 @@ import {
 } from "lucide-react";
 
 /* ============================================================
-   Sidebar Navigation — Glassmorphism style
+   Sidebar Navigation — Floating Glassmorphism (macOS Sonoma)
    ============================================================
-   Design decisions (derived from Mockup 2):
-   - Sidebar uses glass-subtle for a frosted backdrop effect
-     that lets the gradient background show through
-   - Active nav item uses orange accent background (15% opacity)
-     with full white text, matching the mockup's active states
-   - The DealFlow logo area has a bottom border for separation
-   - Icons are 20x20 (h-5 w-5) for clear visual hierarchy
-   - Touch targets exceed 44px height for mobile accessibility
+   Design decisions:
+   - Floating panel detached from screen edges with 12px margins,
+     mimicking macOS Sonoma's sidebar treatment
+   - Triple-layer glass-sidebar class: blur(40px) + saturate(1.8)
+     + brightness(1.1) for photorealistic frosted glass
+   - glass-highlight pseudo-element adds a top-edge catch-light
+     that simulates light refraction across the frost surface
+   - rounded-2xl (16px) corners soften the floating panel
+   - Internal dividers use subtle opacity borders that respect
+     the rounded container without harsh lines at edges
+   - Active nav item retains the orange inset accent indicator
+   - All touch targets remain 44px+ for accessibility compliance
    ============================================================ */
 
 const navItems = [
@@ -43,15 +47,19 @@ export function Sidebar() {
     <aside
       className={cn(
         "hidden md:flex md:w-64 md:flex-col",
-        /* Glassmorphism sidebar surface */
-        "glass-subtle",
-        /* Right border uses glass border token for consistency */
-        "border-r border-sidebar-border",
-        "bg-sidebar"
+        /* Floating panel: full height within its padded container */
+        "h-full",
+        /* Triple-layer glassmorphism + top-edge catch-light */
+        "glass-sidebar glass-highlight",
+        /* macOS-style rounded corners for the floating panel */
+        "rounded-2xl",
+        /* Removed border-r -- panel is no longer flush against edge */
+        "overflow-hidden"
       )}
     >
-      {/* Logo area */}
-      <div className="flex h-16 items-center border-b border-sidebar-border px-6">
+      {/* Logo area — subtle bottom divider using opacity instead of
+          hard border, respects the rounded container aesthetic */}
+      <div className="flex h-16 items-center border-b border-white/[0.06] px-6">
         <Link
           href="/dashboard"
           className="font-serif text-2xl tracking-tight text-foreground"
@@ -93,8 +101,8 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom section — could hold user avatar or plan badge */}
-      <div className="border-t border-sidebar-border p-4">
+      {/* Bottom section — user info with subtle top divider */}
+      <div className="border-t border-white/[0.06] p-4">
         <div className="flex items-center gap-3 rounded-lg px-2 py-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-coral to-orange text-xs font-bold text-white">
             U

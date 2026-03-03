@@ -9,6 +9,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,7 +71,18 @@ export function AnalyticsCharts({
                 stroke="rgba(255,255,255,0.3)"
                 fontSize={12}
               />
-              <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} />
+              <YAxis
+                yAxisId="left"
+                stroke="rgba(255,255,255,0.3)"
+                fontSize={12}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                stroke="rgba(255,255,255,0.3)"
+                fontSize={12}
+                allowDecimals={false}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "rgba(30,20,50,0.9)",
@@ -79,15 +91,20 @@ export function AnalyticsCharts({
                   color: "#fff",
                 }}
               />
+              <Legend
+                wrapperStyle={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}
+              />
               <Line
+                yAxisId="left"
                 type="monotone"
                 dataKey="revenue"
                 stroke="#7ECFB3"
                 strokeWidth={2}
                 dot={{ fill: "#7ECFB3", r: 4 }}
-                name="Revenue ($)"
+                name="Revenue (€)"
               />
               <Line
+                yAxisId="right"
                 type="monotone"
                 dataKey="deals"
                 stroke="#F5A623"
@@ -120,7 +137,18 @@ export function AnalyticsCharts({
                 stroke="rgba(255,255,255,0.3)"
                 fontSize={12}
               />
-              <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} />
+              <YAxis
+                yAxisId="left"
+                stroke="rgba(255,255,255,0.3)"
+                fontSize={12}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                stroke="rgba(255,255,255,0.3)"
+                fontSize={12}
+                allowDecimals={false}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "rgba(30,20,50,0.9)",
@@ -129,13 +157,18 @@ export function AnalyticsCharts({
                   color: "#fff",
                 }}
               />
+              <Legend
+                wrapperStyle={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}
+              />
               <Bar
+                yAxisId="left"
                 dataKey="revenue"
                 fill="#E8788A"
                 radius={[4, 4, 0, 0]}
-                name="Revenue ($)"
+                name="Revenue (€)"
               />
               <Bar
+                yAxisId="right"
                 dataKey="deals"
                 fill="#B8A9E8"
                 radius={[4, 4, 0, 0]}

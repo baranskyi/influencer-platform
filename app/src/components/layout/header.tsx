@@ -22,6 +22,9 @@ import { LogOut, Settings, User, Bell } from "lucide-react";
    - Sticky positioning so it stays visible during scroll
    - Bell icon for notifications (Mockup 2 shows notification badge)
    - Avatar with gradient background matching brand colors
+   - z-30 keeps it below modals/popovers but above content
+   - Border uses white opacity for consistency with the floating
+     sidebar's internal divider treatment
    ============================================================ */
 
 export function Header() {
@@ -37,11 +40,11 @@ export function Header() {
   return (
     <header
       className={[
-        "sticky top-0 z-40",
+        "sticky top-0 z-30",
         "flex h-16 items-center justify-between px-4 md:px-6",
-        /* Glass effect header */
+        /* Glass effect header — frosts the gradient background */
         "glass-subtle",
-        "border-b border-border",
+        "border-b border-white/[0.06]",
       ].join(" ")}
     >
       {/* Mobile logo — only visible below md breakpoint */}
