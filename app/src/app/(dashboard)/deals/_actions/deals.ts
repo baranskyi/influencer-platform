@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { syncDealCalendar } from "@/lib/deals/sync-deal-calendar";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -59,32 +60,45 @@ export async function createDeal(input: CreateDealInput) {
     clientId = client.id;
   }
 
-  const { error } = await supabase.from("deals").insert({
-    user_id: user.id,
-    client_id: clientId || null,
-    title: input.title,
-    brand_name: input.brand_name,
-    platform: input.platform,
-    deal_type: input.deal_type,
-    amount: input.amount,
-    currency: input.currency,
-    payment_terms: input.payment_terms || null,
-    status: input.status || "negotiation",
-    start_date: input.start_date || null,
-    end_date: input.end_date || null,
-    content_deadline: input.content_deadline || null,
-    payment_due_date: input.payment_due_date || null,
-    deliverables: input.deliverables.length > 0 ? input.deliverables : null,
-    content_requirements: input.content_requirements || null,
-    notes: input.notes || null,
-  });
+  const { data: deal, error } = await supabase
+    .from("deals")
+    .insert({
+      user_id: user.id,
+      client_id: clientId || null,
+      title: input.title,
+      brand_name: input.brand_name,
+      platform: input.platform,
+      deal_type: input.deal_type,
+      amount: input.amount,
+      currency: input.currency,
+      payment_terms: input.payment_terms || null,
+      status: input.status || "negotiation",
+      start_date: input.start_date || null,
+      end_date: input.end_date || null,
+      content_deadline: input.content_deadline || null,
+      payment_due_date: input.payment_due_date || null,
+      deliverables: input.deliverables.length > 0 ? input.deliverables : null,
+      content_requirements: input.content_requirements || null,
+      notes: input.notes || null,
+    })
+    .select("id")
+    .single();
 
   if (error) {
     console.error("[createDeal]", error);
     return { error: "Failed to create deal. Please try again." };
   }
 
+  await syncDealCalendar(supabase, {
+    dealId: deal.id,
+    userId: user.id,
+    dealTitle: input.title,
+    contentDeadline: input.content_deadline || null,
+    paymentDueDate: input.payment_due_date || null,
+  });
+
   revalidatePath("/deals");
+  revalidatePath("/calendar");
   redirect("/deals");
 }
 
@@ -148,8 +162,17 @@ export async function updateDeal(dealId: string, input: CreateDealInput) {
     return { error: "Failed to update deal. Please try again." };
   }
 
+  await syncDealCalendar(supabase, {
+    dealId,
+    userId: user.id,
+    dealTitle: input.title,
+    contentDeadline: input.content_deadline || null,
+    paymentDueDate: input.payment_due_date || null,
+  });
+
   revalidatePath("/deals");
   revalidatePath(`/deals/${dealId}`);
+  revalidatePath("/calendar");
   redirect(`/deals/${dealId}`);
 }
 
@@ -183,6 +206,7 @@ export async function updateDealStatus(dealId: string, status: string) {
 
   revalidatePath("/deals");
   revalidatePath(`/deals/${dealId}`);
+  revalidatePath("/calendar");
   return { success: true };
 }
 
@@ -257,5 +281,6 @@ export async function deleteDeal(dealId: string) {
   }
 
   revalidatePath("/deals");
+  revalidatePath("/calendar");
   redirect("/deals");
 }

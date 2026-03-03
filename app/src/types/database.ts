@@ -33,7 +33,8 @@ export type ContentEventType =
   | "reel"
   | "video"
   | "review"
-  | "deadline";
+  | "deadline"
+  | "payment_due";
 
 export type ContentEventStatus =
   | "planned"
@@ -166,6 +167,7 @@ export interface ContentEvent {
   scheduled_at: string;
   completed_at: string | null;
   status: ContentEventStatus;
+  source: "manual" | "deal_sync";
   created_at: string;
   updated_at: string;
 }

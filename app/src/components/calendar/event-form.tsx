@@ -33,6 +33,7 @@ const EVENT_TYPES = [
   { value: "video", label: "Video" },
   { value: "review", label: "Review" },
   { value: "deadline", label: "Deadline" },
+  { value: "payment_due", label: "Payment Due" },
 ];
 
 const PLATFORMS = [
