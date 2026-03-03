@@ -24,6 +24,8 @@ export async function syncDealCalendar(
 ) {
   const { dealId, userId, dealTitle, contentDeadline, paymentDueDate, startDate, endDate } = params;
 
+  console.log("[syncDealCalendar] params:", { dealId, dealTitle, startDate, endDate, contentDeadline, paymentDueDate });
+
   const mappings: DateMapping[] = [
     {
       dateField: startDate,
@@ -64,16 +66,17 @@ export async function syncDealCalendar(
 
     if (mapping.dateField && current) {
       // Date SET + event exists → UPDATE
-      await supabase
+      const { error } = await supabase
         .from("content_events")
         .update({
           scheduled_at: `${mapping.dateField}T10:00:00`,
           title,
         })
         .eq("id", current.id);
+      if (error) console.error(`[syncDealCalendar] UPDATE ${mapping.eventType}:`, error);
     } else if (mapping.dateField && !current) {
       // Date SET + no event → INSERT
-      await supabase.from("content_events").insert({
+      const { error } = await supabase.from("content_events").insert({
         user_id: userId,
         deal_id: dealId,
         title,
@@ -82,12 +85,14 @@ export async function syncDealCalendar(
         status: "planned",
         source: "deal_sync",
       });
+      if (error) console.error(`[syncDealCalendar] INSERT ${mapping.eventType}:`, error);
     } else if (!mapping.dateField && current) {
       // Date NULL + event exists → DELETE
-      await supabase
+      const { error } = await supabase
         .from("content_events")
         .delete()
         .eq("id", current.id);
+      if (error) console.error(`[syncDealCalendar] DELETE ${mapping.eventType}:`, error);
     }
     // Date NULL + no event → nothing to do
   }
