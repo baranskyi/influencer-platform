@@ -315,13 +315,10 @@ export function CalendarGrid({
           const spanPadding = laneCount * SPAN_LANE_HEIGHT;
 
           return (
-            <div key={weekIdx} className="relative">
-              {/* Deal span overlay */}
+            <div key={weekIdx}>
+              {/* Deal span rows (in normal flow, above day cells) */}
               {laneCount > 0 && (
-                <div
-                  className="absolute top-0 left-0 right-0 z-10 pointer-events-none"
-                  style={{ height: `${spanPadding}px` }}
-                >
+                <div className="mb-0.5">
                   {Array.from({ length: laneCount }, (_, lane) => (
                     <div
                       key={lane}
@@ -356,7 +353,6 @@ export function CalendarGrid({
                           : "border-transparent bg-white/[0.02] opacity-40",
                         today && "ring-1 ring-orange/50 border-orange/30",
                       )}
-                      style={{ paddingTop: `${spanPadding + 6}px` }}
                       onClick={() => handleDayClick(date)}
                     >
                       {/* Day number + add button */}
