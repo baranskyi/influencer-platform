@@ -31,7 +31,6 @@ export default async function CalendarPage() {
         .from("deals")
         .select("id, title, brand_name, platform")
         .eq("user_id", user.id)
-        .in("status", ["negotiation", "agreed", "in_progress", "content_submitted"])
         .order("title", { ascending: true }),
     ]);
 
