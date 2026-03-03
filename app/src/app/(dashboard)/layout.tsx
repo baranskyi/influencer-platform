@@ -1,5 +1,4 @@
 import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 
 /* ============================================================
@@ -9,24 +8,18 @@ import { MobileNav } from "@/components/layout/mobile-nav";
    ┌─ bg-dashboard-gradient (full viewport) ──────────────────┐
    │ ┌──12px gap──┐                                           │
    │ │ ┌────────┐ │  ┌──────────────────────────────────────┐ │
-   │ │ │        │ │  │  Header (sticky, glass)               │ │
-   │ │ │ Float- │ │  ├──────────────────────────────────────┤ │
-   │ │ │  ing   │ │  │                                      │ │
-   │ │ │ Side-  │ │  │  Main content (scrollable)           │ │
+   │ │ │ Float- │ │  │                                      │ │
+   │ │ │  ing   │ │  │  Main content (scrollable)           │ │
+   │ │ │ Side-  │ │  │                                      │ │
    │ │ │  bar   │ │  │                                      │ │
-   │ │ │        │ │  │                                      │ │
    │ │ └────────┘ │  └──────────────────────────────────────┘ │
    │ └──12px gap──┘                                           │
    └──────────────────────────────────────────────────────────┘
    │ Mobile Nav (bottom, md:hidden)                            │
    └───────────────────────────────────────────────────────────┘
 
-   Key layout change:
-   The sidebar now sits inside a padded wrapper (p-3 = 12px) so it
-   floats with gaps from the top, bottom, and left screen edges.
-   The gradient background fills the entire viewport and bleeds
-   through the glass sidebar, creating the frosted-glass-over-
-   gradient effect central to the design language.
+   No header bar — user menu and notifications live in the
+   sidebar bottom section (avatar dropdown).
    ============================================================ */
 
 export default function DashboardLayout({
@@ -51,7 +44,6 @@ export default function DashboardLayout({
 
       {/* Main content column */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Header />
         <main
           className={[
             "flex-1 overflow-y-auto",

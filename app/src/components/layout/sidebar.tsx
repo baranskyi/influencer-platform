@@ -1,8 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard,
   Handshake,
@@ -11,6 +21,9 @@ import {
   Users,
   BarChart3,
   Settings,
+  Bell,
+  LogOut,
+  User,
 } from "lucide-react";
 
 /* ============================================================
@@ -42,6 +55,14 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <aside
@@ -81,12 +102,7 @@ export function Sidebar() {
                 /* Base styles: padding for 44px+ touch target, rounded for consistency */
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? [
-                      /* Active state: orange-tinted glass highlight */
-                      "bg-sidebar-accent text-sidebar-accent-foreground",
-                      /* Subtle left accent indicator */
-                      "shadow-[inset_3px_0_0_0_var(--color-orange)]",
-                    ].join(" ")
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : [
                       /* Inactive: muted foreground, hover lifts opacity */
                       "text-sidebar-foreground/60",
@@ -101,20 +117,51 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom section — user info with subtle top divider */}
-      <div className="border-t border-white/[0.06] p-4">
-        <div className="flex items-center gap-3 rounded-lg px-2 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-coral to-orange text-xs font-bold text-white">
-            U
-          </div>
-          <div className="flex-1 truncate">
-            <p className="truncate text-sm font-medium text-sidebar-foreground">
-              Creator
-            </p>
-            <p className="truncate text-xs text-muted-foreground">
-              Free Plan
-            </p>
-          </div>
+      {/* Bottom section — user menu + notifications */}
+      <div className="border-t border-white/[0.06] p-3">
+        <div className="flex items-center gap-2">
+          {/* User avatar with dropdown menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex flex-1 items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-sidebar-accent/50">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-gradient-to-br from-coral to-orange text-xs font-bold text-white">
+                    U
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 truncate text-left">
+                  <p className="truncate text-sm font-medium text-sidebar-foreground">
+                    Creator
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    Free Plan
+                  </p>
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" className="w-48">
+              <DropdownMenuItem onClick={() => router.push("/settings")}>
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/settings")}>
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Notification bell */}
+          <Button variant="ghost" size="icon" className="relative h-8 w-8 shrink-0">
+            <Bell className="h-4 w-4" />
+            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-orange" />
+            <span className="sr-only">Notifications</span>
+          </Button>
         </div>
       </div>
     </aside>
