@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 type DateMapping = {
   dateField: string | null;
-  eventType: "deadline" | "payment_due";
+  eventType: "deadline" | "payment_due" | "campaign_start" | "campaign_end";
   titlePrefix: string;
 };
 
@@ -18,15 +18,27 @@ export async function syncDealCalendar(
     dealTitle: string;
     contentDeadline: string | null;
     paymentDueDate: string | null;
+    startDate: string | null;
+    endDate: string | null;
   }
 ) {
-  const { dealId, userId, dealTitle, contentDeadline, paymentDueDate } = params;
+  const { dealId, userId, dealTitle, contentDeadline, paymentDueDate, startDate, endDate } = params;
 
   const mappings: DateMapping[] = [
+    {
+      dateField: startDate,
+      eventType: "campaign_start",
+      titlePrefix: "Campaign Start",
+    },
     {
       dateField: contentDeadline,
       eventType: "deadline",
       titlePrefix: "Content Deadline",
+    },
+    {
+      dateField: endDate,
+      eventType: "campaign_end",
+      titlePrefix: "Campaign End",
     },
     {
       dateField: paymentDueDate,

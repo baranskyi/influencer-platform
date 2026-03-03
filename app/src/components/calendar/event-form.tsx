@@ -34,6 +34,8 @@ const EVENT_TYPES = [
   { value: "review", label: "Review" },
   { value: "deadline", label: "Deadline" },
   { value: "payment_due", label: "Payment Due" },
+  { value: "campaign_start", label: "Campaign Start" },
+  { value: "campaign_end", label: "Campaign End" },
 ];
 
 const PLATFORMS = [

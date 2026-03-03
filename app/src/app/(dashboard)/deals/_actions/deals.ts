@@ -95,6 +95,8 @@ export async function createDeal(input: CreateDealInput) {
     dealTitle: input.title,
     contentDeadline: input.content_deadline || null,
     paymentDueDate: input.payment_due_date || null,
+    startDate: input.start_date || null,
+    endDate: input.end_date || null,
   });
 
   revalidatePath("/deals");
@@ -168,6 +170,8 @@ export async function updateDeal(dealId: string, input: CreateDealInput) {
     dealTitle: input.title,
     contentDeadline: input.content_deadline || null,
     paymentDueDate: input.payment_due_date || null,
+    startDate: input.start_date || null,
+    endDate: input.end_date || null,
   });
 
   revalidatePath("/deals");

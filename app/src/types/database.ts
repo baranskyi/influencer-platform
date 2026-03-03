@@ -34,7 +34,9 @@ export type ContentEventType =
   | "video"
   | "review"
   | "deadline"
-  | "payment_due";
+  | "payment_due"
+  | "campaign_start"
+  | "campaign_end";
 
 export type ContentEventStatus =
   | "planned"
