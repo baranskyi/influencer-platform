@@ -1,30 +1,733 @@
 import Link from "next/link";
+import {
+  ArrowRight,
+  BarChart3,
+  Calendar,
+  Check,
+  ChevronRight,
+  CircleDollarSign,
+  Globe,
+  Kanban,
+  ReceiptText,
+  Star,
+  Users,
+  Zap,
+} from "lucide-react";
 
-export default function Home() {
+/* ============================================================
+   DealFlow Landing Page
+   ============================================================
+   Server component — no "use client" needed.
+   Uses raw Tailwind + existing glass/gradient utilities from globals.css.
+   Dark-first design with glassmorphism depth.
+   ============================================================ */
+
+/* ---------- Data ---------- */
+
+const NAV_LINKS = [
+  { label: "Features", href: "#features" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "FAQ", href: "#faq" },
+] as const;
+
+const FEATURES = [
+  {
+    icon: Kanban,
+    title: "Deal Pipeline",
+    description:
+      "Visual Kanban board to track every brand deal from pitch to payment. Drag, drop, and never lose track of a deal again.",
+  },
+  {
+    icon: ReceiptText,
+    title: "Smart Invoicing",
+    description:
+      "Generate professional PDF invoices in one click. Automatic reminders keep cash flowing without awkward follow-ups.",
+  },
+  {
+    icon: Users,
+    title: "Client CRM",
+    description:
+      "Keep every brand contact, conversation, and contract in one place. Build relationships that turn into repeat business.",
+  },
+  {
+    icon: BarChart3,
+    title: "Analytics Dashboard",
+    description:
+      "Real-time revenue insights, deal conversion rates, and monthly trends. Know your numbers, grow your income.",
+  },
+  {
+    icon: Calendar,
+    title: "Content Calendar",
+    description:
+      "Never miss a deliverable deadline. Synced calendar with automatic reminders for every post, story, and reel.",
+  },
+  {
+    icon: Globe,
+    title: "Multi-Currency",
+    description:
+      "Work with brands worldwide. Invoice in USD, EUR, GBP, or any currency and track payments across borders.",
+  },
+] as const;
+
+const STATS = [
+  { value: "10,000+", label: "Creators onboarded" },
+  { value: "$50M+", label: "Revenue tracked" },
+  { value: "4.9", label: "Average rating", suffix: "★" },
+  { value: "150+", label: "Countries supported" },
+] as const;
+
+const PRICING_TIERS = [
+  {
+    name: "Free",
+    price: "$0",
+    period: "forever",
+    description: "Perfect for getting started with brand deals.",
+    features: [
+      "Up to 5 active deals",
+      "Basic invoicing",
+      "1 client workspace",
+      "Deal pipeline view",
+      "Email support",
+    ],
+    cta: "Start Free",
+    highlighted: false,
+  },
+  {
+    name: "Pro",
+    price: "$19",
+    period: "per month",
+    description: "Everything you need to run your creator business.",
+    features: [
+      "Unlimited deals",
+      "Smart invoicing with reminders",
+      "Unlimited clients",
+      "Analytics dashboard",
+      "Content calendar",
+      "Multi-currency support",
+      "Priority support",
+    ],
+    cta: "Start Pro Trial",
+    highlighted: true,
+  },
+  {
+    name: "Business",
+    price: "$49",
+    period: "per month",
+    description: "For agencies and creators managing multiple brands.",
+    features: [
+      "Everything in Pro",
+      "Team collaboration (up to 5)",
+      "Custom invoice branding",
+      "API access",
+      "Advanced analytics & exports",
+      "Dedicated account manager",
+      "Custom integrations",
+    ],
+    cta: "Contact Sales",
+    highlighted: false,
+  },
+] as const;
+
+const FAQ_ITEMS = [
+  {
+    question: "Is DealFlow really free to start?",
+    answer:
+      "Yes. The Free plan includes everything you need to manage up to 5 active deals with basic invoicing. No credit card required. Upgrade when you are ready.",
+  },
+  {
+    question: "How does the invoicing work?",
+    answer:
+      "Select a deal, click Generate Invoice, and DealFlow creates a professional PDF with your branding, payment terms, and line items. You can send it directly via email or download and share it yourself.",
+  },
+  {
+    question: "Can I track deals in different currencies?",
+    answer:
+      "Absolutely. DealFlow supports 30+ currencies. You can set a default currency for your account and override it per-deal. Analytics automatically convert everything to your base currency for clean reporting.",
+  },
+  {
+    question: "Is my data secure?",
+    answer:
+      "Your data is encrypted at rest and in transit. We use industry-standard security practices including SOC 2 compliance, regular penetration testing, and automatic backups. You own your data and can export it anytime.",
+  },
+  {
+    question: "Can I migrate from spreadsheets?",
+    answer:
+      "Yes. DealFlow supports CSV import so you can bring your existing deal history, client contacts, and invoice records with you. Most creators are fully migrated within 10 minutes.",
+  },
+  {
+    question: "Do you offer refunds?",
+    answer:
+      "We offer a 14-day money-back guarantee on all paid plans. If DealFlow is not the right fit, contact support and we will process your refund, no questions asked.",
+  },
+] as const;
+
+const FOOTER_LINKS = {
+  Product: [
+    { label: "Features", href: "#features" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "FAQ", href: "#faq" },
+    { label: "Changelog", href: "#" },
+  ],
+  Company: [
+    { label: "About", href: "#" },
+    { label: "Blog", href: "#" },
+    { label: "Careers", href: "#" },
+    { label: "Contact", href: "#" },
+  ],
+  Legal: [
+    { label: "Privacy Policy", href: "#" },
+    { label: "Terms of Service", href: "#" },
+    { label: "Cookie Policy", href: "#" },
+  ],
+} as const;
+
+/* ---------- Page Component ---------- */
+
+export default function LandingPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-      <div className="text-center space-y-6">
-        <h1 className="font-serif text-5xl font-bold text-foreground">
-          DealFlow
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-md">
-          Stop doing admin. Get paid faster.
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Link
-            href="/login"
-            className="rounded-full bg-primary px-6 py-3 text-primary-foreground font-medium hover:opacity-90 transition-opacity"
-          >
-            Log In
+    <div className="min-h-screen bg-mesh-gradient text-foreground font-sans scroll-smooth">
+      {/* ============================================================
+          NAVIGATION
+          Sticky glass nav with smooth scroll anchors.
+          Height: 64px. Z-index keeps it above all sections.
+          ============================================================ */}
+      <nav className="sticky top-0 z-50 glass-subtle" role="navigation" aria-label="Main navigation">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2" aria-label="DealFlow home">
+            <span className="text-gradient-brand font-serif text-2xl tracking-tight">
+              DealFlow
+            </span>
           </Link>
-          <Link
-            href="/signup"
-            className="rounded-full border border-border px-6 py-3 text-foreground font-medium hover:bg-accent/10 transition-colors"
-          >
-            Sign Up
-          </Link>
+
+          {/* Desktop nav links */}
+          <div className="hidden items-center gap-8 md:flex">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          {/* CTA buttons */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+            >
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-coral to-orange px-5 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-orange/25 hover:brightness-110"
+            >
+              Get Started Free
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
-      </div>
+      </nav>
+
+      {/* ============================================================
+          HERO SECTION
+          Large serif headline with gradient text on key phrases.
+          Two CTAs + abstract glass card mockup for visual depth.
+          Generous vertical padding for breathing room.
+          ============================================================ */}
+      <section className="relative overflow-hidden px-4 pb-24 pt-20 sm:px-6 sm:pb-32 sm:pt-28 lg:px-8 lg:pb-40 lg:pt-36">
+        {/* Decorative glow orbs — purely visual background elements */}
+        <div
+          className="pointer-events-none absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full opacity-30 blur-[120px]"
+          style={{ background: "radial-gradient(circle, #7C3AED 0%, transparent 70%)" }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute right-1/4 top-1/4 h-[400px] w-[400px] rounded-full opacity-20 blur-[100px]"
+          style={{ background: "radial-gradient(circle, #F5A623 0%, transparent 70%)" }}
+          aria-hidden="true"
+        />
+
+        <div className="relative mx-auto max-w-7xl">
+          <div className="mx-auto max-w-3xl text-center">
+            {/* Badge */}
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-muted-foreground backdrop-blur-sm">
+              <Zap className="h-3.5 w-3.5 text-orange" />
+              <span>Built for creators who mean business</span>
+            </div>
+
+            {/* Headline */}
+            <h1 className="font-serif text-4xl font-normal leading-[1.1] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+              Stop doing admin.{" "}
+              <span className="text-gradient-brand">Get paid faster.</span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+              The all-in-one platform for influencers and content creators to track brand deals,
+              send invoices, and grow revenue — so you can focus on creating.
+            </p>
+
+            {/* CTAs */}
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-coral to-orange px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:shadow-orange/30 hover:brightness-110"
+              >
+                Start Free
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a
+                href="#features"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-8 py-3.5 text-base font-medium text-foreground backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10"
+              >
+                See How It Works
+                <ChevronRight className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+
+          {/* Abstract dashboard mockup — glass composition */}
+          <div className="relative mx-auto mt-16 max-w-4xl sm:mt-20 lg:mt-24" aria-hidden="true">
+            <div className="glass glass-highlight rounded-2xl p-1.5">
+              <div className="rounded-xl bg-background/50 p-4 sm:p-6">
+                {/* Mock top bar */}
+                <div className="flex items-center gap-2 pb-4">
+                  <div className="h-3 w-3 rounded-full bg-coral/60" />
+                  <div className="h-3 w-3 rounded-full bg-orange/60" />
+                  <div className="h-3 w-3 rounded-full bg-mint/60" />
+                  <div className="ml-4 h-4 w-48 rounded-full bg-white/5" />
+                </div>
+
+                {/* Mock Kanban columns */}
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {["Pitched", "Negotiating", "In Progress", "Paid"].map(
+                    (col, i) => (
+                      <div key={col} className="space-y-2.5">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-2 w-2 rounded-full"
+                            style={{
+                              background: [
+                                "#B8A9E8",
+                                "#F5A623",
+                                "#7ECFB3",
+                                "#E8788A",
+                              ][i],
+                            }}
+                          />
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {col}
+                          </span>
+                        </div>
+                        {/* Mock deal cards */}
+                        {Array.from({ length: 3 - Math.floor(i / 2) }).map(
+                          (_, j) => (
+                            <div
+                              key={j}
+                              className="glass-subtle rounded-lg p-3"
+                            >
+                              <div className="mb-2 h-3 w-full rounded bg-white/8" />
+                              <div className="h-2 w-2/3 rounded bg-white/5" />
+                              <div className="mt-3 flex items-center justify-between">
+                                <div className="h-2.5 w-12 rounded bg-white/8" />
+                                <div
+                                  className="h-5 w-5 rounded-full"
+                                  style={{
+                                    background: [
+                                      "#E8788A30",
+                                      "#F5A62330",
+                                      "#7ECFB330",
+                                      "#B8A9E830",
+                                    ][i],
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Floating glass accent cards */}
+            <div className="absolute -left-6 top-1/3 hidden rounded-xl glass glass-highlight p-3 sm:block lg:-left-12">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-mint/15">
+                  <CircleDollarSign className="h-4 w-4 text-mint" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Invoice Paid</p>
+                  <p className="text-sm font-semibold text-mint">+$2,400</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute -right-6 top-1/2 hidden rounded-xl glass glass-highlight p-3 sm:block lg:-right-12">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange/15">
+                  <BarChart3 className="h-4 w-4 text-orange" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">This Month</p>
+                  <p className="text-sm font-semibold text-orange">$12,840</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          SOCIAL PROOF / STATS
+          A glass strip with key metrics to build credibility.
+          ============================================================ */}
+      <section className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8" aria-label="Platform statistics">
+        <div className="mx-auto max-w-5xl">
+          <div className="glass glass-highlight rounded-2xl px-6 py-8 sm:px-10 sm:py-10">
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+              {STATS.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <p className="text-gradient-brand font-serif text-3xl sm:text-4xl">
+                    {stat.value}
+                    {"suffix" in stat && (
+                      <span className="ml-0.5 text-orange">{stat.suffix}</span>
+                    )}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          FEATURES SECTION
+          6 glass cards in a responsive grid.
+          Each card has a gradient-accented icon, title, and description.
+          ============================================================ */}
+      <section
+        id="features"
+        className="scroll-mt-20 px-4 py-20 sm:px-6 sm:py-28 lg:px-8"
+        aria-labelledby="features-heading"
+      >
+        <div className="mx-auto max-w-7xl">
+          {/* Section header */}
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-orange">
+              Features
+            </p>
+            <h2
+              id="features-heading"
+              className="font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl"
+            >
+              Everything you need to{" "}
+              <span className="text-gradient-brand">run your creator business</span>
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              From first pitch to final payment, DealFlow handles the business side so you can do
+              what you do best.
+            </p>
+          </div>
+
+          {/* Feature cards grid */}
+          <div className="mt-14 grid gap-5 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={feature.title}
+                  className="glass glass-highlight group rounded-2xl p-6 transition-all duration-300 hover:glow-purple hover:-translate-y-0.5 sm:p-7"
+                >
+                  {/* Icon container with subtle gradient background */}
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-coral/15 to-orange/15">
+                    <Icon className="h-5 w-5 text-coral" />
+                  </div>
+                  <h3 className="font-serif text-xl">{feature.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {feature.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          PRICING SECTION
+          3 tiers: Free, Pro (highlighted), Business.
+          Pro tier has orange glow + "Most Popular" badge.
+          ============================================================ */}
+      <section
+        id="pricing"
+        className="scroll-mt-20 px-4 py-20 sm:px-6 sm:py-28 lg:px-8"
+        aria-labelledby="pricing-heading"
+      >
+        <div className="mx-auto max-w-7xl">
+          {/* Section header */}
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-orange">
+              Pricing
+            </p>
+            <h2
+              id="pricing-heading"
+              className="font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl"
+            >
+              Simple pricing,{" "}
+              <span className="text-gradient-brand">no surprises</span>
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Start free. Upgrade when your creator business takes off.
+            </p>
+          </div>
+
+          {/* Pricing cards */}
+          <div className="mx-auto mt-14 grid max-w-5xl gap-6 sm:mt-16 lg:grid-cols-3">
+            {PRICING_TIERS.map((tier) => (
+              <div
+                key={tier.name}
+                className={`relative flex flex-col rounded-2xl p-7 transition-all duration-300 sm:p-8 ${
+                  tier.highlighted
+                    ? "glass-heavy glass-highlight glow-orange scale-[1.02] lg:scale-105"
+                    : "glass glass-highlight"
+                }`}
+              >
+                {/* "Most Popular" badge for highlighted tier */}
+                {tier.highlighted && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-coral to-orange px-4 py-1 text-xs font-semibold text-white shadow-lg">
+                      <Star className="h-3 w-3" />
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+
+                {/* Tier name & price */}
+                <div className="mb-6">
+                  <h3 className="font-serif text-xl">{tier.name}</h3>
+                  <div className="mt-3 flex items-baseline gap-1">
+                    <span className="text-gradient-brand font-serif text-4xl sm:text-5xl">
+                      {tier.price}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      /{tier.period}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    {tier.description}
+                  </p>
+                </div>
+
+                {/* Feature list */}
+                <ul className="mb-8 flex-1 space-y-3" role="list">
+                  {tier.features.map((feat) => (
+                    <li key={feat} className="flex items-start gap-3 text-sm">
+                      <Check
+                        className={`mt-0.5 h-4 w-4 flex-shrink-0 ${
+                          tier.highlighted ? "text-orange" : "text-mint"
+                        }`}
+                      />
+                      <span className="text-muted-foreground">{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <Link
+                  href="/signup"
+                  className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-all ${
+                    tier.highlighted
+                      ? "bg-gradient-to-r from-coral to-orange text-white shadow-lg hover:shadow-orange/30 hover:brightness-110"
+                      : "border border-white/15 bg-white/5 text-foreground hover:border-white/25 hover:bg-white/10"
+                  }`}
+                >
+                  {tier.cta}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          FAQ SECTION
+          HTML <details>/<summary> for zero-JS expand/collapse.
+          Styled as glass cards for visual consistency.
+          ============================================================ */}
+      <section
+        id="faq"
+        className="scroll-mt-20 px-4 py-20 sm:px-6 sm:py-28 lg:px-8"
+        aria-labelledby="faq-heading"
+      >
+        <div className="mx-auto max-w-3xl">
+          {/* Section header */}
+          <div className="text-center">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-orange">
+              FAQ
+            </p>
+            <h2
+              id="faq-heading"
+              className="font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl"
+            >
+              Common <span className="text-gradient-brand">questions</span>
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Everything you need to know about DealFlow.
+            </p>
+          </div>
+
+          {/* FAQ items */}
+          <div className="mt-12 space-y-3 sm:mt-14">
+            {FAQ_ITEMS.map((item) => (
+              <details
+                key={item.question}
+                className="glass glass-highlight group rounded-xl transition-all [&[open]]:glow-purple"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left font-medium transition-colors hover:text-orange [&::-webkit-details-marker]:hidden">
+                  <span>{item.question}</span>
+                  {/* Chevron rotates on open via the group/open variant */}
+                  <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-90" />
+                </summary>
+                <div className="px-6 pb-5">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {item.answer}
+                  </p>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          FINAL CTA SECTION
+          Full-width glass panel with strong call to action.
+          Creates urgency before the footer.
+          ============================================================ */}
+      <section className="px-4 py-20 sm:px-6 sm:py-28 lg:px-8" aria-label="Call to action">
+        <div className="mx-auto max-w-4xl">
+          <div className="glass-heavy glass-highlight relative overflow-hidden rounded-3xl px-6 py-14 text-center sm:px-12 sm:py-20">
+            {/* Background accent orbs */}
+            <div
+              className="pointer-events-none absolute -left-20 -top-20 h-60 w-60 rounded-full opacity-20 blur-[80px]"
+              style={{ background: "#E8788A" }}
+              aria-hidden="true"
+            />
+            <div
+              className="pointer-events-none absolute -bottom-20 -right-20 h-60 w-60 rounded-full opacity-20 blur-[80px]"
+              style={{ background: "#F5A623" }}
+              aria-hidden="true"
+            />
+
+            <div className="relative">
+              <h2 className="font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl">
+                Ready to take control of{" "}
+                <span className="text-gradient-brand">your creator business?</span>
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
+                Join thousands of creators who stopped chasing payments and started growing
+                their income with DealFlow.
+              </p>
+              <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-coral to-orange px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:shadow-orange/30 hover:brightness-110"
+                >
+                  Get Started Free
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <p className="text-sm text-muted-foreground">
+                  No credit card required
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          FOOTER
+          Multi-column links + branding + copyright.
+          Glass-subtle surface sitting at the bottom.
+          ============================================================ */}
+      <footer className="border-t border-white/5 px-4 py-12 sm:px-6 sm:py-16 lg:px-8" role="contentinfo">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+            {/* Brand column */}
+            <div className="lg:col-span-2">
+              <Link href="/" className="inline-block" aria-label="DealFlow home">
+                <span className="text-gradient-brand font-serif text-2xl tracking-tight">
+                  DealFlow
+                </span>
+              </Link>
+              <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
+                The business platform built for influencers and content creators. Track deals,
+                send invoices, get paid.
+              </p>
+            </div>
+
+            {/* Link columns */}
+            {Object.entries(FOOTER_LINKS).map(([category, links]) => (
+              <div key={category}>
+                <p className="text-sm font-semibold text-foreground">{category}</p>
+                <ul className="mt-3 space-y-2.5" role="list">
+                  {links.map((link) => (
+                    <li key={link.label}>
+                      <a
+                        href={link.href}
+                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom bar */}
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">
+            <p className="text-xs text-muted-foreground">
+              &copy; {new Date().getFullYear()} DealFlow. All rights reserved.
+            </p>
+            <div className="flex gap-6">
+              <a
+                href="#"
+                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="DealFlow on Twitter"
+              >
+                Twitter
+              </a>
+              <a
+                href="#"
+                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="DealFlow on LinkedIn"
+              >
+                LinkedIn
+              </a>
+              <a
+                href="#"
+                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="DealFlow on Instagram"
+              >
+                Instagram
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
