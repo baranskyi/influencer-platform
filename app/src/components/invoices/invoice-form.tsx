@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,8 @@ type DealOption = {
   brand_name: string;
   amount: number | null;
   client_id: string | null;
+  currency: string;
+  payment_due_date: string | null;
 };
 
 type ClientOption = {
@@ -31,15 +33,34 @@ type ClientOption = {
 type InvoiceFormProps = {
   deals: DealOption[];
   clients: ClientOption[];
+  prefillDealId?: string;
 };
 
-export function InvoiceForm({ deals, clients }: InvoiceFormProps) {
+export function InvoiceForm({ deals, clients, prefillDealId }: InvoiceFormProps) {
   const [isPending, startTransition] = useTransition();
   const [subtotal, setSubtotal] = useState(0);
   const [taxRate, setTaxRate] = useState(21);
   const [irpfRate, setIrpfRate] = useState(0);
   const [selectedDeal, setSelectedDeal] = useState<string>("");
   const [selectedClient, setSelectedClient] = useState<string>("");
+  const [currency, setCurrency] = useState("EUR");
+  const [dueDate, setDueDate] = useState("");
+  const didPrefill = useRef(false);
+
+  // Auto-select deal from URL param on mount
+  useEffect(() => {
+    if (prefillDealId && !didPrefill.current) {
+      didPrefill.current = true;
+      const deal = deals.find((d) => d.id === prefillDealId);
+      if (deal) {
+        setSelectedDeal(deal.id);
+        if (deal.amount) setSubtotal(deal.amount);
+        if (deal.client_id) setSelectedClient(deal.client_id);
+        if (deal.currency) setCurrency(deal.currency);
+        if (deal.payment_due_date) setDueDate(deal.payment_due_date);
+      }
+    }
+  }, [prefillDealId, deals]);
 
   const taxAmount = +(subtotal * (taxRate / 100)).toFixed(2);
   const irpfAmount = +(subtotal * (irpfRate / 100)).toFixed(2);
@@ -51,6 +72,8 @@ export function InvoiceForm({ deals, clients }: InvoiceFormProps) {
     if (deal) {
       if (deal.amount) setSubtotal(deal.amount);
       if (deal.client_id) setSelectedClient(deal.client_id);
+      if (deal.currency) setCurrency(deal.currency);
+      if (deal.payment_due_date) setDueDate(deal.payment_due_date);
     }
   }
 
@@ -62,11 +85,11 @@ export function InvoiceForm({ deals, clients }: InvoiceFormProps) {
         subtotal,
         tax_rate: taxRate,
         irpf_rate: irpfRate,
-        currency: (formData.get("currency") as string) || "EUR",
+        currency: currency || "EUR",
         issue_date:
           (formData.get("issue_date") as string) ||
           new Date().toISOString().split("T")[0],
-        due_date: formData.get("due_date") as string,
+        due_date: dueDate || (formData.get("due_date") as string),
         notes: formData.get("notes") as string,
       });
     });
@@ -127,7 +150,7 @@ export function InvoiceForm({ deals, clients }: InvoiceFormProps) {
             {/* Currency */}
             <div className="space-y-2">
               <Label htmlFor="currency">Currency</Label>
-              <Select name="currency" defaultValue="EUR">
+              <Select name="currency" value={currency} onValueChange={setCurrency}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -152,7 +175,13 @@ export function InvoiceForm({ deals, clients }: InvoiceFormProps) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="due_date">Due Date</Label>
-                <Input id="due_date" name="due_date" type="date" />
+                <Input
+                  id="due_date"
+                  name="due_date"
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                />
               </div>
             </div>
 

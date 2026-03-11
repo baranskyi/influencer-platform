@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getStatusConfig } from "@/lib/get-status-config";
-import { getPaidStatuses } from "@/lib/deal-status-config";
+import { getPaidStatuses, getEnabledStatuses } from "@/lib/deal-status-config";
 
 export type CreateInvoiceInput = {
   deal_id: string | null;
@@ -71,6 +71,23 @@ export async function createInvoice(input: CreateInvoiceInput) {
   if (error) {
     console.error("[createInvoice]", error);
     return { error: "Failed to create invoice. Please try again." };
+  }
+
+  // Auto-transition linked deal to "invoiced" status if it exists and is enabled
+  if (input.deal_id) {
+    const statusConfig = await getStatusConfig();
+    const invoicedStatus = getEnabledStatuses(statusConfig).find(
+      (s) => s.value === "invoiced"
+    );
+    if (invoicedStatus) {
+      await supabase
+        .from("deals")
+        .update({ status: "invoiced" })
+        .eq("id", input.deal_id)
+        .eq("user_id", user.id);
+      revalidatePath("/deals");
+      revalidatePath(`/deals/${input.deal_id}`);
+    }
   }
 
   revalidatePath("/invoices");

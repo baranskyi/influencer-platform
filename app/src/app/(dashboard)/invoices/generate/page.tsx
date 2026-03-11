@@ -10,7 +10,12 @@ import { InvoiceForm } from "@/components/invoices/invoice-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileText } from "lucide-react";
 
-export default async function GenerateInvoicePage() {
+export default async function GenerateInvoicePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ deal_id?: string }>;
+}) {
+  const { deal_id: prefillDealId } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,6 +27,8 @@ export default async function GenerateInvoicePage() {
     brand_name: string;
     amount: number | null;
     client_id: string | null;
+    currency: string;
+    payment_due_date: string | null;
   }> = [];
   let clients: Array<{ id: string; name: string }> = [];
 
@@ -32,7 +39,7 @@ export default async function GenerateInvoicePage() {
     const dealsQuery = invoiceableStatuses.length > 0
       ? supabase
           .from("deals")
-          .select("id, title, brand_name, amount, client_id")
+          .select("id, title, brand_name, amount, client_id, currency, payment_due_date")
           .eq("user_id", user.id)
           .in("status", invoiceableStatuses)
           .order("title")
@@ -53,6 +60,8 @@ export default async function GenerateInvoicePage() {
       brand_name: d.brand_name as string,
       amount: d.amount != null ? Number(d.amount) : null,
       client_id: (d.client_id as string) ?? null,
+      currency: (d.currency as string) ?? "EUR",
+      payment_due_date: (d.payment_due_date as string) ?? null,
     }));
     clients = (clientsRes.data ?? []).map((c: Record<string, unknown>) => ({
       id: c.id as string,
@@ -72,7 +81,7 @@ export default async function GenerateInvoicePage() {
         <DashboardHeading>Generate Invoice</DashboardHeading>
       </div>
 
-      <InvoiceForm deals={deals} clients={clients} />
+      <InvoiceForm deals={deals} clients={clients} prefillDealId={prefillDealId} />
     </DashboardShell>
   );
 }

@@ -18,9 +18,10 @@ import { DealStatusSelect } from "@/components/deals/deal-status-select";
 import { DeleteDealButton } from "@/components/deals/delete-deal-button";
 import { getPlatformEmoji } from "@/components/deals/deal-status-badge";
 import { DeliverablesChecklist } from "@/components/deals/deliverables-checklist";
-import { ArrowLeft, Calendar, CreditCard, Handshake, Pencil, Users } from "lucide-react";
+import { ArrowLeft, Calendar, CreditCard, FileText, Handshake, Pencil, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getStatusConfig } from "@/lib/get-status-config";
+import { getInvoiceableStatuses } from "@/lib/deal-status-config";
 
 function formatCurrency(amount: number | null, currency: string) {
   if (amount === null) return "—";
@@ -88,6 +89,14 @@ export default async function DealDetailPage({
         </div>
         <div className="flex items-center gap-3">
           <DealStatusSelect dealId={deal.id} currentStatus={deal.status} statusConfig={statusConfig} />
+          {getInvoiceableStatuses(statusConfig).includes(deal.status) && (
+            <Link href={`/invoices/generate?deal_id=${deal.id}`}>
+              <Button variant="glass" size="sm">
+                <FileText className="h-4 w-4" />
+                Create Invoice
+              </Button>
+            </Link>
+          )}
           <Link href={`/deals/${deal.id}/edit`}>
             <Button variant="glass" size="sm">
               <Pencil className="h-4 w-4" />
