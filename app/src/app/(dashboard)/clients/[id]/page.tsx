@@ -28,7 +28,9 @@ import {
   FileText,
 } from "lucide-react";
 import { format } from "date-fns";
-import type { DealStatus, InvoiceStatus } from "@/types/database";
+import type { InvoiceStatus } from "@/types/database";
+import { getStatusConfig } from "@/lib/get-status-config";
+import { getEarnedStatuses } from "@/lib/deal-status-config";
 import { ClientDetailActions } from "@/components/clients/client-detail-actions";
 
 export default async function ClientDetailPage({
@@ -52,6 +54,9 @@ export default async function ClientDetailPage({
     .single();
 
   if (!client) notFound();
+
+  const statusConfig = await getStatusConfig();
+  const earnedStatusValues = getEarnedStatuses(statusConfig);
 
   // Fetch related deals and invoices
   const [dealsRes, invoicesRes] = await Promise.all([
@@ -104,7 +109,7 @@ export default async function ClientDetailPage({
           label="Total Revenue"
           value={`$${deals
             .filter((d: Record<string, unknown>) =>
-              ["paid", "completed"].includes(d.status as string)
+              earnedStatusValues.includes(d.status as string)
             )
             .reduce(
               (sum: number, d: Record<string, unknown>) =>
@@ -223,7 +228,7 @@ export default async function ClientDetailPage({
                       </TableCell>
                       <TableCell>
                         <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium">
-                          {(deal.status as DealStatus).replace(/_/g, " ")}
+                          {(deal.status as string).replace(/_/g, " ")}
                         </span>
                       </TableCell>
                     </TableRow>

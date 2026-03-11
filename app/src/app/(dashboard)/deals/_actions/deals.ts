@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { syncDealCalendar } from "@/lib/deals/sync-deal-calendar";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getStatusConfig } from "@/lib/get-status-config";
+import { getInitialStatus, getPaidStatuses } from "@/lib/deal-status-config";
 
 export type CreateDealInput = {
   title: string;
@@ -60,6 +62,9 @@ export async function createDeal(input: CreateDealInput) {
     clientId = client.id;
   }
 
+  const statusConfig = await getStatusConfig();
+  const defaultStatus = getInitialStatus(statusConfig);
+
   const { data: deal, error } = await supabase
     .from("deals")
     .insert({
@@ -72,7 +77,7 @@ export async function createDeal(input: CreateDealInput) {
       amount: input.amount,
       currency: input.currency,
       payment_terms: input.payment_terms || null,
-      status: input.status || "negotiation",
+      status: input.status || defaultStatus,
       start_date: input.start_date || null,
       end_date: input.end_date || null,
       content_deadline: input.content_deadline || null,
@@ -137,6 +142,9 @@ export async function updateDeal(dealId: string, input: CreateDealInput) {
     clientId = client.id;
   }
 
+  const statusConfig2 = await getStatusConfig();
+  const defaultStatus2 = getInitialStatus(statusConfig2);
+
   const { error } = await supabase
     .from("deals")
     .update({
@@ -148,7 +156,7 @@ export async function updateDeal(dealId: string, input: CreateDealInput) {
       amount: input.amount,
       currency: input.currency,
       payment_terms: input.payment_terms || null,
-      status: input.status || "negotiation",
+      status: input.status || defaultStatus2,
       start_date: input.start_date || null,
       end_date: input.end_date || null,
       content_deadline: input.content_deadline || null,
@@ -194,8 +202,10 @@ export async function updateDealStatus(dealId: string, status: string) {
 
   const updateData: Record<string, unknown> = { status };
 
-  // Auto-set paid_date when marking as paid
-  if (status === "paid") {
+  // Auto-set paid_date when status has isPaid flag
+  const statusConfig3 = await getStatusConfig();
+  const paidStatuses = getPaidStatuses(statusConfig3);
+  if (paidStatuses.includes(status)) {
     updateData.paid_date = new Date().toISOString().split("T")[0];
   }
 

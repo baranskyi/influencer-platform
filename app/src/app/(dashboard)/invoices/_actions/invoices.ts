@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getStatusConfig } from "@/lib/get-status-config";
+import { getPaidStatuses } from "@/lib/deal-status-config";
 
 export type CreateInvoiceInput = {
   deal_id: string | null;
@@ -103,7 +105,7 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
     return { error: "Failed to update invoice status. Please try again." };
   }
 
-  // When invoice is marked paid, auto-update linked deal to "paid"
+  // When invoice is marked paid, auto-update linked deal to the first isPaid status
   if (status === "paid") {
     const { data: invoice } = await supabase
       .from("invoices")
@@ -113,9 +115,13 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
       .single();
 
     if (invoice?.deal_id) {
+      const statusConfig = await getStatusConfig();
+      const paidStatuses = getPaidStatuses(statusConfig);
+      const dealPaidStatus = paidStatuses[0] ?? "paid";
+
       await supabase
         .from("deals")
-        .update({ status: "paid", paid_date: today })
+        .update({ status: dealPaidStatus, paid_date: today })
         .eq("id", invoice.deal_id)
         .eq("user_id", user.id);
 

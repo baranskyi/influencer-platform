@@ -85,6 +85,51 @@ export async function updateProfile(input: UpdateProfileInput) {
   return { success: true };
 }
 
+export async function saveDealStatusConfig(config: import("@/lib/deal-status-config").StatusConfig[]) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Validate: at least one isInitial, at least one isPaid, at least one isEarned
+  const enabled = config.filter((s) => s.enabled);
+  if (enabled.length < 2) return { error: "At least 2 statuses must be enabled." };
+  if (enabled.filter((s) => s.isInitial).length !== 1)
+    return { error: "Exactly one enabled status must be marked as Initial." };
+  if (!config.some((s) => s.isPaid))
+    return { error: "At least one status must be marked as Paid." };
+  if (!config.some((s) => s.isEarned))
+    return { error: "At least one status must be marked as Earned." };
+
+  // Check unique slugs
+  const slugs = new Set<string>();
+  for (const s of config) {
+    if (slugs.has(s.value)) return { error: `Duplicate slug: "${s.value}"` };
+    slugs.add(s.value);
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ deal_status_config: config, updated_at: new Date().toISOString() })
+    .eq("id", user.id);
+
+  if (error) {
+    console.error("[saveDealStatusConfig]", error);
+    return { error: "Failed to save pipeline config." };
+  }
+
+  revalidatePath("/settings");
+  revalidatePath("/deals");
+  revalidatePath("/dashboard");
+  revalidatePath("/analytics");
+  revalidatePath("/calendar");
+  return { success: true };
+}
+
 export async function changePassword(newPassword: string) {
   const supabase = await createClient();
   const {

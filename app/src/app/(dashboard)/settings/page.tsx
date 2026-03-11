@@ -48,6 +48,7 @@ export default async function SettingsPage() {
     follower_count: null,
     currency: "EUR",
     timezone: "UTC",
+    deal_status_config: null,
     notification_preferences: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),

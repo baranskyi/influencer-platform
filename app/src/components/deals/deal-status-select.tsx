@@ -10,28 +10,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-
-const PIPELINE = [
-  { value: "negotiation", label: "Negotiation" },
-  { value: "agreed", label: "Agreed" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "content_submitted", label: "Content Submitted" },
-  { value: "content_approved", label: "Content Approved" },
-  { value: "invoiced", label: "Invoiced" },
-  { value: "paid", label: "Paid" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
-  { value: "disputed", label: "Disputed" },
-];
+import {
+  type StatusConfig,
+  DEFAULT_DEAL_STATUSES,
+  getEnabledStatuses,
+} from "@/lib/deal-status-config";
 
 export function DealStatusSelect({
   dealId,
   currentStatus,
+  statusConfig,
 }: {
   dealId: string;
   currentStatus: string;
+  statusConfig?: StatusConfig[];
 }) {
+  const config = statusConfig ?? DEFAULT_DEAL_STATUSES;
   const [isPending, startTransition] = useTransition();
+  const statuses = getEnabledStatuses(config);
 
   function handleChange(newStatus: string) {
     startTransition(async () => {
@@ -50,7 +46,7 @@ export function DealStatusSelect({
           )}
         </SelectTrigger>
         <SelectContent>
-          {PIPELINE.map((s) => (
+          {statuses.map((s) => (
             <SelectItem key={s.value} value={s.value}>
               {s.label}
             </SelectItem>

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { DealStatusBadge, getPlatformEmoji } from "./deal-status-badge";
 import { ChevronUp, ChevronDown, ChevronsUpDown, Handshake, Plus } from "lucide-react";
 import type { Deal } from "@/types/database";
+import type { StatusConfig } from "@/lib/deal-status-config";
 
 type SortColumn = "title" | "amount" | "status" | "created_at";
 type SortDirection = "asc" | "desc";
@@ -31,9 +32,10 @@ function formatCurrency(amount: number | null, currency: string) {
 interface DealsTableProps {
   deals: Deal[];
   allDealsCount: number;
+  statusConfig?: StatusConfig[];
 }
 
-export function DealsTable({ deals, allDealsCount }: DealsTableProps) {
+export function DealsTable({ deals, allDealsCount, statusConfig }: DealsTableProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>("created_at");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
@@ -163,7 +165,7 @@ export function DealsTable({ deals, allDealsCount }: DealsTableProps) {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <DealStatusBadge status={deal.status} />
+                  <DealStatusBadge status={deal.status} statusConfig={statusConfig} />
                 </TableCell>
                 <TableCell className="text-right font-medium">
                   {formatCurrency(deal.amount, deal.currency)}

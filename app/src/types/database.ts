@@ -1,14 +1,6 @@
-export type DealStatus =
-  | "negotiation"
-  | "agreed"
-  | "in_progress"
-  | "content_submitted"
-  | "content_approved"
-  | "invoiced"
-  | "paid"
-  | "completed"
-  | "cancelled"
-  | "disputed";
+import type { StatusConfig } from "@/lib/deal-status-config";
+
+export type DealStatus = string;
 
 export type InvoiceStatus =
   | "draft"
@@ -84,6 +76,7 @@ export interface Profile {
   currency: string;
   timezone: string;
   notification_preferences: Record<string, unknown> | null;
+  deal_status_config: StatusConfig[] | null;
   created_at: string;
   updated_at: string;
 }

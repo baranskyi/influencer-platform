@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getStatusConfig } from "@/lib/get-status-config";
+import { getInvoiceableStatuses } from "@/lib/deal-status-config";
 import {
   DashboardShell,
   DashboardHeading,
@@ -24,19 +26,20 @@ export default async function GenerateInvoicePage() {
   let clients: Array<{ id: string; name: string }> = [];
 
   if (user) {
+    const statusConfig = await getStatusConfig();
+    const invoiceableStatuses = getInvoiceableStatuses(statusConfig);
+
+    const dealsQuery = invoiceableStatuses.length > 0
+      ? supabase
+          .from("deals")
+          .select("id, title, brand_name, amount, client_id")
+          .eq("user_id", user.id)
+          .in("status", invoiceableStatuses)
+          .order("title")
+      : Promise.resolve({ data: [] });
+
     const [dealsRes, clientsRes] = await Promise.all([
-      supabase
-        .from("deals")
-        .select("id, title, brand_name, amount, client_id")
-        .eq("user_id", user.id)
-        .in("status", [
-          "agreed",
-          "in_progress",
-          "content_submitted",
-          "content_approved",
-          "completed",
-        ])
-        .order("title"),
+      dealsQuery,
       supabase
         .from("clients")
         .select("id, name")

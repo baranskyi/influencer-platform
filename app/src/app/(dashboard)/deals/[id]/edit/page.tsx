@@ -9,6 +9,7 @@ import { DealForm } from "@/components/deals/deal-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Handshake } from "lucide-react";
 import type { Deal } from "@/types/database";
+import { getStatusConfig } from "@/lib/get-status-config";
 
 export default async function EditDealPage({
   params,
@@ -16,7 +17,10 @@ export default async function EditDealPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
+  const [supabase, statusConfig] = await Promise.all([
+    createClient(),
+    getStatusConfig(),
+  ]);
 
   const {
     data: { user },
@@ -59,7 +63,7 @@ export default async function EditDealPage({
           <Handshake className="h-7 w-7 text-orange" />
           <DashboardHeading>Edit Deal</DashboardHeading>
         </div>
-        <DealForm clients={clients} deal={deal} dealId={id} />
+        <DealForm clients={clients} deal={deal} dealId={id} statusConfig={statusConfig} />
       </div>
     </DashboardShell>
   );

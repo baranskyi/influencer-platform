@@ -11,11 +11,15 @@ import {
 } from "@/components/dashboard/dashboard-grid";
 import { Button } from "@/components/ui/button";
 import { DealsPageClient } from "@/components/deals/deals-page-client";
+import { getStatusConfig } from "@/lib/get-status-config";
 import { Plus, Handshake } from "lucide-react";
 import type { Deal } from "@/types/database";
 
 export default async function DealsPage() {
-  const supabase = await createClient();
+  const [supabase, statusConfig] = await Promise.all([
+    createClient(),
+    getStatusConfig(),
+  ]);
   const { data: deals } = await supabase
     .from("deals")
     .select("*")
@@ -35,7 +39,7 @@ export default async function DealsPage() {
           </Button>
         </Link>
       </div>
-      <DealsPageClient deals={(deals as Deal[]) ?? []} />
+      <DealsPageClient deals={(deals as Deal[]) ?? []} statusConfig={statusConfig} />
     </DashboardShell>
   );
 }

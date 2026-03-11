@@ -4,23 +4,18 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
-import { STATUS_CONFIG, getPlatformEmoji } from "./deal-status-badge";
+import { getPlatformEmoji } from "./deal-status-badge";
 import { updateDealStatus } from "@/app/(dashboard)/deals/_actions/deals";
 import { Handshake } from "lucide-react";
-import type { Deal, DealStatus } from "@/types/database";
-
-const PIPELINE_ORDER: DealStatus[] = [
-  "negotiation",
-  "agreed",
-  "in_progress",
-  "content_submitted",
-  "content_approved",
-  "invoiced",
-  "paid",
-  "completed",
-];
-
-const CONDITIONAL_STATUSES: DealStatus[] = ["cancelled", "disputed"];
+import type { Deal } from "@/types/database";
+import {
+  type StatusConfig,
+  DEFAULT_DEAL_STATUSES,
+  getPipelineStatuses,
+  getConditionalStatuses,
+  getStatusLabel,
+  getDotClassName,
+} from "@/lib/deal-status-config";
 
 function formatCurrency(amount: number | null, currency: string) {
   if (amount === null) return "—";
@@ -30,30 +25,19 @@ function formatCurrency(amount: number | null, currency: string) {
   }).format(amount);
 }
 
-// Dot color derived from STATUS_CONFIG className
-function getStatusDotColor(status: string): string {
-  const map: Record<string, string> = {
-    negotiation: "bg-yellow-400",
-    agreed: "bg-blue-400",
-    in_progress: "bg-indigo-400",
-    content_submitted: "bg-purple-400",
-    content_approved: "bg-teal-400",
-    invoiced: "bg-orange-400",
-    paid: "bg-green-400",
-    completed: "bg-emerald-400",
-    cancelled: "bg-gray-400",
-    disputed: "bg-red-400",
-  };
-  return map[status] ?? "bg-gray-400";
-}
-
-export function DealsKanban({ deals }: { deals: Deal[] }) {
+export function DealsKanban({
+  deals,
+  statusConfig,
+}: {
+  deals: Deal[];
+  statusConfig?: StatusConfig[];
+}) {
+  const config = statusConfig ?? DEFAULT_DEAL_STATUSES;
   const [localDeals, setLocalDeals] = useState<Deal[]>(deals);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   // Sync with parent when deals prop changes
-  // (e.g. after server revalidation)
   const dealsKey = deals.map((d) => `${d.id}:${d.status}`).join(",");
   const [prevKey, setPrevKey] = useState(dealsKey);
   if (dealsKey !== prevKey) {
@@ -61,20 +45,20 @@ export function DealsKanban({ deals }: { deals: Deal[] }) {
     setPrevKey(dealsKey);
   }
 
-  // Build columns — only show conditional statuses if they have deals
-  const columns = [
-    ...PIPELINE_ORDER,
-    ...CONDITIONAL_STATUSES.filter((s) =>
-      localDeals.some((d) => d.status === s)
-    ),
-  ];
+  // Build columns from config
+  const pipelineStatuses = getPipelineStatuses(config).map((s) => s.value);
+  const conditionalStatuses = getConditionalStatuses(config)
+    .map((s) => s.value)
+    .filter((s) => localDeals.some((d) => d.status === s));
+
+  const columns = [...pipelineStatuses, ...conditionalStatuses];
 
   const grouped = columns.reduce(
     (acc, status) => {
       acc[status] = localDeals.filter((d) => d.status === status);
       return acc;
     },
-    {} as Record<string, Deal[]>
+    {} as Record<string, Deal[]>,
   );
 
   const handleDragStart = useCallback(
@@ -83,7 +67,7 @@ export function DealsKanban({ deals }: { deals: Deal[] }) {
       e.dataTransfer.effectAllowed = "move";
       setDraggingId(dealId);
     },
-    []
+    [],
   );
 
   const handleDragEnd = useCallback(() => {
@@ -97,7 +81,7 @@ export function DealsKanban({ deals }: { deals: Deal[] }) {
       e.dataTransfer.dropEffect = "move";
       setDragOverColumn(status);
     },
-    []
+    [],
   );
 
   const handleDragLeave = useCallback(() => {
@@ -105,7 +89,7 @@ export function DealsKanban({ deals }: { deals: Deal[] }) {
   }, []);
 
   const handleDrop = useCallback(
-    async (e: React.DragEvent, newStatus: DealStatus) => {
+    async (e: React.DragEvent, newStatus: string) => {
       e.preventDefault();
       setDragOverColumn(null);
 
@@ -118,16 +102,15 @@ export function DealsKanban({ deals }: { deals: Deal[] }) {
       // Optimistic update
       const previousDeals = localDeals;
       setLocalDeals((prev) =>
-        prev.map((d) => (d.id === dealId ? { ...d, status: newStatus } : d))
+        prev.map((d) => (d.id === dealId ? { ...d, status: newStatus } : d)),
       );
 
       const result = await updateDealStatus(dealId, newStatus);
       if (result?.error) {
-        // Rollback on error
         setLocalDeals(previousDeals);
       }
     },
-    [localDeals]
+    [localDeals],
   );
 
   if (localDeals.length === 0) {
@@ -151,10 +134,8 @@ export function DealsKanban({ deals }: { deals: Deal[] }) {
       <div className="flex gap-4" style={{ minWidth: "fit-content" }}>
         {columns.map((status) => {
           const columnDeals = grouped[status] ?? [];
-          const config = STATUS_CONFIG[status] ?? {
-            label: status,
-            className: "",
-          };
+          const label = getStatusLabel(config, status);
+          const dotClass = getDotClassName(config, status);
           const isOver = dragOverColumn === status;
 
           return (
@@ -167,14 +148,12 @@ export function DealsKanban({ deals }: { deals: Deal[] }) {
               }`}
               onDragOver={(e) => handleDragOver(e, status)}
               onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, status as DealStatus)}
+              onDrop={(e) => handleDrop(e, status)}
             >
               {/* Column header */}
               <div className="flex items-center gap-2 border-b border-border/30 px-3 py-2.5">
-                <span
-                  className={`h-2.5 w-2.5 rounded-full ${getStatusDotColor(status)}`}
-                />
-                <span className="text-sm font-medium">{config.label}</span>
+                <span className={`h-2.5 w-2.5 rounded-full ${dotClass}`} />
+                <span className="text-sm font-medium">{label}</span>
                 <span className="ml-auto text-xs text-muted-foreground">
                   {columnDeals.length}
                 </span>
@@ -209,7 +188,7 @@ export function DealsKanban({ deals }: { deals: Deal[] }) {
                         <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
                           {format(
                             new Date(deal.content_deadline),
-                            "MMM d"
+                            "MMM d",
                           )}
                         </span>
                       )}

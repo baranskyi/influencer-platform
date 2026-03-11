@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   title: "Clients",
 };
 import { Building2 } from "lucide-react";
+import { getStatusConfig } from "@/lib/get-status-config";
+import { getEarnedStatuses } from "@/lib/deal-status-config";
 
 export default async function ClientsPage() {
   const supabase = await createClient();
@@ -42,6 +44,9 @@ export default async function ClientsPage() {
     ]);
 
     // Build a map of client_id → computed totals from actual deals
+    const statusConfig = await getStatusConfig();
+    const earnedStatusValues = getEarnedStatuses(statusConfig);
+
     type DealTotals = { dealCount: number; totalRevenue: number };
     const dealTotalsMap = new Map<string, DealTotals>();
 
@@ -50,7 +55,7 @@ export default async function ClientsPage() {
       if (!clientId) continue;
       const existing = dealTotalsMap.get(clientId) ?? { dealCount: 0, totalRevenue: 0 };
       existing.dealCount += 1;
-      if (["paid", "completed"].includes(deal.status as string)) {
+      if (earnedStatusValues.includes(deal.status as string)) {
         existing.totalRevenue += Number(deal.amount ?? 0);
       }
       dealTotalsMap.set(clientId, existing);

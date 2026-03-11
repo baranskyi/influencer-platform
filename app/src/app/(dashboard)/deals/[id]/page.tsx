@@ -20,6 +20,7 @@ import { getPlatformEmoji } from "@/components/deals/deal-status-badge";
 import { DeliverablesChecklist } from "@/components/deals/deliverables-checklist";
 import { ArrowLeft, Calendar, CreditCard, Handshake, Pencil, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getStatusConfig } from "@/lib/get-status-config";
 
 function formatCurrency(amount: number | null, currency: string) {
   if (amount === null) return "—";
@@ -40,7 +41,10 @@ export default async function DealDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
+  const [supabase, statusConfig] = await Promise.all([
+    createClient(),
+    getStatusConfig(),
+  ]);
 
   const { data: deal } = await supabase
     .from("deals")
@@ -83,7 +87,7 @@ export default async function DealDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <DealStatusSelect dealId={deal.id} currentStatus={deal.status} />
+          <DealStatusSelect dealId={deal.id} currentStatus={deal.status} statusConfig={statusConfig} />
           <Link href={`/deals/${deal.id}/edit`}>
             <Button variant="glass" size="sm">
               <Pencil className="h-4 w-4" />

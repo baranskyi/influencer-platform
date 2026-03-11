@@ -8,6 +8,8 @@ export const metadata: Metadata = {
 import { CalendarPageClient } from "@/components/calendar/calendar-page-client";
 import { CalendarDays } from "lucide-react";
 import type { ContentEvent } from "@/types/database";
+import { getStatusConfig } from "@/lib/get-status-config";
+import { getHiddenFromCalendarStatuses } from "@/lib/deal-status-config";
 
 type DealOption = { id: string; title: string; brand_name: string; platform: string; start_date: string | null; end_date: string | null };
 
@@ -34,14 +36,17 @@ export default async function CalendarPage() {
         .order("title", { ascending: true }),
     ]);
 
+    const statusConfig = await getStatusConfig();
+    const hiddenStatuses = getHiddenFromCalendarStatuses(statusConfig);
+
     const allDeals = dealsRes.data ?? [];
-    const completedDealIds = new Set(
-      allDeals.filter((d) => d.status === "completed").map((d) => d.id),
+    const hiddenDealIds = new Set(
+      allDeals.filter((d) => hiddenStatuses.includes(d.status as string)).map((d) => d.id),
     );
 
-    deals = allDeals.filter((d) => d.status !== "completed");
+    deals = allDeals.filter((d) => !hiddenStatuses.includes(d.status as string));
     events = (eventsRes.data ?? []).filter(
-      (e) => !e.deal_id || !completedDealIds.has(e.deal_id),
+      (e) => !e.deal_id || !hiddenDealIds.has(e.deal_id),
     );
   }
 

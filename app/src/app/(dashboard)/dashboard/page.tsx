@@ -26,7 +26,9 @@ import {
   CalendarDays,
   ChevronRight,
 } from "lucide-react";
-import type { DealStatus, InvoiceStatus, Platform } from "@/types/database";
+import type { InvoiceStatus, Platform } from "@/types/database";
+import { getStatusConfig } from "@/lib/get-status-config";
+import { getEarnedStatuses, getTerminalStatuses, getPaidStatuses } from "@/lib/deal-status-config";
 import {
   startOfDay,
   addDays,
@@ -102,7 +104,7 @@ export default async function DashboardPage() {
   const todayISO = startOfDay(now).toISOString();
 
   // Typed row shapes coming back from Supabase
-  type DealRow = { amount: number | null; status: DealStatus; created_at: string; currency: string };
+  type DealRow = { amount: number | null; status: string; created_at: string; currency: string };
   type InvoiceRow = { total: number; status: InvoiceStatus; paid_date: string | null; issue_date: string };
   type ContentEventRow = { platform: Platform | null; scheduled_at: string };
   type DeadlineRow = {
@@ -144,20 +146,28 @@ export default async function DashboardPage() {
         .order("scheduled_at", { ascending: true }),
 
       // Upcoming Deadlines: deals with content_deadline or payment_due_date >= today
-      supabase
-        .from("deals")
-        .select("id, title, brand_name, content_deadline, payment_due_date")
-        .eq("user_id", user.id)
-        .or(
-          `content_deadline.gte.${todayISO},payment_due_date.gte.${todayISO}`
-        )
-        .not("status", "in", '("cancelled","completed","paid")')
-        .order("content_deadline", { ascending: true, nullsFirst: false }),
+      // Exclude terminal + paid statuses from deadline view
+      (async () => {
+        const cfg = await getStatusConfig();
+        const excludeStatuses = [...new Set([...getTerminalStatuses(cfg), ...getPaidStatuses(cfg)])];
+        const excludeStr = excludeStatuses.length > 0
+          ? `(${excludeStatuses.map((s) => `"${s}"`).join(",")})`
+          : '("__none__")';
+        return supabase
+          .from("deals")
+          .select("id, title, brand_name, content_deadline, payment_due_date")
+          .eq("user_id", user.id)
+          .or(
+            `content_deadline.gte.${todayISO},payment_due_date.gte.${todayISO}`
+          )
+          .not("status", "in", excludeStr)
+          .order("content_deadline", { ascending: true, nullsFirst: false });
+      })(),
     ]);
 
     dealsThisMonth = (dealsRes.data ?? []).map((d: Record<string, unknown>) => ({
       amount: d.amount != null ? Number(d.amount) : null,
-      status: d.status as DealStatus,
+      status: d.status as string,
       created_at: d.created_at as string,
       currency: (d.currency as string) ?? "EUR",
     }));
@@ -193,16 +203,21 @@ export default async function DashboardPage() {
     Object.entries(currencyCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "EUR";
   const formatCurrency = makeCurrencyFormatter(primaryCurrency);
 
-  // ---- KPI calculations ----
+  // ---- KPI calculations (config-driven) ----
+  const statusConfig = await getStatusConfig();
+  const earnedStatusValues = getEarnedStatuses(statusConfig);
+  const terminalStatusValues = getTerminalStatuses(statusConfig);
+  const paidStatusValues = getPaidStatuses(statusConfig);
+  const inactiveStatuses = [...new Set([...terminalStatusValues, ...paidStatusValues])];
 
-  // "Earned This Month" — deals created this month that are paid or completed
+  // "Earned This Month" — deals created this month with isEarned statuses
   const earnedThisMonth = dealsThisMonth
-    .filter((d) => ["paid", "completed"].includes(d.status))
+    .filter((d) => earnedStatusValues.includes(d.status))
     .reduce((sum, d) => sum + (d.amount ?? 0), 0);
 
   // "Active Deals" — deals this month NOT in terminal/paid statuses
   const activeDeals = dealsThisMonth.filter(
-    (d) => !["paid", "completed", "cancelled"].includes(d.status)
+    (d) => !inactiveStatuses.includes(d.status)
   ).length;
 
   // "Pending Payment" — invoices with status sent or viewed

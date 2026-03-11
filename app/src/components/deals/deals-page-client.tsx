@@ -14,19 +14,11 @@ import { DealsTable } from "./deals-table";
 import { DealsKanban } from "./deals-kanban";
 import { Search, LayoutList, LayoutGrid } from "lucide-react";
 import type { Deal } from "@/types/database";
-
-const ALL_STATUSES = [
-  { value: "all", label: "All Statuses" },
-  { value: "negotiation", label: "Negotiation" },
-  { value: "agreed", label: "Agreed" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "content_submitted", label: "Submitted" },
-  { value: "content_approved", label: "Approved" },
-  { value: "invoiced", label: "Invoiced" },
-  { value: "paid", label: "Paid" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
-];
+import {
+  type StatusConfig,
+  DEFAULT_DEAL_STATUSES,
+  getEnabledStatuses,
+} from "@/lib/deal-status-config";
 
 const ALL_PLATFORMS = [
   { value: "all", label: "All Platforms" },
@@ -38,11 +30,24 @@ const ALL_PLATFORMS = [
 
 type ViewMode = "table" | "kanban";
 
-export function DealsPageClient({ deals }: { deals: Deal[] }) {
+export function DealsPageClient({
+  deals,
+  statusConfig,
+}: {
+  deals: Deal[];
+  statusConfig?: StatusConfig[];
+}) {
+  const config = statusConfig ?? DEFAULT_DEAL_STATUSES;
   const [view, setView] = useState<ViewMode>("table");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
+
+  const enabledStatuses = getEnabledStatuses(config);
+  const allStatuses = [
+    { value: "all", label: "All Statuses" },
+    ...enabledStatuses.map((s) => ({ value: s.value, label: s.label })),
+  ];
 
   const filtered = deals.filter((deal) => {
     const matchesSearch =
@@ -74,7 +79,7 @@ export function DealsPageClient({ deals }: { deals: Deal[] }) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {ALL_STATUSES.map((s) => (
+            {allStatuses.map((s) => (
               <SelectItem key={s.value} value={s.value}>
                 {s.label}
               </SelectItem>
@@ -115,9 +120,9 @@ export function DealsPageClient({ deals }: { deals: Deal[] }) {
 
       {/* View */}
       {view === "table" ? (
-        <DealsTable deals={filtered} allDealsCount={deals.length} />
+        <DealsTable deals={filtered} allDealsCount={deals.length} statusConfig={config} />
       ) : (
-        <DealsKanban deals={filtered} />
+        <DealsKanban deals={filtered} statusConfig={config} />
       )}
     </div>
   );

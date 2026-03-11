@@ -20,6 +20,8 @@ import {
 import { updateProfile, changePassword } from "@/app/(dashboard)/settings/_actions/settings";
 import type { Profile } from "@/types/database";
 import { User, Building2, CreditCard, Share2, Settings, Lock } from "lucide-react";
+import { resolveStatusConfig } from "@/lib/deal-status-config";
+import { DealPipelineEditor } from "./deal-pipeline-editor";
 import { toast } from "sonner";
 
 type SettingsFormProps = {
@@ -400,6 +402,13 @@ export function SettingsForm({ profile }: SettingsFormProps) {
         </Button>
       </div>
     </form>
+
+    {/* Deal Pipeline — independent save */}
+    <div className="mt-6">
+      <DealPipelineEditor
+        initialConfig={resolveStatusConfig(profile.deal_status_config)}
+      />
+    </div>
 
     {/* Security — separate form so it doesn't interfere with the profile form */}
     <form onSubmit={handleChangePassword} className="mt-6">

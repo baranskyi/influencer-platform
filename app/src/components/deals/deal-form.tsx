@@ -21,6 +21,12 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, Loader2 } from "lucide-react";
+import {
+  type StatusConfig,
+  DEFAULT_DEAL_STATUSES,
+  getEnabledStatuses,
+  getInitialStatus,
+} from "@/lib/deal-status-config";
 
 const PLATFORMS = [
   { value: "instagram", label: "Instagram" },
@@ -35,12 +41,6 @@ const DEAL_TYPES = [
   { value: "barter", label: "Barter" },
   { value: "ambassador", label: "Ambassador" },
   { value: "ugc", label: "UGC" },
-];
-
-const STATUSES = [
-  { value: "negotiation", label: "Negotiation" },
-  { value: "agreed", label: "Agreed" },
-  { value: "in_progress", label: "In Progress" },
 ];
 
 const DELIVERABLE_TYPES = [
@@ -59,11 +59,17 @@ export function DealForm({
   clients,
   deal,
   dealId,
+  statusConfig,
 }: {
   clients: Client[];
   deal?: Deal;
   dealId?: string;
+  statusConfig?: StatusConfig[];
 }) {
+  const config = statusConfig ?? DEFAULT_DEAL_STATUSES;
+  // Non-terminal enabled statuses for initial status selection
+  const formStatuses = getEnabledStatuses(config).filter((s) => !s.isTerminal);
+  const initialStatus = getInitialStatus(config);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [showNewClient, setShowNewClient] = useState(false);
@@ -100,7 +106,7 @@ export function DealForm({
         : null,
       currency: (formData.get("currency") as string) || "EUR",
       payment_terms: formData.get("payment_terms") as string,
-      status: (formData.get("status") as string) || "negotiation",
+      status: (formData.get("status") as string) || initialStatus,
       start_date: (formData.get("start_date") as string) || null,
       end_date: (formData.get("end_date") as string) || null,
       content_deadline: (formData.get("content_deadline") as string) || null,
@@ -193,12 +199,12 @@ export function DealForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="status">Initial Status</Label>
-            <Select name="status" defaultValue={deal?.status ?? "negotiation"}>
+            <Select name="status" defaultValue={deal?.status ?? initialStatus}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {STATUSES.map((s) => (
+                {formStatuses.map((s) => (
                   <SelectItem key={s.value} value={s.value}>
                     {s.label}
                   </SelectItem>

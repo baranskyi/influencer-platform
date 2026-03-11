@@ -20,7 +20,9 @@ import {
   BarChart3,
   Users,
 } from "lucide-react";
-import type { DealStatus, Platform } from "@/types/database";
+import type { Platform } from "@/types/database";
+import { getStatusConfig } from "@/lib/get-status-config";
+import { getEarnedStatuses, getTerminalStatuses } from "@/lib/deal-status-config";
 
 export default async function AnalyticsPage() {
   const supabase = await createClient();
@@ -31,7 +33,7 @@ export default async function AnalyticsPage() {
   let deals: Array<{
     amount: number | null;
     currency: string;
-    status: DealStatus;
+    status: string;
     platform: Platform;
     created_at: string;
     client_id: string | null;
@@ -58,7 +60,7 @@ export default async function AnalyticsPage() {
     deals = (dealsRes.data ?? []).map((d: Record<string, unknown>) => ({
       amount: d.amount != null ? Number(d.amount) : null,
       currency: d.currency as string,
-      status: d.status as DealStatus,
+      status: d.status as string,
       platform: d.platform as Platform,
       created_at: d.created_at as string,
       client_id: (d.client_id as string) ?? null,
@@ -89,10 +91,14 @@ export default async function AnalyticsPage() {
       minimumFractionDigits: 0,
     }).format(n);
 
-  // Calculate KPIs
-  // Total Revenue = sum of paid/completed deals + paid invoices (whichever is higher)
+  // Calculate KPIs (config-driven)
+  const statusConfig = await getStatusConfig();
+  const earnedStatusValues = getEarnedStatuses(statusConfig);
+  const terminalStatusValues = getTerminalStatuses(statusConfig);
+
+  // Total Revenue = sum of earned deals + paid invoices (whichever is higher)
   const paidDealRevenue = deals
-    .filter((d) => ["paid", "completed"].includes(d.status))
+    .filter((d) => earnedStatusValues.includes(d.status))
     .reduce((sum, d) => sum + (d.amount ?? 0), 0);
   const paidInvoices = invoices.filter((i) => i.status === "paid");
   const paidInvoiceRevenue = paidInvoices.reduce((sum, i) => sum + i.total, 0);
@@ -101,9 +107,7 @@ export default async function AnalyticsPage() {
 
   const pendingRevenue = deals
     .filter((d) =>
-      ["negotiation", "agreed", "in_progress", "content_submitted", "content_approved", "invoiced"].includes(
-        d.status
-      )
+      !earnedStatusValues.includes(d.status) && !terminalStatusValues.includes(d.status)
     )
     .reduce((sum, d) => sum + (d.amount ?? 0), 0);
   const totalDeals = deals.length;
@@ -136,7 +140,7 @@ export default async function AnalyticsPage() {
 
     const monthDeals = deals.filter((d) => d.created_at.startsWith(monthKey));
     const monthRevenue = monthDeals
-      .filter((d) => ["paid", "completed"].includes(d.status))
+      .filter((d) => earnedStatusValues.includes(d.status))
       .reduce((sum, d) => sum + (d.amount ?? 0), 0);
 
     monthlyData.push({
@@ -146,10 +150,10 @@ export default async function AnalyticsPage() {
     });
   }
 
-  // Revenue by client — paid/completed deals grouped by client, top 8
+  // Revenue by client — earned deals grouped by client, top 8
   const clientRevenueMap: Record<string, { name: string; revenue: number }> = {};
   deals
-    .filter((d) => ["paid", "completed"].includes(d.status) && d.client_id)
+    .filter((d) => earnedStatusValues.includes(d.status) && d.client_id)
     .forEach((d) => {
       const id = d.client_id!;
       const name = d.clients?.name ?? "Unknown Client";

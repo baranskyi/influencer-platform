@@ -7,9 +7,13 @@ import { DealForm } from "@/components/deals/deal-form";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft, Handshake } from "lucide-react";
+import { getStatusConfig } from "@/lib/get-status-config";
 
 export default async function NewDealPage() {
-  const supabase = await createClient();
+  const [supabase, statusConfig] = await Promise.all([
+    createClient(),
+    getStatusConfig(),
+  ]);
   const { data: clients } = await supabase
     .from("clients")
     .select("id, name")
@@ -27,7 +31,7 @@ export default async function NewDealPage() {
           <Handshake className="h-7 w-7 text-orange" />
           <DashboardHeading>New Deal</DashboardHeading>
         </div>
-        <DealForm clients={clients ?? []} />
+        <DealForm clients={clients ?? []} statusConfig={statusConfig} />
       </div>
     </DashboardShell>
   );
