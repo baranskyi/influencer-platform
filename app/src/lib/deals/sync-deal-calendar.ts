@@ -20,9 +20,10 @@ export async function syncDealCalendar(
     paymentDueDate: string | null;
     startDate: string | null;
     endDate: string | null;
+    platform: string;
   }
 ) {
-  const { dealId, userId, dealTitle, contentDeadline, paymentDueDate, startDate, endDate } = params;
+  const { dealId, userId, dealTitle, contentDeadline, paymentDueDate, startDate, endDate, platform } = params;
 
   console.log("[syncDealCalendar] params:", { dealId, dealTitle, startDate, endDate, contentDeadline, paymentDueDate });
 
@@ -71,6 +72,7 @@ export async function syncDealCalendar(
         .update({
           scheduled_at: `${mapping.dateField}T10:00:00`,
           title,
+          platform,
         })
         .eq("id", current.id);
       if (error) console.error(`[syncDealCalendar] UPDATE ${mapping.eventType}:`, error);
@@ -84,6 +86,7 @@ export async function syncDealCalendar(
         scheduled_at: `${mapping.dateField}T10:00:00`,
         status: "planned",
         source: "deal_sync",
+        platform,
       });
       if (error) console.error(`[syncDealCalendar] INSERT ${mapping.eventType}:`, error);
     } else if (!mapping.dateField && current) {

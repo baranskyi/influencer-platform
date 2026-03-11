@@ -97,6 +97,7 @@ export async function createDeal(input: CreateDealInput) {
     paymentDueDate: input.payment_due_date || null,
     startDate: input.start_date || null,
     endDate: input.end_date || null,
+    platform: input.platform,
   });
 
   revalidatePath("/deals");
@@ -172,6 +173,7 @@ export async function updateDeal(dealId: string, input: CreateDealInput) {
     paymentDueDate: input.payment_due_date || null,
     startDate: input.start_date || null,
     endDate: input.end_date || null,
+    platform: input.platform,
   });
 
   revalidatePath("/deals");

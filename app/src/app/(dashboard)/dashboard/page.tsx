@@ -24,7 +24,6 @@ import {
   Plus,
   FileText,
   CalendarDays,
-  TrendingUp,
   ChevronRight,
 } from "lucide-react";
 import type { DealStatus, InvoiceStatus, Platform } from "@/types/database";
@@ -33,10 +32,8 @@ import {
   addDays,
   getDay,
   parseISO,
-  subMonths,
-  startOfMonth,
-  endOfMonth,
   format,
+  differenceInDays,
 } from "date-fns";
 
 /* ============================================================
@@ -52,8 +49,7 @@ import {
 
    2. Bento Grid:
       - Content Calendar (full-width weekly view with colored blocks)
-      - Invoice Tracking (bar chart + status legend — real data)
-      - Campaign Analytics (line chart + metrics)
+      - Upcoming Deadlines (full-width: content + payment due dates)
 
    3. Quick Actions row at top-right
 
@@ -102,22 +98,28 @@ export default async function DashboardPage() {
   const weekStart = startOfDay(now);
   const weekEnd = startOfDay(addDays(now, 7));
 
-  // Last 6 months: for Invoice bar chart and Campaign Analytics
-  const sixMonthsAgo = startOfMonth(subMonths(now, 5));
+  // Upcoming Deadlines: today's date string for querying
+  const todayISO = startOfDay(now).toISOString();
 
   // Typed row shapes coming back from Supabase
   type DealRow = { amount: number | null; status: DealStatus; created_at: string; currency: string };
   type InvoiceRow = { total: number; status: InvoiceStatus; paid_date: string | null; issue_date: string };
   type ContentEventRow = { platform: Platform | null; scheduled_at: string };
-  type DealHistoryRow = { amount: number | null; status: DealStatus; created_at: string; currency: string };
+  type DeadlineRow = {
+    id: string;
+    title: string;
+    brand_name: string | null;
+    content_deadline: string | null;
+    payment_due_date: string | null;
+  };
 
   let dealsThisMonth: DealRow[] = [];
   let allInvoices: InvoiceRow[] = [];
   let contentEvents: ContentEventRow[] = [];
-  let dealsHistory: DealHistoryRow[] = [];
+  let upcomingDeadlines: DeadlineRow[] = [];
 
   if (user) {
-    const [dealsRes, invoicesRes, eventsRes, dealsHistoryRes] = await Promise.all([
+    const [dealsRes, invoicesRes, eventsRes, deadlinesRes] = await Promise.all([
       // KPI: deals created this calendar month
       supabase
         .from("deals")
@@ -126,7 +128,7 @@ export default async function DashboardPage() {
         .gte("created_at", monthStart)
         .lt("created_at", monthEnd),
 
-      // All invoices (for KPI and bar chart)
+      // All invoices (for KPI stats)
       supabase
         .from("invoices")
         .select("total, status, paid_date, issue_date")
@@ -141,12 +143,16 @@ export default async function DashboardPage() {
         .lt("scheduled_at", weekEnd.toISOString())
         .order("scheduled_at", { ascending: true }),
 
-      // Campaign Analytics: deals from last 6 months
+      // Upcoming Deadlines: deals with content_deadline or payment_due_date >= today
       supabase
         .from("deals")
-        .select("amount, status, created_at, currency")
+        .select("id, title, brand_name, content_deadline, payment_due_date")
         .eq("user_id", user.id)
-        .gte("created_at", sixMonthsAgo.toISOString()),
+        .or(
+          `content_deadline.gte.${todayISO},payment_due_date.gte.${todayISO}`
+        )
+        .not("status", "in", '("cancelled","completed","paid")')
+        .order("content_deadline", { ascending: true, nullsFirst: false }),
     ]);
 
     dealsThisMonth = (dealsRes.data ?? []).map((d: Record<string, unknown>) => ({
@@ -168,17 +174,18 @@ export default async function DashboardPage() {
       scheduled_at: e.scheduled_at as string,
     }));
 
-    dealsHistory = (dealsHistoryRes.data ?? []).map((d: Record<string, unknown>) => ({
-      amount: d.amount != null ? Number(d.amount) : null,
-      status: d.status as DealStatus,
-      created_at: d.created_at as string,
-      currency: (d.currency as string) ?? "EUR",
+    upcomingDeadlines = (deadlinesRes.data ?? []).map((d: Record<string, unknown>) => ({
+      id: d.id as string,
+      title: (d.title as string) ?? "Untitled Deal",
+      brand_name: (d.brand_name as string | null) ?? null,
+      content_deadline: (d.content_deadline as string | null) ?? null,
+      payment_due_date: (d.payment_due_date as string | null) ?? null,
     }));
   }
 
-  // ---- Determine primary currency from all fetched deals ----
+  // ---- Determine primary currency from fetched deals ----
   const currencyCounts: Record<string, number> = {};
-  [...dealsThisMonth, ...dealsHistory].forEach((d) => {
+  dealsThisMonth.forEach((d) => {
     const c = d.currency ?? "EUR";
     currencyCounts[c] = (currencyCounts[c] || 0) + 1;
   });
@@ -207,11 +214,6 @@ export default async function DashboardPage() {
   // "Overdue" — invoices with status overdue
   const overdueInvoices = allInvoices.filter((i) => i.status === "overdue");
   const overdueTotal = overdueInvoices.reduce((sum, i) => sum + i.total, 0);
-
-  // Invoice Tracking card — revenue (paid invoices) + pending + overdue
-  const invoiceRevenue = allInvoices
-    .filter((i) => i.status === "paid")
-    .reduce((sum, i) => sum + i.total, 0);
 
   // ---- Content Calendar: group events by day-of-week index (0=Mon…6=Sun) ----
   // We render a Mon-Sun week starting from today's week.
@@ -250,58 +252,55 @@ export default async function DashboardPage() {
 
   const hasAnyCalendarEvents = calendarDays.some((slots) => slots.length > 0);
 
-  // ---- Invoice bar chart: last 6 months paid totals ----
-  // Build array of { monthKey: "YYYY-MM", total: number } for 6 months
-  const invoiceMonthlyTotals: number[] = Array(6).fill(0);
-  const invoiceMonthLabels: string[] = [];
-  for (let i = 5; i >= 0; i--) {
-    const monthDate = subMonths(now, i);
-    invoiceMonthLabels.push(format(monthDate, "MMM"));
-    const mStart = startOfMonth(monthDate);
-    const mEnd = endOfMonth(monthDate);
-    const total = allInvoices
-      .filter((inv) => {
-        if (inv.status !== "paid" || !inv.paid_date) return false;
-        const paidAt = parseISO(inv.paid_date);
-        return paidAt >= mStart && paidAt <= mEnd;
-      })
-      .reduce((sum, inv) => sum + inv.total, 0);
-    invoiceMonthlyTotals[5 - i] = total;
+  // ---- Upcoming Deadlines: build flat sorted list of deadline entries ----
+  type DeadlineEntry = {
+    dealId: string;
+    dealTitle: string;
+    brandName: string | null;
+    date: Date;
+    type: "content" | "payment";
+  };
+
+  const today = startOfDay(now);
+  const deadlineEntries: DeadlineEntry[] = [];
+
+  for (const deal of upcomingDeadlines) {
+    if (deal.content_deadline) {
+      const d = startOfDay(parseISO(deal.content_deadline));
+      if (d >= today) {
+        deadlineEntries.push({
+          dealId: deal.id,
+          dealTitle: deal.title,
+          brandName: deal.brand_name,
+          date: d,
+          type: "content",
+        });
+      }
+    }
+    if (deal.payment_due_date) {
+      const d = startOfDay(parseISO(deal.payment_due_date));
+      if (d >= today) {
+        deadlineEntries.push({
+          dealId: deal.id,
+          dealTitle: deal.title,
+          brandName: deal.brand_name,
+          date: d,
+          type: "payment",
+        });
+      }
+    }
   }
-  const invoiceMaxMonthly = Math.max(...invoiceMonthlyTotals, 1); // avoid div/0
-  const invoiceBarHeights = invoiceMonthlyTotals.map((t) =>
-    Math.max(Math.round((t / invoiceMaxMonthly) * 100), 4)
-  );
 
-  // ---- Campaign Analytics: last 6 months deal revenue ----
-  const dealMonthlyRevenue: number[] = Array(6).fill(0);
-  const dealMonthLabels: string[] = [];
-  for (let i = 5; i >= 0; i--) {
-    const monthDate = subMonths(now, i);
-    dealMonthLabels.push(format(monthDate, "MMM"));
-    const mStart = startOfMonth(monthDate);
-    const mEnd = endOfMonth(monthDate);
-    const revenue = dealsHistory
-      .filter((d) => {
-        if (!["paid", "completed"].includes(d.status)) return false;
-        const createdAt = parseISO(d.created_at);
-        return createdAt >= mStart && createdAt <= mEnd;
-      })
-      .reduce((sum, d) => sum + (d.amount ?? 0), 0);
-    dealMonthlyRevenue[5 - i] = revenue;
+  // Sort by date ascending and take top 7
+  deadlineEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
+  const visibleDeadlines = deadlineEntries.slice(0, 7);
+
+  function formatDeadlineDistance(date: Date): string {
+    const days = differenceInDays(date, today);
+    if (days === 0) return "today";
+    if (days === 1) return "tomorrow";
+    return `in ${days} days`;
   }
-  const dealMaxMonthly = Math.max(...dealMonthlyRevenue, 1);
-  const dealBarHeights = dealMonthlyRevenue.map((r) =>
-    Math.max(Math.round((r / dealMaxMonthly) * 100), 4)
-  );
-
-  // Total revenue across all 6 months (paid/completed deals)
-  const totalRevenue6Months = dealMonthlyRevenue.reduce((s, v) => s + v, 0);
-
-  // Active deals count across all 6-month history (not just this month)
-  const activeDealsTotal = dealsHistory.filter(
-    (d) => !["paid", "completed", "cancelled"].includes(d.status)
-  ).length;
 
   return (
     <DashboardShell>
@@ -460,130 +459,82 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* ---- Invoice Tracking Card (real data) ---- */}
-        <Card variant="glass" className="min-h-[320px]">
+        {/* ---- Upcoming Deadlines Card (full width) ---- */}
+        <Card variant="glass" className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-mint" />
-              Invoice Tracking
+              <CalendarDays className="h-5 w-5 text-orange" />
+              Upcoming Deadlines
             </CardTitle>
             <CardAction>
-              <Link href="/invoices">
+              <Link href="/deals">
                 <Button variant="glass" size="xs">
-                  View All
-                </Button>
-              </Link>
-            </CardAction>
-          </CardHeader>
-          <CardContent>
-            {/* Bar chart — real paid invoice totals for last 6 months */}
-            <div className="mb-1 flex items-end gap-2" style={{ height: "100px" }}>
-              {invoiceBarHeights.map((height, i) => (
-                <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                  <div
-                    className="w-full rounded-t-sm bg-gradient-to-t from-mint/60 to-mint/20 transition-all hover:from-mint/80 hover:to-mint/40"
-                    style={{ height: `${height}%` }}
-                  />
-                </div>
-              ))}
-            </div>
-            {/* Month labels below the bars */}
-            <div className="mb-3 flex gap-2">
-              {invoiceMonthLabels.map((label, i) => (
-                <div
-                  key={i}
-                  className="flex-1 text-center text-[9px] text-muted-foreground"
-                >
-                  {label}
-                </div>
-              ))}
-            </div>
-
-            {/* Status legend — real numbers from invoices */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-lg bg-white/5 p-2.5">
-                <p className="text-[10px] font-medium text-muted-foreground">Revenue</p>
-                <p className="text-sm font-bold text-mint">
-                  {formatCurrency(invoiceRevenue)}
-                </p>
-              </div>
-              <div className="rounded-lg bg-white/5 p-2.5">
-                <p className="text-[10px] font-medium text-muted-foreground">Pending</p>
-                <p className="text-sm font-bold text-orange">
-                  {formatCurrency(pendingPaymentTotal)}
-                </p>
-              </div>
-              <div className="rounded-lg bg-white/5 p-2.5">
-                <p className="text-[10px] font-medium text-muted-foreground">Overdue</p>
-                <p className="text-sm font-bold text-coral">
-                  {formatCurrency(overdueTotal)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* ---- Campaign Analytics Card ---- */}
-        <Card variant="glass" className="min-h-[320px]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-coral" />
-              Campaign Analytics
-            </CardTitle>
-            <CardAction>
-              <Link href="/analytics">
-                <Button variant="glass" size="xs">
-                  Details
+                  All Deals
                   <ChevronRight className="h-3 w-3" />
                 </Button>
               </Link>
             </CardAction>
           </CardHeader>
           <CardContent>
-            {/* Bar chart — real deal revenue for last 6 months */}
-            <div className="mb-1 flex items-end gap-2" style={{ height: "100px" }}>
-              {dealBarHeights.map((height, i) => (
-                <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                  <div
-                    className="w-full rounded-t-sm bg-gradient-to-t from-coral/50 to-coral/10 transition-all hover:from-coral/70 hover:to-coral/20"
-                    style={{ height: `${height}%` }}
-                  />
-                </div>
-              ))}
-            </div>
-            {/* Month labels */}
-            <div className="mb-3 flex gap-2">
-              {dealMonthLabels.map((label, i) => (
-                <div
-                  key={i}
-                  className="flex-1 text-center text-[9px] text-muted-foreground"
-                >
-                  {label}
-                </div>
-              ))}
-            </div>
+            {visibleDeadlines.length > 0 ? (
+              <ul className="divide-y divide-white/5">
+                {visibleDeadlines.map((entry, idx) => {
+                  const daysAway = differenceInDays(entry.date, today);
+                  const isUrgent = daysAway <= 2;
+                  const isSoon = daysAway <= 7 && daysAway > 2;
+                  return (
+                    <li
+                      key={`${entry.dealId}-${entry.type}-${idx}`}
+                      className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
+                    >
+                      {/* Icon */}
+                      <div
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg
+                          ${entry.type === "content"
+                            ? "bg-lavender/15 text-lavender"
+                            : "bg-mint/15 text-mint"
+                          }`}
+                      >
+                        {entry.type === "content" ? (
+                          <CalendarDays className="h-4 w-4" />
+                        ) : (
+                          <DollarSign className="h-4 w-4" />
+                        )}
+                      </div>
 
-            {/* Metrics row — real data */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-[10px] font-medium text-muted-foreground">
-                  Total Revenue
-                </p>
-                <p className="text-lg font-bold">
-                  {formatCurrency(totalRevenue6Months)}
-                </p>
-                <p className="text-xs text-mint">last 6 months</p>
+                      {/* Deal info */}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium leading-tight">
+                          {entry.dealTitle}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {entry.brandName ?? "No brand"} &middot;{" "}
+                          {entry.type === "content" ? "Content deadline" : "Payment due"}
+                        </p>
+                      </div>
+
+                      {/* Date + urgency badge */}
+                      <div className="flex shrink-0 flex-col items-end gap-0.5">
+                        <span className="text-xs font-medium text-foreground">
+                          {format(entry.date, "MMM d")}
+                        </span>
+                        <span
+                          className={`text-[10px] font-semibold
+                            ${isUrgent ? "text-coral" : isSoon ? "text-orange" : "text-muted-foreground"}`}
+                        >
+                          {formatDeadlineDistance(entry.date)}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <div className="flex h-36 flex-col items-center justify-center gap-2 text-muted-foreground">
+                <CalendarDays className="h-8 w-8 opacity-30" />
+                <p className="text-sm">No upcoming deadlines</p>
               </div>
-              <div className="rounded-lg bg-white/5 p-3">
-                <p className="text-[10px] font-medium text-muted-foreground">
-                  Active Deals
-                </p>
-                <p className="text-lg font-bold">{activeDealsTotal}</p>
-                <p className="text-xs text-orange">
-                  {activeDealsTotal === 1 ? "deal in progress" : "deals in progress"}
-                </p>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </DashboardGrid>

@@ -18,6 +18,7 @@ import {
   Handshake,
   FileText,
   BarChart3,
+  Users,
 } from "lucide-react";
 import type { DealStatus, Platform } from "@/types/database";
 
@@ -33,6 +34,8 @@ export default async function AnalyticsPage() {
     status: DealStatus;
     platform: Platform;
     created_at: string;
+    client_id: string | null;
+    clients: { name: string } | null;
   }> = [];
   let invoices: Array<{
     total: number;
@@ -44,7 +47,7 @@ export default async function AnalyticsPage() {
     const [dealsRes, invoicesRes] = await Promise.all([
       supabase
         .from("deals")
-        .select("amount, currency, status, platform, created_at")
+        .select("amount, currency, status, platform, created_at, client_id, clients(name)")
         .eq("user_id", user.id),
       supabase
         .from("invoices")
@@ -58,6 +61,10 @@ export default async function AnalyticsPage() {
       status: d.status as DealStatus,
       platform: d.platform as Platform,
       created_at: d.created_at as string,
+      client_id: (d.client_id as string) ?? null,
+      clients: d.clients
+        ? { name: (d.clients as Record<string, unknown>).name as string }
+        : null,
     }));
     invoices = (invoicesRes.data ?? []).map((i: Record<string, unknown>) => ({
       total: Number(i.total),
@@ -139,6 +146,23 @@ export default async function AnalyticsPage() {
     });
   }
 
+  // Revenue by client — paid/completed deals grouped by client, top 8
+  const clientRevenueMap: Record<string, { name: string; revenue: number }> = {};
+  deals
+    .filter((d) => ["paid", "completed"].includes(d.status) && d.client_id)
+    .forEach((d) => {
+      const id = d.client_id!;
+      const name = d.clients?.name ?? "Unknown Client";
+      if (!clientRevenueMap[id]) {
+        clientRevenueMap[id] = { name, revenue: 0 };
+      }
+      clientRevenueMap[id].revenue += d.amount ?? 0;
+    });
+  const revenueByClient = Object.values(clientRevenueMap)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 8);
+  const maxClientRevenue = revenueByClient[0]?.revenue ?? 0;
+
   return (
     <DashboardShell>
       <div className="mb-6 flex items-center gap-3">
@@ -215,6 +239,47 @@ export default async function AnalyticsPage() {
               );
             })}
           </div>
+        </CardContent>
+      </Card>
+      {/* Revenue by Client */}
+      <Card variant="glass" className="mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Users className="h-5 w-5 text-mint" />
+            Revenue by Client
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {revenueByClient.length === 0 ? (
+            <p className="py-4 text-center text-sm text-muted-foreground">
+              No revenue data yet
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {revenueByClient.map((client) => {
+                const barWidth =
+                  maxClientRevenue > 0
+                    ? Math.round((client.revenue / maxClientRevenue) * 100)
+                    : 0;
+                return (
+                  <div key={client.name} className="rounded-lg bg-white/5 p-3">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className="text-sm font-medium">{client.name}</span>
+                      <span className="text-sm font-semibold text-mint">
+                        {fmt(client.revenue)}
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className="h-full rounded-full bg-mint transition-all"
+                        style={{ width: `${barWidth}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
     </DashboardShell>
