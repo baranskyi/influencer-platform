@@ -293,7 +293,10 @@ export function DealPipelineEditor({
 
                   {/* Semantic flags */}
                   <div className="flex flex-wrap gap-3 text-xs">
-                    <label className="flex items-center gap-1.5 cursor-pointer">
+                    <label
+                      className="flex items-center gap-1.5 cursor-pointer"
+                      title="Default status for newly created deals. Only one status can be Initial."
+                    >
                       <input
                         type="radio"
                         name="isInitial"
@@ -302,7 +305,10 @@ export function DealPipelineEditor({
                       />
                       Initial
                     </label>
-                    <label className="flex items-center gap-1.5 cursor-pointer">
+                    <label
+                      className="flex items-center gap-1.5 cursor-pointer"
+                      title="Automatically sets the payment date when a deal reaches this status. Used for invoice-to-deal sync."
+                    >
                       <input
                         type="checkbox"
                         checked={s.isPaid}
@@ -312,7 +318,10 @@ export function DealPipelineEditor({
                       />
                       Paid
                     </label>
-                    <label className="flex items-center gap-1.5 cursor-pointer">
+                    <label
+                      className="flex items-center gap-1.5 cursor-pointer"
+                      title="Counts as revenue in Dashboard, Analytics, and Client statistics."
+                    >
                       <input
                         type="checkbox"
                         checked={s.isEarned}
@@ -322,7 +331,10 @@ export function DealPipelineEditor({
                       />
                       Earned
                     </label>
-                    <label className="flex items-center gap-1.5 cursor-pointer">
+                    <label
+                      className="flex items-center gap-1.5 cursor-pointer"
+                      title="Deal is closed. Excluded from active deals count, deadline queries, and main kanban columns."
+                    >
                       <input
                         type="checkbox"
                         checked={s.isTerminal}
@@ -332,7 +344,10 @@ export function DealPipelineEditor({
                       />
                       Terminal
                     </label>
-                    <label className="flex items-center gap-1.5 cursor-pointer">
+                    <label
+                      className="flex items-center gap-1.5 cursor-pointer"
+                      title="Deals with this status will not appear on the calendar."
+                    >
                       <input
                         type="checkbox"
                         checked={s.hideFromCalendar}
