@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { trackEvent } from "@/lib/analytics";
 
 export function SignUpForm() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export function SignUpForm() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    trackEvent({ action: "signup_submit" });
 
     const supabase = createClient();
     const { error } = await supabase.auth.signUp({
@@ -47,6 +49,7 @@ export function SignUpForm() {
       return;
     }
 
+    trackEvent({ action: "signup_success" });
     router.push("/login?message=Check your email to confirm your account");
   }
 

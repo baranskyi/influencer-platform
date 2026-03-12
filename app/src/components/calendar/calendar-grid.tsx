@@ -41,6 +41,7 @@ import {
   type DealSpanSegment,
 } from "./compute-deal-spans";
 import type { ContentEvent, Platform } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 
 type DealOption = {
   id: string;
@@ -218,6 +219,7 @@ export function CalendarGrid({
   }
 
   function handlePrev() {
+    trackEvent({ action: "calendar_month_navigate", label: "prev" });
     if (viewMode === "month") {
       setCurrentMonth(subMonths(currentMonth, 1));
     } else {
@@ -226,6 +228,7 @@ export function CalendarGrid({
   }
 
   function handleNext() {
+    trackEvent({ action: "calendar_month_navigate", label: "next" });
     if (viewMode === "month") {
       setCurrentMonth(addMonths(currentMonth, 1));
     } else {
@@ -258,7 +261,7 @@ export function CalendarGrid({
                   ? "bg-white/10 text-foreground"
                   : "text-muted-foreground hover:text-foreground",
               )}
-              onClick={() => setViewMode("month")}
+              onClick={() => { setViewMode("month"); trackEvent({ action: "calendar_view_toggle", label: "month" }); }}
             >
               <CalendarIcon className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Month</span>
@@ -272,6 +275,7 @@ export function CalendarGrid({
               )}
               onClick={() => {
                 setViewMode("week");
+                trackEvent({ action: "calendar_view_toggle", label: "week" });
                 // Sync week start to current month view
                 setCurrentWeekStart(
                   startOfWeek(currentMonth, { weekStartsOn: 1 }),

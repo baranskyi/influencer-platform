@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 
 export function LoginForm() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    trackEvent({ action: "login_submit" });
 
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
@@ -36,11 +38,13 @@ export function LoginForm() {
     });
 
     if (error) {
+      trackEvent({ action: "login_error", label: error.message });
       setError(error.message);
       setLoading(false);
       return;
     }
 
+    trackEvent({ action: "login_success" });
     router.push("/dashboard");
     router.refresh();
   }

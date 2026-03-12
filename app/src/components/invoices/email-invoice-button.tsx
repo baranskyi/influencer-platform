@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { sendInvoiceEmail } from "@/app/(dashboard)/invoices/_actions/email";
 import { Mail } from "lucide-react";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 
 export function EmailInvoiceButton({
   invoiceId,
@@ -21,6 +22,7 @@ export function EmailInvoiceButton({
   }
 
   function handleEmailInvoice() {
+    trackEvent({ action: "invoice_send_email" });
     startTransition(async () => {
       const result = await sendInvoiceEmail(invoiceId);
       if ("error" in result) {

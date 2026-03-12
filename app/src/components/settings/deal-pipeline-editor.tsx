@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { saveDealStatusConfig } from "@/app/(dashboard)/settings/_actions/settings";
 import type { StatusConfig } from "@/lib/deal-status-config";
 import { STATUS_COLOR_MAP } from "@/lib/deal-status-config";
+import { trackEvent } from "@/lib/analytics";
 
 const COLOR_OPTIONS = Object.keys(STATUS_COLOR_MAP);
 
@@ -63,12 +64,14 @@ export function DealPipelineEditor({
       copy.splice(to, 0, removed);
       return copy.map((s, i) => ({ ...s, position: i }));
     });
+    trackEvent({ action: "settings_pipeline_reorder" });
     dragItem.current = null;
     dragOver.current = null;
   }, []);
 
   // ── Toggle enabled ───────────────────────────────────────
   const toggleEnabled = useCallback((idx: number) => {
+    trackEvent({ action: "settings_pipeline_toggle_status" });
     setStatuses((prev) =>
       prev.map((s, i) => (i === idx ? { ...s, enabled: !s.enabled } : s)),
     );
@@ -93,6 +96,7 @@ export function DealPipelineEditor({
 
   // ── Add custom status ────────────────────────────────────
   const addStatus = useCallback(() => {
+    trackEvent({ action: "settings_pipeline_add_status" });
     const slug = `custom_${Date.now()}`;
     setStatuses((prev) => [
       ...prev,
@@ -115,6 +119,7 @@ export function DealPipelineEditor({
 
   // ── Remove non-system status ─────────────────────────────
   const removeStatus = useCallback((idx: number) => {
+    trackEvent({ action: "settings_pipeline_delete_status" });
     setStatuses((prev) =>
       prev.filter((_, i) => i !== idx).map((s, i) => ({ ...s, position: i })),
     );

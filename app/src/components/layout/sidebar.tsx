@@ -23,6 +23,7 @@ import {
   Bell,
   LogOut,
 } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 /* ============================================================
    Sidebar Navigation — Floating Glassmorphism (macOS Sonoma)
@@ -56,6 +57,7 @@ export function Sidebar() {
   const router = useRouter();
 
   async function handleLogout() {
+    trackEvent({ action: "nav_click", label: "logout" });
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");
@@ -96,6 +98,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => trackEvent({ action: "nav_click", label: item.label })}
               className={cn(
                 /* Base styles: padding for 44px+ touch target, rounded for consistency */
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",

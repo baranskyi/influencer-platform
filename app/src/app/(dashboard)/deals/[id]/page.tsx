@@ -90,7 +90,7 @@ export default async function DealDetailPage({
         <div className="flex items-center gap-3">
           <DealStatusSelect dealId={deal.id} currentStatus={deal.status} statusConfig={statusConfig} />
           {getInvoiceableStatuses(statusConfig).includes(deal.status) && (
-            <Link href={`/invoices/generate?deal_id=${deal.id}`}>
+            <Link href={`/invoices/generate?deal_id=${deal.id}`} data-track="cta" data-track-label="deal-create-invoice">
               <Button variant="glass" size="sm">
                 <FileText className="h-4 w-4" />
                 Create Invoice

@@ -13,11 +13,13 @@ import {
 } from "@/components/ui/dialog";
 import { deleteInvoice } from "@/app/(dashboard)/invoices/_actions/invoices";
 import { Trash2 } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 export function DeleteInvoiceButton({ invoiceId }: { invoiceId: string }) {
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
+    trackEvent({ action: "invoice_delete" });
     startTransition(async () => {
       await deleteInvoice(invoiceId);
     });

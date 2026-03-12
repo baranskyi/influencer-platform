@@ -6,6 +6,7 @@ import { updateInvoiceStatus } from "@/app/(dashboard)/invoices/_actions/invoice
 import { CheckCircle } from "lucide-react";
 import confetti from "canvas-confetti";
 import type { InvoiceStatus } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 
 function firePaidConfetti() {
   const duration = 3000;
@@ -78,6 +79,7 @@ export function MarkPaidButton({
   }
 
   function handleMarkPaid() {
+    trackEvent({ action: "invoice_mark_paid" });
     startTransition(async () => {
       const result = await updateInvoiceStatus(invoiceId, "paid");
       if (!result?.error) {

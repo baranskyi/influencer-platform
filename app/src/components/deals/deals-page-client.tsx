@@ -14,6 +14,7 @@ import { DealsTable } from "./deals-table";
 import { DealsKanban } from "./deals-kanban";
 import { Search, LayoutList, LayoutGrid } from "lucide-react";
 import type { Deal } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 import {
   type StatusConfig,
   DEFAULT_DEAL_STATUSES,
@@ -74,7 +75,7 @@ export function DealsPageClient({
             className="pl-9"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); trackEvent({ action: "deal_filter_status", label: v }); }}>
           <SelectTrigger className="w-full sm:w-44">
             <SelectValue />
           </SelectTrigger>
@@ -102,7 +103,7 @@ export function DealsPageClient({
           <Button
             variant={view === "table" ? "secondary" : "ghost"}
             size="icon"
-            onClick={() => setView("table")}
+            onClick={() => { setView("table"); trackEvent({ action: "deal_view_toggle", label: "table" }); }}
             aria-label="Table view"
           >
             <LayoutList className="h-4 w-4" />
@@ -110,7 +111,7 @@ export function DealsPageClient({
           <Button
             variant={view === "kanban" ? "secondary" : "ghost"}
             size="icon"
-            onClick={() => setView("kanban")}
+            onClick={() => { setView("kanban"); trackEvent({ action: "deal_view_toggle", label: "kanban" }); }}
             aria-label="Kanban view"
           >
             <LayoutGrid className="h-4 w-4" />

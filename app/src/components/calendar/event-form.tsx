@@ -23,6 +23,7 @@ import {
   updateEvent,
 } from "@/app/(dashboard)/calendar/_actions/events";
 import type { ContentEvent } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 
 type DealOption = { id: string; title: string };
 
@@ -75,6 +76,7 @@ export function EventForm({
       deal_id: ((formData.get("deal_id") as string) === "__none__" ? null : (formData.get("deal_id") as string)) || null,
     };
 
+    trackEvent({ action: "calendar_event_submit" });
     startTransition(async () => {
       let result;
       if (isEditing && event) {

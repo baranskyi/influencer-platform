@@ -23,6 +23,7 @@ import {
   updateClientAction,
 } from "@/app/(dashboard)/clients/_actions/clients";
 import type { Client } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 
 const CATEGORIES = [
   "Fashion",
@@ -58,6 +59,7 @@ export function ClientForm({ open, onOpenChange, client }: ClientFormProps) {
       notes: formData.get("notes") as string,
     };
 
+    trackEvent({ action: "client_create_submit" });
     startTransition(async () => {
       if (isEditing && client) {
         const result = await updateClientAction({ ...input, id: client.id });

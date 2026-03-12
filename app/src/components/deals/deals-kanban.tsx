@@ -8,6 +8,7 @@ import { getPlatformEmoji } from "./deal-status-badge";
 import { updateDealStatus } from "@/app/(dashboard)/deals/_actions/deals";
 import { Handshake } from "lucide-react";
 import type { Deal } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 import {
   type StatusConfig,
   DEFAULT_DEAL_STATUSES,
@@ -105,6 +106,7 @@ export function DealsKanban({
         prev.map((d) => (d.id === dealId ? { ...d, status: newStatus } : d)),
       );
 
+      trackEvent({ action: "deal_kanban_drag", label: newStatus });
       const result = await updateDealStatus(dealId, newStatus);
       if (result?.error) {
         setLocalDeals(previousDeals);

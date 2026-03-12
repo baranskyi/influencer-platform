@@ -15,6 +15,7 @@ import {
   DEFAULT_DEAL_STATUSES,
   getEnabledStatuses,
 } from "@/lib/deal-status-config";
+import { trackEvent } from "@/lib/analytics";
 
 export function DealStatusSelect({
   dealId,
@@ -30,6 +31,7 @@ export function DealStatusSelect({
   const statuses = getEnabledStatuses(config);
 
   function handleChange(newStatus: string) {
+    trackEvent({ action: "deal_status_change", label: newStatus });
     startTransition(async () => {
       await updateDealStatus(dealId, newStatus);
     });

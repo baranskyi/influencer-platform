@@ -13,6 +13,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import { LandingTracker } from "@/components/landing/landing-tracker";
 
 /* ============================================================
    brandea.today Landing Page
@@ -186,6 +187,7 @@ const FOOTER_LINKS = {
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-mesh-gradient text-foreground font-sans scroll-smooth">
+      <LandingTracker />
       {/* ============================================================
           NAVIGATION
           Sticky glass nav with smooth scroll anchors.
@@ -207,6 +209,8 @@ export default function LandingPage() {
                 key={link.href}
                 href={link.href}
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                data-track="nav"
+                data-track-label={link.label}
               >
                 {link.label}
               </a>
@@ -218,12 +222,16 @@ export default function LandingPage() {
             <Link
               href="/login"
               className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+              data-track="nav"
+              data-track-label="login"
             >
               Log In
             </Link>
             <Link
               href="/signup"
               className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-coral to-orange px-5 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-orange/25 hover:brightness-110"
+              data-track="cta"
+              data-track-label="nav-get-started"
             >
               Get Started Free
               <ArrowRight className="h-4 w-4" />
@@ -276,6 +284,8 @@ export default function LandingPage() {
               <Link
                 href="/signup"
                 className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-coral to-orange px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:shadow-orange/30 hover:brightness-110"
+                data-track="cta"
+                data-track-label="hero-start-free"
               >
                 Start Free
                 <ArrowRight className="h-4 w-4" />
@@ -283,6 +293,8 @@ export default function LandingPage() {
               <a
                 href="#features"
                 className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-8 py-3.5 text-base font-medium text-foreground backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10"
+                data-track="cta"
+                data-track-label="hero-see-how"
               >
                 See How It Works
                 <ChevronRight className="h-4 w-4" />
@@ -550,6 +562,8 @@ export default function LandingPage() {
                       ? "bg-gradient-to-r from-coral to-orange text-white shadow-lg hover:shadow-orange/30 hover:brightness-110"
                       : "border border-white/15 bg-white/5 text-foreground hover:border-white/25 hover:bg-white/10"
                   }`}
+                  data-track="pricing"
+                  data-track-label={tier.name.toLowerCase()}
                 >
                   {tier.cta}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -593,6 +607,8 @@ export default function LandingPage() {
               <details
                 key={item.question}
                 className="glass glass-highlight group rounded-xl transition-all [&[open]]:glow-purple"
+                data-track="faq"
+                data-track-label={item.question}
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left font-medium transition-colors hover:text-orange [&::-webkit-details-marker]:hidden">
                   <span>{item.question}</span>
@@ -643,6 +659,8 @@ export default function LandingPage() {
                 <Link
                   href="/signup"
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-coral to-orange px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:shadow-orange/30 hover:brightness-110"
+                  data-track="cta"
+                  data-track-label="final-get-started"
                 >
                   Get Started Free
                   <ArrowRight className="h-4 w-4" />

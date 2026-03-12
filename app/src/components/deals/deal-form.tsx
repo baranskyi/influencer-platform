@@ -27,6 +27,7 @@ import {
   getEnabledStatuses,
   getInitialStatus,
 } from "@/lib/deal-status-config";
+import { trackEvent } from "@/lib/analytics";
 
 const PLATFORMS = [
   { value: "instagram", label: "Instagram" },
@@ -123,6 +124,7 @@ export function DealForm({
         (formData.get("new_client_category") as string) || "",
     };
 
+    trackEvent({ action: dealId ? "deal_edit_submit" : "deal_create_submit" });
     startTransition(async () => {
       const result = dealId
         ? await updateDeal(dealId, input)

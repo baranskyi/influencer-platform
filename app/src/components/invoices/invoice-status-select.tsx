@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { updateInvoiceStatus } from "@/app/(dashboard)/invoices/_actions/invoices";
 import type { InvoiceStatus } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 
 const STATUSES: { value: InvoiceStatus; label: string }[] = [
   { value: "draft", label: "Draft" },
@@ -30,6 +31,7 @@ export function InvoiceStatusSelect({
   const [isPending, startTransition] = useTransition();
 
   function handleChange(value: string) {
+    trackEvent({ action: "invoice_status_change", label: value });
     startTransition(async () => {
       await updateInvoiceStatus(invoiceId, value);
     });

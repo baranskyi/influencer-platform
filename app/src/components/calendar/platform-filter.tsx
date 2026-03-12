@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import type { Platform } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 
 const FILTERS: { value: Platform | "all"; label: string; color: string }[] = [
   { value: "all", label: "All", color: "bg-white/20 text-foreground" },
@@ -22,7 +23,7 @@ export function PlatformFilter({ value, onChange }: PlatformFilterProps) {
       {FILTERS.map((filter) => (
         <button
           key={filter.value}
-          onClick={() => onChange(filter.value)}
+          onClick={() => { onChange(filter.value); trackEvent({ action: "calendar_platform_filter", label: filter.value }); }}
           className={cn(
             "rounded-full px-3 py-1 text-xs font-medium transition-all",
             value === filter.value

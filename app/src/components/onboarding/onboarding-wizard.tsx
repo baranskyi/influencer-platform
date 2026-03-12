@@ -23,6 +23,7 @@ import { DashboardShell } from "@/components/dashboard/dashboard-grid";
 import { updateProfile } from "@/app/(dashboard)/settings/_actions/settings";
 import type { Profile } from "@/types/database";
 import { User, Share2, Building2, ChevronRight, ChevronLeft } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 type OnboardingWizardProps = {
   profile: Profile;
@@ -107,6 +108,7 @@ export function OnboardingWizard({ profile }: OnboardingWizardProps) {
       return;
     }
     setErrorMessage(null);
+    trackEvent({ action: "onboarding_step", label: STEPS[currentStep + 1].label });
     setCurrentStep((s) => s + 1);
   }
 
@@ -116,11 +118,13 @@ export function OnboardingWizard({ profile }: OnboardingWizardProps) {
   }
 
   function handleSkip() {
+    trackEvent({ action: "onboarding_skip" });
     setErrorMessage(null);
     submitProfile(true);
   }
 
   function handleFinish() {
+    trackEvent({ action: "onboarding_complete" });
     setErrorMessage(null);
     submitProfile(false);
   }

@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 export function DownloadPdfButton({ invoiceId }: { invoiceId: string }) {
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleDownload() {
+    trackEvent({ action: "invoice_download_pdf" });
     setIsLoading(true);
     try {
       const response = await fetch(`/api/invoices/${invoiceId}/pdf`);

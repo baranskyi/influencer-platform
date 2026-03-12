@@ -13,12 +13,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Trash2, Loader2 } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 export function DeleteDealButton({ dealId }: { dealId: string }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
+    trackEvent({ action: "deal_delete" });
     startTransition(async () => {
       await deleteDeal(dealId);
     });

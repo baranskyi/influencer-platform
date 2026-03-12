@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { markInvoiceSent } from "@/app/(dashboard)/invoices/_actions/invoices";
 import { Send } from "lucide-react";
 import type { InvoiceStatus } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 
 export function SendInvoiceButton({
   invoiceId,
@@ -20,6 +21,7 @@ export function SendInvoiceButton({
   }
 
   function handleSend() {
+    trackEvent({ action: "invoice_send_email" });
     startTransition(async () => {
       await markInvoiceSent(invoiceId);
     });

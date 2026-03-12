@@ -6,6 +6,7 @@ import { sendPaymentReminder } from "@/app/(dashboard)/invoices/_actions/email";
 import { Bell } from "lucide-react";
 import { toast } from "sonner";
 import type { InvoiceStatus } from "@/types/database";
+import { trackEvent } from "@/lib/analytics";
 
 const ELIGIBLE_STATUSES: InvoiceStatus[] = ["sent", "viewed", "overdue"];
 
@@ -33,6 +34,7 @@ export function SendReminderButton({
       : "Send Reminder";
 
   function handleSendReminder() {
+    trackEvent({ action: "invoice_send_reminder" });
     startTransition(async () => {
       const result = await sendPaymentReminder(invoiceId);
       if ("error" in result) {

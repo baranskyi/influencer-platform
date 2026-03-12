@@ -10,6 +10,7 @@ import {
   CalendarDays,
   BarChart3,
 } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 /* ============================================================
    Mobile Bottom Navigation — Glassmorphism
@@ -52,6 +53,7 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => trackEvent({ action: "mobile_nav_click", label: item.label })}
               className={cn(
                 /* 44x44px minimum touch target */
                 "flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 px-3 py-1 text-[10px] transition-colors",

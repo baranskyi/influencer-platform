@@ -15,6 +15,7 @@ import { deleteClientAction } from "@/app/(dashboard)/clients/_actions/clients";
 import type { Client } from "@/types/database";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 
 type ClientDetailActionsProps = {
   client: Client;
@@ -27,6 +28,7 @@ export function ClientDetailActions({ client }: ClientDetailActionsProps) {
   const router = useRouter();
 
   function handleDelete() {
+    trackEvent({ action: "client_delete" });
     startTransition(async () => {
       const result = await deleteClientAction(client.id);
       if (result?.error) {

@@ -14,6 +14,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createInvoice } from "@/app/(dashboard)/invoices/_actions/invoices";
 import { DollarSign } from "lucide-react";
+import { trackEvent } from "@/lib/analytics";
 
 type DealOption = {
   id: string;
@@ -78,6 +79,7 @@ export function InvoiceForm({ deals, clients, prefillDealId }: InvoiceFormProps)
   }
 
   function handleSubmit(formData: FormData) {
+    trackEvent({ action: "invoice_create_submit" });
     startTransition(async () => {
       await createInvoice({
         deal_id: selectedDeal || null,

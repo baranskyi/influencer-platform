@@ -23,6 +23,7 @@ import { User, Building2, CreditCard, Share2, Settings, Lock } from "lucide-reac
 import { resolveStatusConfig } from "@/lib/deal-status-config";
 import { DealPipelineEditor } from "./deal-pipeline-editor";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 
 type SettingsFormProps = {
   profile: Profile;
@@ -41,6 +42,7 @@ export function SettingsForm({ profile }: SettingsFormProps) {
     setSuccessMessage(null);
     setErrorMessage(null);
 
+    trackEvent({ action: "settings_save" });
     startTransition(async () => {
       const result = await updateProfile({
         full_name: (formData.get("full_name") as string) ?? "",
