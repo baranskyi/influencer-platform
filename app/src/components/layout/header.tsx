@@ -50,7 +50,7 @@ export function Header() {
       {/* Mobile logo — only visible below md breakpoint */}
       <div className="md:hidden">
         <span className="font-serif text-xl">
-          <span className="text-gradient-brand">DealFlow</span>
+          <span className="text-gradient-brand">brandea.today</span>
         </span>
       </div>
 

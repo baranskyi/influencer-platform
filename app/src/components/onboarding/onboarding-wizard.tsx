@@ -168,7 +168,7 @@ export function OnboardingWizard({ profile }: OnboardingWizardProps) {
         {/* Hero heading */}
         <div className="mb-8 text-center">
           <h1 className="font-serif text-3xl tracking-tight md:text-4xl">
-            Welcome to DealFlow
+            Welcome to brandea.today
           </h1>
           <p className="mt-2 text-muted-foreground">
             Let&apos;s set up your creator profile

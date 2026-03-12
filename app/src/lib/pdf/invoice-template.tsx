@@ -365,7 +365,7 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Text style={styles.invoiceLabel}>INVOICE</Text>
-            <Text style={styles.headerTagline}>DealFlow — Creator Finance</Text>
+            <Text style={styles.headerTagline}>brandea.today — Creator Finance</Text>
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.invoiceNumber}>{invoice.invoice_number}</Text>
@@ -535,7 +535,7 @@ export function InvoicePDF({ invoice, profile, client }: InvoicePDFProps) {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>Thank you for your business.</Text>
-          <Text style={styles.footerBrand}>DealFlow</Text>
+          <Text style={styles.footerBrand}>brandea.today</Text>
         </View>
       </Page>
     </Document>

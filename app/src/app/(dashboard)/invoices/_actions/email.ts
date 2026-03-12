@@ -6,7 +6,7 @@ import { resend } from "@/lib/email/resend";
 import { generateInvoiceEmail } from "@/lib/email/templates/invoice-email";
 import { generatePaymentReminder } from "@/lib/email/templates/payment-reminder";
 
-const FROM_ADDRESS = "DealFlow <onboarding@resend.dev>";
+const FROM_ADDRESS = "brandea.today <onboarding@resend.dev>";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export async function sendInvoiceEmail(

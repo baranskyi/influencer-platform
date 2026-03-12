@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 /* ============================================================
-   DealFlow Landing Page
+   brandea.today Landing Page
    ============================================================
    Server component — no "use client" needed.
    Uses raw Tailwind + existing glass/gradient utilities from globals.css.
@@ -130,19 +130,19 @@ const PRICING_TIERS = [
 
 const FAQ_ITEMS = [
   {
-    question: "Is DealFlow really free to start?",
+    question: "Is brandea.today really free to start?",
     answer:
       "Yes. The Free plan includes everything you need to manage up to 5 active deals with basic invoicing. No credit card required. Upgrade when you are ready.",
   },
   {
     question: "How does the invoicing work?",
     answer:
-      "Select a deal, click Generate Invoice, and DealFlow creates a professional PDF with your branding, payment terms, and line items. You can send it directly via email or download and share it yourself.",
+      "Select a deal, click Generate Invoice, and brandea.today creates a professional PDF with your branding, payment terms, and line items. You can send it directly via email or download and share it yourself.",
   },
   {
     question: "Can I track deals in different currencies?",
     answer:
-      "Absolutely. DealFlow supports 30+ currencies. You can set a default currency for your account and override it per-deal. Analytics automatically convert everything to your base currency for clean reporting.",
+      "Absolutely. brandea.today supports 30+ currencies. You can set a default currency for your account and override it per-deal. Analytics automatically convert everything to your base currency for clean reporting.",
   },
   {
     question: "Is my data secure?",
@@ -152,12 +152,12 @@ const FAQ_ITEMS = [
   {
     question: "Can I migrate from spreadsheets?",
     answer:
-      "Yes. DealFlow supports CSV import so you can bring your existing deal history, client contacts, and invoice records with you. Most creators are fully migrated within 10 minutes.",
+      "Yes. brandea.today supports CSV import so you can bring your existing deal history, client contacts, and invoice records with you. Most creators are fully migrated within 10 minutes.",
   },
   {
     question: "Do you offer refunds?",
     answer:
-      "We offer a 14-day money-back guarantee on all paid plans. If DealFlow is not the right fit, contact support and we will process your refund, no questions asked.",
+      "We offer a 14-day money-back guarantee on all paid plans. If brandea.today is not the right fit, contact support and we will process your refund, no questions asked.",
   },
 ] as const;
 
@@ -194,9 +194,9 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 glass-subtle" role="navigation" aria-label="Main navigation">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2" aria-label="DealFlow home">
+          <Link href="/" className="flex items-center gap-2" aria-label="brandea.today home">
             <span className="text-gradient-brand font-serif text-2xl tracking-tight">
-              DealFlow
+              brandea.today
             </span>
           </Link>
 
@@ -434,7 +434,7 @@ export default function LandingPage() {
               <span className="text-gradient-brand">run your creator business</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              From first pitch to final payment, DealFlow handles the business side so you can do
+              From first pitch to final payment, brandea.today handles the business side so you can do
               what you do best.
             </p>
           </div>
@@ -583,7 +583,7 @@ export default function LandingPage() {
               Common <span className="text-gradient-brand">questions</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Everything you need to know about DealFlow.
+              Everything you need to know about brandea.today.
             </p>
           </div>
 
@@ -637,7 +637,7 @@ export default function LandingPage() {
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
                 Join thousands of creators who stopped chasing payments and started growing
-                their income with DealFlow.
+                their income with brandea.today.
               </p>
               <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <Link
@@ -666,9 +666,9 @@ export default function LandingPage() {
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
             {/* Brand column */}
             <div className="lg:col-span-2">
-              <Link href="/" className="inline-block" aria-label="DealFlow home">
+              <Link href="/" className="inline-block" aria-label="brandea.today home">
                 <span className="text-gradient-brand font-serif text-2xl tracking-tight">
-                  DealFlow
+                  brandea.today
                 </span>
               </Link>
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
@@ -700,27 +700,27 @@ export default function LandingPage() {
           {/* Bottom bar */}
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">
             <p className="text-xs text-muted-foreground">
-              &copy; {new Date().getFullYear()} DealFlow. All rights reserved.
+              &copy; {new Date().getFullYear()} brandea.today. All rights reserved.
             </p>
             <div className="flex gap-6">
               <a
                 href="#"
                 className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="DealFlow on Twitter"
+                aria-label="brandea.today on Twitter"
               >
                 Twitter
               </a>
               <a
                 href="#"
                 className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="DealFlow on LinkedIn"
+                aria-label="brandea.today on LinkedIn"
               >
                 LinkedIn
               </a>
               <a
                 href="#"
                 className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="DealFlow on Instagram"
+                aria-label="brandea.today on Instagram"
               >
                 Instagram
               </a>

@@ -59,7 +59,7 @@ export function generateContentDeadlineEmail(data: ContentDeadlineData): {
           <!-- Header -->
           <tr>
             <td style="background-color:#0f0f0f;padding:32px 40px;text-align:center;">
-              <span style="font-size:24px;font-weight:700;color:#ff6b2b;letter-spacing:-0.5px;">DealFlow</span>
+              <span style="font-size:24px;font-weight:700;color:#ff6b2b;letter-spacing:-0.5px;">brandea.today</span>
               <p style="margin:8px 0 0;font-size:13px;color:#888888;">Creator Business Management</p>
             </td>
           </tr>
@@ -123,7 +123,7 @@ export function generateContentDeadlineEmail(data: ContentDeadlineData): {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <a href="${data.appUrl}" style="display:inline-block;background-color:#ff6b2b;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;">View Deal in DealFlow</a>
+                    <a href="${data.appUrl}" style="display:inline-block;background-color:#ff6b2b;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;">View Deal in brandea.today</a>
                   </td>
                 </tr>
               </table>
@@ -134,8 +134,8 @@ export function generateContentDeadlineEmail(data: ContentDeadlineData): {
           <!-- Footer -->
           <tr>
             <td style="background-color:#fafafa;border-top:1px solid #e5e5e5;padding:24px 40px;text-align:center;">
-              <p style="margin:0;font-size:13px;color:#888888;">This reminder was sent automatically by <strong style="color:#ff6b2b;">DealFlow</strong></p>
-              <p style="margin:16px 0 0;font-size:11px;color:#cccccc;">Powered by DealFlow · Creator Business Management</p>
+              <p style="margin:0;font-size:13px;color:#888888;">This reminder was sent automatically by <strong style="color:#ff6b2b;">brandea.today</strong></p>
+              <p style="margin:16px 0 0;font-size:11px;color:#cccccc;">Powered by brandea.today · Creator Business Management</p>
             </td>
           </tr>
 

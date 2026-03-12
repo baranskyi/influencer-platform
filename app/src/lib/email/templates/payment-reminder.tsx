@@ -60,7 +60,7 @@ export function generatePaymentReminder(data: PaymentReminderData): {
           <!-- Header -->
           <tr>
             <td style="background-color:#0f0f0f;padding:32px 40px;text-align:center;">
-              <span style="font-size:24px;font-weight:700;color:#ff6b2b;letter-spacing:-0.5px;">DealFlow</span>
+              <span style="font-size:24px;font-weight:700;color:#ff6b2b;letter-spacing:-0.5px;">brandea.today</span>
               <p style="margin:8px 0 0;font-size:13px;color:#888888;">Creator Business Management</p>
             </td>
           </tr>
@@ -132,7 +132,7 @@ export function generatePaymentReminder(data: PaymentReminderData): {
               <p style="margin:0 0 4px;font-size:13px;color:#888888;">Sent by <strong style="color:#555555;">${safeCreatorName}</strong></p>
               <p style="margin:0;font-size:12px;color:#aaaaaa;">${safeCreatorEmail}</p>
               ${data.reminderCount > 1 ? `<p style="margin:8px 0 0;font-size:11px;color:#cccccc;">Reminder ${data.reminderCount} of this invoice</p>` : ""}
-              <p style="margin:16px 0 0;font-size:11px;color:#cccccc;">Powered by DealFlow · Creator Business Management</p>
+              <p style="margin:16px 0 0;font-size:11px;color:#cccccc;">Powered by brandea.today · Creator Business Management</p>
             </td>
           </tr>
 

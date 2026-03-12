@@ -83,7 +83,7 @@ export function Sidebar() {
           href="/dashboard"
           className="font-serif text-2xl tracking-tight text-foreground"
         >
-          <span className="text-gradient-brand">DealFlow</span>
+          <span className="text-gradient-brand">brandea.today</span>
         </Link>
       </div>
 

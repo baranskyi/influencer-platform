@@ -55,7 +55,7 @@ export function SignUpForm() {
       <CardHeader className="text-center">
         <CardTitle className="font-serif text-3xl">Create account</CardTitle>
         <CardDescription>
-          Start managing your deals with DealFlow
+          Start managing your deals with brandea.today
         </CardDescription>
       </CardHeader>
       <CardContent>

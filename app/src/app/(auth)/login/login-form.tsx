@@ -85,7 +85,7 @@ export function LoginForm() {
       <CardHeader className="text-center">
         <CardTitle className="font-serif text-3xl">Welcome back</CardTitle>
         <CardDescription>
-          Sign in to your DealFlow account
+          Sign in to your brandea.today account
         </CardDescription>
       </CardHeader>
       <CardContent>

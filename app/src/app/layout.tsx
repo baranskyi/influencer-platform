@@ -33,15 +33,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "DealFlow — Influencer Business Platform",
-    template: "%s | DealFlow",
+    default: "brandea.today — Influencer Business Platform",
+    template: "%s | brandea.today",
   },
   description:
     "Stop doing admin. Get paid faster. Deal tracking, invoicing, and analytics for micro-influencers.",
   keywords: ["influencer", "creator", "deals", "invoicing", "analytics", "content calendar"],
-  authors: [{ name: "DealFlow" }],
+  authors: [{ name: "brandea.today" }],
   openGraph: {
-    title: "DealFlow — Influencer Business Platform",
+    title: "brandea.today — Influencer Business Platform",
     description: "Deal tracking, invoicing, and analytics for micro-influencers.",
     type: "website",
   },
