@@ -71,10 +71,10 @@ const FEATURES = [
 ] as const;
 
 const STATS = [
-  { value: "10,000+", label: "Creators onboarded" },
-  { value: "$50M+", label: "Revenue tracked" },
+  { value: "650+", label: "Creators onboarded" },
+  { value: "$1.5M+", label: "Revenue tracked" },
   { value: "4.9", label: "Average rating", suffix: "★" },
-  { value: "150+", label: "Countries supported" },
+  { value: "30+", label: "Countries supported" },
 ] as const;
 
 const PRICING_TIERS = [
@@ -82,7 +82,7 @@ const PRICING_TIERS = [
     name: "Free",
     price: "$0",
     period: "forever",
-    description: "Perfect for getting started with brand deals.",
+    description: "Free forever for up to 5 clients. No credit card required.",
     features: [
       "Up to 5 active deals",
       "Basic invoicing",
@@ -90,16 +90,16 @@ const PRICING_TIERS = [
       "Deal pipeline view",
       "Email support",
     ],
-    cta: "Start Free",
+    cta: "Sign Up Free",
     highlighted: false,
   },
   {
     name: "Pro",
-    price: "$19",
-    period: "per month",
-    description: "Everything you need to run your creator business.",
+    price: "$0",
+    period: "free up to 5 deals",
+    description: "Free to start. Unlimited deals when your business grows.",
     features: [
-      "Unlimited deals",
+      "Free up to 5 deals, then unlimited",
       "Smart invoicing with reminders",
       "Unlimited clients",
       "Analytics dashboard",
@@ -107,25 +107,8 @@ const PRICING_TIERS = [
       "Multi-currency support",
       "Priority support",
     ],
-    cta: "Start Pro Trial",
+    cta: "Sign Up Free",
     highlighted: true,
-  },
-  {
-    name: "Business",
-    price: "$49",
-    period: "per month",
-    description: "For agencies and creators managing multiple brands.",
-    features: [
-      "Everything in Pro",
-      "Team collaboration (up to 5)",
-      "Custom invoice branding",
-      "API access",
-      "Advanced analytics & exports",
-      "Dedicated account manager",
-      "Custom integrations",
-    ],
-    cta: "Contact Sales",
-    highlighted: false,
   },
 ] as const;
 
@@ -477,7 +460,7 @@ export default function LandingPage() {
 
       {/* ============================================================
           PRICING SECTION
-          3 tiers: Free, Pro (highlighted), Business.
+          2 tiers: Free and Pro (highlighted).
           Pro tier has orange glow + "Most Popular" badge.
           ============================================================ */}
       <section
@@ -499,12 +482,14 @@ export default function LandingPage() {
               <span className="text-gradient-brand">no surprises</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Start free. Upgrade when your creator business takes off.
+              Upgrade when your creator business takes off.
+              <br />
+              We really want to help you love your creative job again.
             </p>
           </div>
 
           {/* Pricing cards */}
-          <div className="mx-auto mt-14 grid max-w-5xl gap-6 sm:mt-16 lg:grid-cols-3">
+          <div className="mx-auto mt-14 grid max-w-3xl gap-6 sm:mt-16 lg:grid-cols-2">
             {PRICING_TIERS.map((tier) => (
               <div
                 key={tier.name}
@@ -568,6 +553,9 @@ export default function LandingPage() {
                   {tier.cta}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
+                <p className="mt-2 text-center text-xs text-muted-foreground">
+                  No credit card required
+                </p>
               </div>
             ))}
           </div>
