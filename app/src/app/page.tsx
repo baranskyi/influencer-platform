@@ -28,7 +28,6 @@ import { LandingTracker } from "@/components/landing/landing-tracker";
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
   { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" },
 ] as const;
 
 const FEATURES = [
@@ -95,8 +94,8 @@ const PRICING_TIERS = [
   },
   {
     name: "Pro",
-    price: "$0",
-    period: "free up to 5 deals",
+    price: "$29",
+    period: "per month",
     description: "Free to start. Unlimited deals when your business grows.",
     features: [
       "Free up to 5 deals, then unlimited",
@@ -112,44 +111,10 @@ const PRICING_TIERS = [
   },
 ] as const;
 
-const FAQ_ITEMS = [
-  {
-    question: "Is brandea.today really free to start?",
-    answer:
-      "Yes. The Free plan includes everything you need to manage up to 5 active deals with basic invoicing. No credit card required. Upgrade when you are ready.",
-  },
-  {
-    question: "How does the invoicing work?",
-    answer:
-      "Select a deal, click Generate Invoice, and brandea.today creates a professional PDF with your branding, payment terms, and line items. You can send it directly via email or download and share it yourself.",
-  },
-  {
-    question: "Can I track deals in different currencies?",
-    answer:
-      "Absolutely. brandea.today supports 30+ currencies. You can set a default currency for your account and override it per-deal. Analytics automatically convert everything to your base currency for clean reporting.",
-  },
-  {
-    question: "Is my data secure?",
-    answer:
-      "Your data is encrypted at rest and in transit. We use industry-standard security practices including SOC 2 compliance, regular penetration testing, and automatic backups. You own your data and can export it anytime.",
-  },
-  {
-    question: "Can I migrate from spreadsheets?",
-    answer:
-      "Yes. brandea.today supports CSV import so you can bring your existing deal history, client contacts, and invoice records with you. Most creators are fully migrated within 10 minutes.",
-  },
-  {
-    question: "Do you offer refunds?",
-    answer:
-      "We offer a 14-day money-back guarantee on all paid plans. If brandea.today is not the right fit, contact support and we will process your refund, no questions asked.",
-  },
-] as const;
-
 const FOOTER_LINKS = {
   Product: [
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
-    { label: "FAQ", href: "#faq" },
     { label: "Changelog", href: "#" },
   ],
   Company: [
@@ -557,58 +522,6 @@ export default function LandingPage() {
                   No credit card required
                 </p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================
-          FAQ SECTION
-          HTML <details>/<summary> for zero-JS expand/collapse.
-          Styled as glass cards for visual consistency.
-          ============================================================ */}
-      <section
-        id="faq"
-        className="scroll-mt-20 px-4 py-20 sm:px-6 sm:py-28 lg:px-8"
-        aria-labelledby="faq-heading"
-      >
-        <div className="mx-auto max-w-3xl">
-          {/* Section header */}
-          <div className="text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-orange">
-              FAQ
-            </p>
-            <h2
-              id="faq-heading"
-              className="font-serif text-3xl leading-tight sm:text-4xl lg:text-5xl"
-            >
-              Common <span className="text-gradient-brand">questions</span>
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Everything you need to know about brandea.today.
-            </p>
-          </div>
-
-          {/* FAQ items */}
-          <div className="mt-12 space-y-3 sm:mt-14">
-            {FAQ_ITEMS.map((item) => (
-              <details
-                key={item.question}
-                className="glass glass-highlight group rounded-xl transition-all [&[open]]:glow-purple"
-                data-track="faq"
-                data-track-label={item.question}
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left font-medium transition-colors hover:text-orange [&::-webkit-details-marker]:hidden">
-                  <span>{item.question}</span>
-                  {/* Chevron rotates on open via the group/open variant */}
-                  <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-90" />
-                </summary>
-                <div className="px-6 pb-5">
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {item.answer}
-                  </p>
-                </div>
-              </details>
             ))}
           </div>
         </div>
