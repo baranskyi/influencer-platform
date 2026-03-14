@@ -18,34 +18,22 @@ import { Loader2, MailCheck } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
 export function SignUpForm() {
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
-  async function handleSignUp(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    if (!fullName.trim()) {
-      setError("Full name is required.");
-      setLoading(false);
-      return;
-    }
-
     trackEvent({ action: "signup_submit" });
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signInWithOtp({
       email,
-      password,
       options: {
-        data: {
-          full_name: fullName,
-        },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
@@ -61,7 +49,7 @@ export function SignUpForm() {
     setEmailSent(true);
   }
 
-  // ── Email confirmation screen ──────────────────────────────
+  // ── Magic Link sent screen ─────────────────────────────────
   if (emailSent) {
     return (
       <Card>
@@ -70,17 +58,16 @@ export function SignUpForm() {
             <MailCheck className="h-8 w-8 text-mint" />
           </div>
           <CardTitle className="font-serif text-2xl">
-            Confirm your email
+            Check your email
           </CardTitle>
           <CardDescription className="mt-2 text-base">
-            We sent a confirmation link to{" "}
+            We sent a magic link to{" "}
             <span className="font-medium text-foreground">{email}</span>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 text-center">
           <p className="text-sm text-muted-foreground">
-            Click the link in the email to activate your account. You&apos;ll be
-            logged in automatically.
+            Click the link in the email to sign in. No password needed.
           </p>
           <div className="rounded-lg border border-border/50 bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
             Didn&apos;t get the email? Check your spam folder or{" "}
@@ -94,40 +81,21 @@ export function SignUpForm() {
             .
           </div>
         </CardContent>
-        <CardFooter className="justify-center">
-          <p className="text-sm text-muted-foreground">
-            Already confirmed?{" "}
-            <Link href="/login" className="text-primary hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </CardFooter>
       </Card>
     );
   }
 
-  // ── Sign-up form ───────────────────────────────────────────
+  // ── Sign-up form (email only) ──────────────────────────────
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="font-serif text-3xl">Create account</CardTitle>
+        <CardTitle className="font-serif text-3xl">Get started</CardTitle>
         <CardDescription>
-          Start managing your deals with brandea.today
+          Enter your email to create an account on brandea.today
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSignUp} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Maria Garcia"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -137,18 +105,7 @@ export function SignUpForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="At least 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={6}
-              required
+              autoFocus
             />
           </div>
 
@@ -160,10 +117,10 @@ export function SignUpForm() {
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating account...
+                Sending link...
               </>
             ) : (
-              "Create Account"
+              "Send Magic Link"
             )}
           </Button>
         </form>

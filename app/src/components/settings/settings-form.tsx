@@ -17,9 +17,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { updateProfile, changePassword } from "@/app/(dashboard)/settings/_actions/settings";
+import { updateProfile } from "@/app/(dashboard)/settings/_actions/settings";
 import type { Profile } from "@/types/database";
-import { User, Building2, CreditCard, Share2, Settings, Lock } from "lucide-react";
+import { User, Building2, CreditCard, Share2, Settings } from "lucide-react";
 import { resolveStatusConfig } from "@/lib/deal-status-config";
 import { DealPipelineEditor } from "./deal-pipeline-editor";
 import { toast } from "sonner";
@@ -33,10 +33,6 @@ export function SettingsForm({ profile }: SettingsFormProps) {
   const [isPending, startTransition] = useTransition();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isPasswordPending, startPasswordTransition] = useTransition();
 
   function handleSubmit(formData: FormData) {
     setSuccessMessage(null);
@@ -72,28 +68,6 @@ export function SettingsForm({ profile }: SettingsFormProps) {
         setErrorMessage(result.error);
       } else {
         setSuccessMessage("Settings saved successfully.");
-      }
-    });
-  }
-
-  function handleChangePassword(e: React.FormEvent) {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
-    startPasswordTransition(async () => {
-      const result = await changePassword(newPassword);
-      if (result?.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Password updated successfully");
-        setNewPassword("");
-        setConfirmPassword("");
       }
     });
   }
@@ -412,57 +386,6 @@ export function SettingsForm({ profile }: SettingsFormProps) {
       />
     </div>
 
-    {/* Security — separate form so it doesn't interfere with the profile form */}
-    <form onSubmit={handleChangePassword} className="mt-6">
-      <Card variant="glass">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Lock className="h-5 w-5 text-lavender" />
-            Security
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="new_password">New Password</Label>
-              <Input
-                id="new_password"
-                name="new_password"
-                type="password"
-                placeholder="Enter new password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                minLength={6}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm_password">Confirm Password</Label>
-              <Input
-                id="confirm_password"
-                name="confirm_password"
-                type="password"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                minLength={6}
-              />
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              variant="outline"
-              size="sm"
-              disabled={isPasswordPending}
-            >
-              {isPasswordPending ? "Updating..." : "Update Password"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </form>
     </>
   );
 }

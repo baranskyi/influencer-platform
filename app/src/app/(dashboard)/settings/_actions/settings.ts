@@ -131,24 +131,3 @@ export async function saveDealStatusConfig(config: import("@/lib/deal-status-con
   return { success: true };
 }
 
-export async function changePassword(newPassword: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: "Not authenticated" };
-  }
-
-  if (newPassword.length < 8) {
-    return { error: "Password must be at least 8 characters long" };
-  }
-
-  const { error } = await supabase.auth.updateUser({ password: newPassword });
-  if (error) {
-    console.error("[changePassword]", error);
-    return { error: "Failed to change password. Please try again." };
-  }
-  return { success: true };
-}
