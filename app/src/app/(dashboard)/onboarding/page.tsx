@@ -17,7 +17,7 @@ export default async function OnboardingPage() {
     .from("profiles")
     .select("*")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   const profile = data as Profile | null;
 

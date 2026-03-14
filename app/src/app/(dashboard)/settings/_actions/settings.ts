@@ -39,7 +39,9 @@ export async function updateProfile(input: UpdateProfileInput) {
 
   const { error } = await supabase
     .from("profiles")
-    .update({
+    .upsert({
+      id: user.id,
+      email: user.email ?? "",
       full_name: input.full_name || null,
       display_name: input.display_name || null,
       phone: input.phone || null,
@@ -73,8 +75,7 @@ export async function updateProfile(input: UpdateProfileInput) {
       currency: input.currency || "EUR",
       timezone: input.timezone || "UTC",
       updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
+    });
 
   if (error) {
     console.error("[updateProfile]", error);

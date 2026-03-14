@@ -395,6 +395,45 @@
   }
 }
 
+/* ============================================================
+   Browser Autofill Override (Safari / Chrome / WebKit)
+   Forces autofilled inputs to match the dark theme instead of
+   the default light-blue/white background.
+   ============================================================ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px oklch(0.18 0.012 280 / 80%) inset !important;
+  -webkit-text-fill-color: oklch(0.97 0.002 247) !important;
+  caret-color: oklch(0.97 0.002 247) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+:root input:-webkit-autofill,
+:root input:-webkit-autofill:hover,
+:root input:-webkit-autofill:focus,
+:root input:-webkit-autofill:active,
+:root textarea:-webkit-autofill,
+:root select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px oklch(0.97 0.002 247) inset !important;
+  -webkit-text-fill-color: oklch(0.145 0.005 247) !important;
+  caret-color: oklch(0.145 0.005 247) !important;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active,
+.dark textarea:-webkit-autofill,
+.dark select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px oklch(0.18 0.012 280 / 80%) inset !important;
+  -webkit-text-fill-color: oklch(0.97 0.002 247) !important;
+  caret-color: oklch(0.97 0.002 247) !important;
+}
+
 /* Touch-friendly improvements */
 @media (max-width: 768px) {
   /* Larger touch targets */

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,20 +14,28 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Loader2, MailCheck } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
 export function SignUpForm() {
-  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!fullName.trim()) {
+      setError("Full name is required.");
+      setLoading(false);
+      return;
+    }
+
     trackEvent({ action: "signup_submit" });
 
     const supabase = createClient();
@@ -50,9 +57,56 @@ export function SignUpForm() {
     }
 
     trackEvent({ action: "signup_success" });
-    router.push("/login?message=Check your email to confirm your account");
+    setLoading(false);
+    setEmailSent(true);
   }
 
+  // ── Email confirmation screen ──────────────────────────────
+  if (emailSent) {
+    return (
+      <Card>
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-mint/15">
+            <MailCheck className="h-8 w-8 text-mint" />
+          </div>
+          <CardTitle className="font-serif text-2xl">
+            Confirm your email
+          </CardTitle>
+          <CardDescription className="mt-2 text-base">
+            We sent a confirmation link to{" "}
+            <span className="font-medium text-foreground">{email}</span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            Click the link in the email to activate your account. You&apos;ll be
+            logged in automatically.
+          </p>
+          <div className="rounded-lg border border-border/50 bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
+            Didn&apos;t get the email? Check your spam folder or{" "}
+            <button
+              type="button"
+              className="text-primary hover:underline"
+              onClick={() => setEmailSent(false)}
+            >
+              try again
+            </button>
+            .
+          </div>
+        </CardContent>
+        <CardFooter className="justify-center">
+          <p className="text-sm text-muted-foreground">
+            Already confirmed?{" "}
+            <Link href="/login" className="text-primary hover:underline">
+              Sign in
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  // ── Sign-up form ───────────────────────────────────────────
   return (
     <Card>
       <CardHeader className="text-center">
@@ -103,7 +157,14 @@ export function SignUpForm() {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating account..." : "Create Account"}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating account...
+              </>
+            ) : (
+              "Create Account"
+            )}
           </Button>
         </form>
       </CardContent>
