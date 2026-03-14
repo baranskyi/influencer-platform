@@ -1,5 +1,6 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { OnboardingGate } from "@/components/onboarding/onboarding-gate";
 
 /* ============================================================
    Dashboard Layout — Floating Sidebar (macOS Sonoma style)
@@ -55,6 +56,7 @@ export default function DashboardLayout({
         </main>
         <MobileNav />
       </div>
+      <OnboardingGate />
     </div>
   );
 }

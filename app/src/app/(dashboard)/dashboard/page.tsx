@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   DashboardShell,
@@ -77,17 +76,7 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
 
   // Redirect new users to onboarding if profile has no full_name set
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", user.id)
-      .single();
-
-    if (profile && !profile.full_name) {
-      redirect("/onboarding");
-    }
-  }
+  // Onboarding is now handled by OnboardingGate in the dashboard layout
 
   // ---- Date boundaries ----
   const now = new Date();

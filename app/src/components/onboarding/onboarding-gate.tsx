@@ -1,17 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
+import { OnboardingModal } from "./onboarding-modal";
 import type { Profile } from "@/types/database";
 
-export default async function OnboardingPage() {
+export async function OnboardingGate() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+  if (!user) return null;
 
   const { data } = await supabase
     .from("profiles")
@@ -21,12 +18,10 @@ export default async function OnboardingPage() {
 
   const profile = data as Profile | null;
 
-  // If profile already has full_name filled, onboarding is done
-  if (profile?.full_name) {
-    redirect("/dashboard");
-  }
+  // If profile already has full_name, onboarding is done
+  if (profile?.full_name) return null;
 
-  // Provide a fallback profile so the wizard always has something to work with
+  // Build a fallback profile so the modal always has data to work with
   const resolvedProfile: Profile = profile ?? {
     id: user.id,
     full_name: user.user_metadata?.full_name ?? "",
@@ -50,5 +45,5 @@ export default async function OnboardingPage() {
     updated_at: new Date().toISOString(),
   };
 
-  return <OnboardingWizard profile={resolvedProfile} />;
+  return <OnboardingModal profile={resolvedProfile} />;
 }

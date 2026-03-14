@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 const ALLOWED_REDIRECT_PREFIXES = [
@@ -9,7 +10,6 @@ const ALLOWED_REDIRECT_PREFIXES = [
   "/clients",
   "/analytics",
   "/settings",
-  "/onboarding",
 ];
 
 function getSafeRedirectPath(next: string | null): string {
@@ -30,10 +30,23 @@ function getSafeRedirectPath(next: string | null): string {
   return isAllowed ? next : fallback;
 }
 
+async function getOrigin(requestUrl: string): Promise<string> {
+  const headersList = await headers();
+  const forwardedHost = headersList.get("x-forwarded-host");
+  const forwardedProto = headersList.get("x-forwarded-proto") ?? "https";
+
+  if (forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  return new URL(requestUrl).origin;
+}
+
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const next = getSafeRedirectPath(searchParams.get("next"));
+  const origin = await getOrigin(request.url);
 
   if (code) {
     const supabase = await createClient();
