@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { OnboardingGate } from "@/components/onboarding/onboarding-gate";
@@ -56,7 +57,9 @@ export default function DashboardLayout({
         </main>
         <MobileNav />
       </div>
-      <OnboardingGate />
+      <Suspense fallback={null}>
+        <OnboardingGate />
+      </Suspense>
     </div>
   );
 }
