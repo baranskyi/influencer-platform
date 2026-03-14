@@ -28,6 +28,7 @@ import { LandingTracker } from "@/components/landing/landing-tracker";
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
   { label: "Pricing", href: "#pricing" },
+  { label: "Blog", href: "/blog" },
 ] as const;
 
 const FEATURES = [
@@ -115,12 +116,10 @@ const FOOTER_LINKS = {
   Product: [
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
-    { label: "Changelog", href: "#" },
   ],
   Company: [
     { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Careers", href: "#" },
+    { label: "Blog", href: "/blog" },
     { label: "Contact", href: "#" },
   ],
   Legal: [
@@ -617,33 +616,10 @@ export default function LandingPage() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">
-            <p className="text-xs text-muted-foreground">
+          <div className="mt-12 border-t border-white/5 pt-8">
+            <p className="text-center text-xs text-muted-foreground">
               &copy; {new Date().getFullYear()} brandea.today. All rights reserved.
             </p>
-            <div className="flex gap-6">
-              <a
-                href="#"
-                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="brandea.today on Twitter"
-              >
-                Twitter
-              </a>
-              <a
-                href="#"
-                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="brandea.today on LinkedIn"
-              >
-                LinkedIn
-              </a>
-              <a
-                href="#"
-                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="brandea.today on Instagram"
-              >
-                Instagram
-              </a>
-            </div>
           </div>
         </div>
       </footer>

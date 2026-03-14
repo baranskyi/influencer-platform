@@ -61,7 +61,9 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/auth/callback");
 
   const isPublicRoute =
-    request.nextUrl.pathname === "/" || isAuthRoute;
+    request.nextUrl.pathname === "/" ||
+    request.nextUrl.pathname.startsWith("/blog") ||
+    isAuthRoute;
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
