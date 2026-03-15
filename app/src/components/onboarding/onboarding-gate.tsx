@@ -18,8 +18,11 @@ export async function OnboardingGate() {
 
   const profile = data as Profile | null;
 
-  // If profile already has full_name, onboarding is done
-  if (profile?.full_name) return null;
+  // The DB trigger sets full_name to the email as fallback on signup.
+  // If full_name is missing OR equals the email, onboarding hasn't been completed.
+  const hasCompletedOnboarding =
+    profile?.full_name && profile.full_name !== profile.email;
+  if (hasCompletedOnboarding) return null;
 
   // Build a fallback profile so the modal always has data to work with
   const resolvedProfile: Profile = profile ?? {
@@ -44,6 +47,12 @@ export async function OnboardingGate() {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
+
+  // If full_name is just the email (DB trigger fallback), clear it so the
+  // modal shows a proper empty placeholder for the name field.
+  if (resolvedProfile.full_name === resolvedProfile.email) {
+    resolvedProfile.full_name = "";
+  }
 
   return <OnboardingModal profile={resolvedProfile} />;
 }
