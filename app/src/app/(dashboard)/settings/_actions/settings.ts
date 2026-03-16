@@ -37,38 +37,42 @@ export async function updateProfile(input: UpdateProfileInput) {
     return { error: "Not authenticated" };
   }
 
+  const hasAddress =
+    input.address.street ||
+    input.address.city ||
+    input.address.postal_code ||
+    input.address.country;
+
+  const hasBankDetails =
+    input.bank_details.iban ||
+    input.bank_details.swift ||
+    input.bank_details.bank_name;
+
   const { error } = await supabase
     .from("profiles")
     .upsert({
       id: user.id,
       email: user.email ?? "",
-      full_name: input.full_name || null,
+      full_name: input.full_name.trim(),
       display_name: input.display_name || null,
       phone: input.phone || null,
       legal_name: input.legal_name || null,
       tax_id: input.tax_id || null,
-      address:
-        input.address.street ||
-        input.address.city ||
-        input.address.postal_code ||
-        input.address.country
-          ? {
-              street: input.address.street || undefined,
-              city: input.address.city || undefined,
-              postal_code: input.address.postal_code || undefined,
-              country: input.address.country || undefined,
-            }
-          : null,
-      bank_details:
-        input.bank_details.iban ||
-        input.bank_details.swift ||
-        input.bank_details.bank_name
-          ? {
-              iban: input.bank_details.iban || undefined,
-              swift: input.bank_details.swift || undefined,
-              bank_name: input.bank_details.bank_name || undefined,
-            }
-          : null,
+      address: hasAddress
+        ? {
+            street: input.address.street || null,
+            city: input.address.city || null,
+            postal_code: input.address.postal_code || null,
+            country: input.address.country || null,
+          }
+        : null,
+      bank_details: hasBankDetails
+        ? {
+            iban: input.bank_details.iban || null,
+            swift: input.bank_details.swift || null,
+            bank_name: input.bank_details.bank_name || null,
+          }
+        : null,
       instagram_handle: input.instagram_handle || null,
       tiktok_handle: input.tiktok_handle || null,
       youtube_handle: input.youtube_handle || null,
@@ -79,10 +83,10 @@ export async function updateProfile(input: UpdateProfileInput) {
 
   if (error) {
     console.error("[updateProfile]", error);
-    return { error: "Failed to update profile. Please try again." };
+    return { error: `Failed to update profile: ${error.message}` };
   }
 
-  revalidatePath("/settings");
+  revalidatePath("/", "layout");
   return { success: true };
 }
 
