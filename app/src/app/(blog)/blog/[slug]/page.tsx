@@ -33,6 +33,7 @@ export async function generateMetadata({
       description: article.description,
       type: "article",
       publishedTime: article.date,
+      images: [{ url: article.image }],
     },
   };
 }
@@ -61,17 +62,12 @@ export default async function ArticlePage({
       </Link>
 
       {/* Cover */}
-      <div
-        className="mb-10 flex h-56 items-center justify-center rounded-2xl sm:h-72"
-        style={{
-          background: `linear-gradient(135deg, ${article.gradient.from}, ${article.gradient.to})`,
-        }}
-      >
-        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-          <rect x="10" y="10" width="100" height="100" rx="24" fill="white" fillOpacity="0.12" />
-          <rect x="28" y="28" width="64" height="64" rx="16" fill="white" fillOpacity="0.18" />
-          <circle cx="60" cy="60" r="18" fill="white" fillOpacity="0.25" />
-        </svg>
+      <div className="mb-10 overflow-hidden rounded-2xl">
+        <img
+          src={article.image}
+          alt={article.title}
+          className="h-56 w-full object-cover sm:h-72"
+        />
       </div>
 
       {/* Meta */}

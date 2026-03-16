@@ -33,36 +33,13 @@ export default function BlogIndex() {
             href={`/blog/${article.slug}`}
             className="glass glass-highlight group rounded-2xl overflow-hidden transition-all duration-300 hover:glow-purple hover:-translate-y-0.5"
           >
-            {/* Gradient cover */}
-            <div
-              className="h-48 w-full"
-              style={{
-                background: `linear-gradient(135deg, ${article.gradient.from}, ${article.gradient.to})`,
-              }}
-            >
-              <div className="flex h-full items-center justify-center">
-                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
-                  <rect
-                    x="10"
-                    y="10"
-                    width="60"
-                    height="60"
-                    rx="16"
-                    fill="white"
-                    fillOpacity="0.15"
-                  />
-                  <rect
-                    x="22"
-                    y="22"
-                    width="36"
-                    height="36"
-                    rx="10"
-                    fill="white"
-                    fillOpacity="0.2"
-                  />
-                  <circle cx="40" cy="40" r="10" fill="white" fillOpacity="0.3" />
-                </svg>
-              </div>
+            {/* Cover image */}
+            <div className="h-48 w-full overflow-hidden">
+              <img
+                src={article.image}
+                alt={article.title}
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
             </div>
 
             {/* Content */}

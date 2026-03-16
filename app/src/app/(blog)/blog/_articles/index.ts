@@ -4,6 +4,7 @@ export type Article = {
   description: string;
   date: string;
   readTime: string;
+  image: string;
   gradient: { from: string; to: string };
 };
 
@@ -15,6 +16,7 @@ export const ARTICLES: Article[] = [
       "Creators should focus on content, not spreadsheets. Let brandea.today handle the boring stuff.",
     date: "2025-03-10",
     readTime: "4 min read",
+    image: "/blog/focus-on-creating.png",
     gradient: { from: "#E8788A", to: "#F5A623" },
   },
   {
@@ -24,6 +26,7 @@ export const ARTICLES: Article[] = [
       "A step-by-step tutorial on creating professional invoices with brandea.today — in under a minute.",
     date: "2025-03-06",
     readTime: "3 min read",
+    image: "/blog/generate-invoice-pdf.png",
     gradient: { from: "#7ECFB3", to: "#3B82F6" },
   },
   {
@@ -33,6 +36,7 @@ export const ARTICLES: Article[] = [
       "Everything a virtual assistant does for your creator business — deal tracking, invoices, reminders — for a fraction of the cost.",
     date: "2025-02-28",
     readTime: "5 min read",
+    image: "/blog/replace-your-assistant.png",
     gradient: { from: "#F5A623", to: "#E8788A" },
   },
   {
@@ -42,6 +46,7 @@ export const ARTICLES: Article[] = [
       "Manage deals on the subway, check invoices from a café, update your pipeline from set. Fully responsive.",
     date: "2025-02-20",
     readTime: "3 min read",
+    image: "/blog/desktop-and-mobile.png",
     gradient: { from: "#B8A9E8", to: "#7C3AED" },
   },
   {
@@ -51,6 +56,7 @@ export const ARTICLES: Article[] = [
       "A real comparison with pricing, features, and who each tool is actually built for.",
     date: "2025-02-14",
     readTime: "6 min read",
+    image: "/blog/brandea-vs-competitors.png",
     gradient: { from: "#7C3AED", to: "#E8788A" },
   },
 ];
