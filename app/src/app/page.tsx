@@ -344,6 +344,24 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================================
+          PRODUCT HUNT BADGE
+          ============================================================ */}
+      <section className="flex justify-center px-4 pb-8 sm:px-6 lg:px-8" aria-label="Featured on Product Hunt">
+        <a
+          href="https://www.producthunt.com/products/brandea?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-brandea"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1099957&theme=dark&t=1773676114292"
+            alt="Brandea - Deal tracker &amp; invoicing built for content creators | Product Hunt"
+            width="250"
+            height="54"
+          />
+        </a>
+      </section>
+
+      {/* ============================================================
           SOCIAL PROOF / STATS
           A glass strip with key metrics to build credibility.
           ============================================================ */}
