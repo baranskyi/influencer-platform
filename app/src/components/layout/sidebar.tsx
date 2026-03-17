@@ -22,6 +22,7 @@ import {
   Settings,
   Bell,
   LogOut,
+  Mail,
 } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
@@ -117,6 +118,17 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Contact link */}
+      <div className="px-3 pb-2">
+        <a
+          href="mailto:hello@brandea.today"
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/60 transition-all duration-200 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+        >
+          <Mail className="h-5 w-5 shrink-0" />
+          Contact Us
+        </a>
+      </div>
 
       {/* Bottom section — user menu + notifications */}
       <div className="border-t border-white/[0.06] p-3">

@@ -120,7 +120,7 @@ const FOOTER_LINKS = {
   Company: [
     { label: "About", href: "#" },
     { label: "Blog", href: "/blog" },
-    { label: "Contact", href: "#" },
+    { label: "Contact Us", href: "mailto:hello@brandea.today" },
   ],
   Legal: [
     { label: "Privacy Policy", href: "#" },
