@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brandea — Pitch Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #7C3AED;
+    --secondary: #A78BFA;
+    --accent: #F43F5E;
+    --mint: #7ECFB3;
+    --gold: #FBBF24;
+    --bg: #0F0F23;
+    --bg-light: #1A1A2E;
+    --text: #E2E8F0;
+    --muted: #94A3B8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'VT323', monospace;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    image-rendering: pixelated;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+  .slide {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    position: relative;
+    text-align: center;
+  }
+  .slide.active { display: flex; }
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 20px;
+    border: 4px solid var(--primary);
+    box-shadow: 0 0 20px rgba(124,58,237,0.3), inset 0 0 20px rgba(124,58,237,0.1);
+    pointer-events: none;
+  }
+  h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(24px, 4vw, 48px);
+    line-height: 1.4;
+    text-shadow: 0 0 20px var(--primary), 0 0 40px rgba(124,58,237,0.5);
+    margin-bottom: 30px;
+  }
+  h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(16px, 2.5vw, 28px);
+    line-height: 1.5;
+    color: var(--secondary);
+    margin-bottom: 40px;
+  }
+  h3 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(12px, 1.8vw, 20px);
+    line-height: 1.6;
+    color: var(--mint);
+    margin-bottom: 20px;
+  }
+  p, li {
+    font-size: clamp(20px, 2.5vw, 32px);
+    line-height: 1.8;
+    max-width: 900px;
+  }
+  ul { list-style: none; text-align: left; max-width: 900px; }
+  ul li { padding: 8px 0; position: relative; padding-left: 30px; }
+  ul li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); }
+  .slide-number {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    color: var(--muted);
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+  }
+  .pixel-divider {
+    width: 200px; height: 4px;
+    background: repeating-linear-gradient(90deg, var(--primary) 0px, var(--primary) 8px, transparent 8px, transparent 12px);
+    margin: 20px auto;
+  }
+  .neon { text-shadow: 0 0 10px var(--accent), 0 0 30px var(--accent), 0 0 60px var(--accent); color: var(--accent); }
+  .neon-mint { text-shadow: 0 0 10px var(--mint), 0 0 30px var(--mint); color: var(--mint); }
+  .neon-gold { text-shadow: 0 0 10px var(--gold), 0 0 30px var(--gold); color: var(--gold); }
+  .pixel-box {
+    background: var(--bg-light);
+    border: 3px solid var(--primary);
+    padding: 30px 40px;
+    margin: 15px;
+    box-shadow: 6px 6px 0 rgba(124,58,237,0.4);
+    max-width: 400px;
+    text-align: center;
+  }
+  .pixel-box h3 { margin-bottom: 10px; }
+  .grid-2 { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+  .grid-3 { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .stat-value {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(28px, 4vw, 56px);
+    color: var(--gold);
+    text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(251,191,36,0.4);
+  }
+  .stat-label { font-size: 22px; color: var(--muted); margin-top: 8px; }
+  .team-member {
+    background: var(--bg-light);
+    border: 2px solid var(--secondary);
+    padding: 20px;
+    width: 160px;
+    box-shadow: 4px 4px 0 rgba(167,139,250,0.3);
+  }
+  .team-member .pixel-avatar {
+    width: 48px; height: 48px;
+    margin: 0 auto 10px;
+    border: 2px solid var(--mint);
+    image-rendering: pixelated;
+    position: relative;
+    overflow: hidden;
+  }
+  .team-member .name { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--mint); }
+  .team-member .role { font-size: 18px; color: var(--muted); margin-top: 4px; }
+  .tier {
+    background: var(--bg-light);
+    border: 3px solid var(--secondary);
+    padding: 25px;
+    width: 240px;
+    box-shadow: 6px 6px 0 rgba(124,58,237,0.3);
+  }
+  .tier.featured {
+    border-color: var(--accent);
+    box-shadow: 6px 6px 0 rgba(244,63,94,0.4), 0 0 30px rgba(244,63,94,0.15);
+  }
+  .tier .price { font-family: 'Press Start 2P', monospace; font-size: 28px; color: var(--gold); }
+  .tier .period { font-size: 20px; color: var(--muted); }
+  .tier ul { text-align: left; margin-top: 15px; }
+  .tier ul li { font-size: 20px; padding: 4px 0; }
+  .axis-chart {
+    width: 400px; height: 300px;
+    border-left: 3px solid var(--muted);
+    border-bottom: 3px solid var(--muted);
+    position: relative;
+    margin: 20px auto;
+  }
+  .axis-label-x, .axis-label-y {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    position: absolute;
+  }
+  .axis-label-x { bottom: -25px; right: 0; }
+  .axis-label-y { top: -10px; left: -10px; }
+  .competitor-dot { position: absolute; width: 12px; height: 12px; border: 2px solid; }
+  .competitor-label { font-size: 16px; position: absolute; white-space: nowrap; }
+  .nav {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 12px; z-index: 100;
+  }
+  .nav button {
+    font-family: 'Press Start 2P', monospace; font-size: 14px;
+    background: var(--bg-light); color: var(--text);
+    border: 3px solid var(--primary); padding: 12px 24px;
+    cursor: pointer; box-shadow: 4px 4px 0 rgba(124,58,237,0.4); transition: all 0.15s;
+  }
+  .nav button:hover { background: var(--primary); box-shadow: 2px 2px 0 rgba(124,58,237,0.4); transform: translate(2px,2px); }
+  .nav button:active { box-shadow: none; transform: translate(4px,4px); }
+  .progress {
+    position: fixed; top: 0; left: 0; height: 4px;
+    background: var(--accent); transition: width 0.3s; z-index: 100;
+    box-shadow: 0 0 10px var(--accent);
+  }
+  @keyframes glitch {
+    0%, 100% { text-shadow: 0 0 20px var(--primary), 0 0 40px rgba(124,58,237,0.5); }
+    20% { text-shadow: -2px 0 var(--accent), 2px 0 var(--mint); }
+    40% { text-shadow: 2px 0 var(--accent), -2px 0 var(--mint); }
+    60% { text-shadow: 0 0 20px var(--primary), 0 0 40px rgba(124,58,237,0.5); }
+  }
+  .glitch { animation: glitch 3s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  .cursor { animation: blink 1s step-end infinite; color: var(--mint); }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .float { animation: float 3s ease-in-out infinite; }
+  @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 10px rgba(124,58,237,0.3); } 50% { box-shadow: 0 0 30px rgba(124,58,237,0.6), 0 0 60px rgba(124,58,237,0.2); } }
+  .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+  /* ===== PIXEL ART GRAPHICS ===== */
+  .pixel-art {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
+
+  /* Pixel phone */
+  .pixel-phone {
+    width: 60px; height: 100px;
+    background: #1E293B;
+    border: 4px solid var(--secondary);
+    position: relative;
+    margin: 0 auto;
+    box-shadow: 4px 4px 0 rgba(124,58,237,0.4);
+  }
+  .pixel-phone::before {
+    content: '';
+    position: absolute; top: 8px; left: 6px;
+    width: 40px; height: 68px;
+    background: linear-gradient(180deg, var(--primary) 0%, #4C1D95 50%, var(--accent) 100%);
+  }
+  .pixel-phone::after {
+    content: '';
+    position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+    width: 12px; height: 4px;
+    background: var(--muted);
+  }
+
+  /* Pixel coin */
+  .pixel-coin {
+    width: 40px; height: 40px;
+    background: var(--gold);
+    border: 4px solid #D97706;
+    position: relative;
+    display: inline-block;
+    box-shadow: 4px 4px 0 rgba(217,119,6,0.4);
+  }
+  .pixel-coin::after {
+    content: '$';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Press Start 2P'; font-size: 14px; color: #92400E;
+  }
+
+  /* Pixel chart bars */
+  .pixel-bars {
+    display: flex; align-items: flex-end; gap: 8px; height: 100px; margin: 20px auto;
+    justify-content: center;
+  }
+  .pixel-bar {
+    width: 24px;
+    background: var(--primary);
+    border: 2px solid var(--secondary);
+    transition: height 0.5s;
+    position: relative;
+  }
+  .pixel-bar::after {
+    content: attr(data-label);
+    position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+    font-size: 12px; color: var(--muted); white-space: nowrap;
+    font-family: 'Press Start 2P';
+  }
+
+  /* Pixel envelope */
+  .pixel-envelope {
+    width: 56px; height: 40px;
+    background: var(--accent);
+    border: 3px solid #BE123C;
+    position: relative;
+    display: inline-block;
+    box-shadow: 3px 3px 0 rgba(190,18,60,0.4);
+  }
+  .pixel-envelope::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 0; height: 0;
+    border-left: 25px solid var(--bg-light);
+    border-right: 25px solid var(--bg-light);
+    border-bottom: 18px solid transparent;
+  }
+
+  /* Pixel rocket */
+  .pixel-rocket {
+    width: 32px; height: 56px;
+    position: relative;
+    display: inline-block;
+    margin: 0 20px;
+  }
+  .pixel-rocket .body {
+    width: 20px; height: 36px;
+    background: var(--text);
+    border: 3px solid var(--muted);
+    position: absolute; top: 0; left: 6px;
+  }
+  .pixel-rocket .nose {
+    width: 0; height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 14px solid var(--accent);
+    position: absolute; top: -14px; left: 6px;
+  }
+  .pixel-rocket .fin-l, .pixel-rocket .fin-r {
+    width: 8px; height: 16px;
+    background: var(--primary);
+    position: absolute; bottom: 4px;
+  }
+  .pixel-rocket .fin-l { left: 0; }
+  .pixel-rocket .fin-r { right: 0; }
+  .pixel-rocket .flame {
+    width: 12px; height: 16px;
+    background: var(--gold);
+    position: absolute; bottom: -14px; left: 10px;
+    box-shadow: 0 4px 8px var(--gold), 0 8px 16px rgba(251,191,36,0.5);
+    animation: flicker 0.3s infinite alternate;
+  }
+  @keyframes flicker { 0% { height: 12px; opacity: 1; } 100% { height: 18px; opacity: 0.8; } }
+
+  /* Pixel shield */
+  .pixel-shield {
+    width: 44px; height: 52px;
+    background: var(--mint);
+    border: 4px solid #047857;
+    clip-path: polygon(50% 0%, 100% 20%, 100% 65%, 50% 100%, 0% 65%, 0% 20%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Press Start 2P'; font-size: 14px; color: #064E3B;
+  }
+
+  /* Pixel crown */
+  .pixel-crown {
+    width: 48px; height: 36px;
+    position: relative;
+    display: inline-block;
+    margin: 10px;
+  }
+  .pixel-crown .base {
+    width: 48px; height: 16px;
+    background: var(--gold);
+    border: 3px solid #B45309;
+    position: absolute; bottom: 0;
+  }
+  .pixel-crown .point1, .pixel-crown .point2, .pixel-crown .point3 {
+    width: 10px; height: 20px;
+    background: var(--gold);
+    border: 2px solid #B45309;
+    position: absolute; top: 0;
+  }
+  .pixel-crown .point1 { left: 4px; }
+  .pixel-crown .point2 { left: 19px; height: 24px; top: -4px; }
+  .pixel-crown .point3 { right: 4px; }
+  .pixel-crown .gem {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    position: absolute; top: 8px; left: 21px;
+  }
+
+  /* Pixel skyline (Dubai-style) */
+  .pixel-skyline {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 120px;
+    margin: 20px auto;
+    justify-content: center;
+    opacity: 0.15;
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .pixel-skyline .bld {
+    background: var(--primary);
+    border: 2px solid var(--secondary);
+  }
+
+  /* Pixel globe/map */
+  .pixel-map {
+    width: 80px; height: 80px;
+    background: radial-gradient(circle at 60% 40%, var(--mint) 30%, var(--primary) 31%, var(--primary) 35%, #1E40AF 36%);
+    border: 4px solid var(--secondary);
+    display: inline-block;
+    box-shadow: 4px 4px 0 rgba(124,58,237,0.4);
+  }
+
+  /* Pixel heart */
+  .pixel-heart {
+    width: 24px; height: 22px;
+    background: var(--accent);
+    position: relative;
+    display: inline-block;
+    transform: rotate(45deg);
+    margin: 0 8px;
+  }
+  .pixel-heart::before, .pixel-heart::after {
+    content: '';
+    width: 24px; height: 24px;
+    background: var(--accent);
+    position: absolute;
+  }
+  .pixel-heart::before { top: -12px; left: 0; }
+  .pixel-heart::after { left: -12px; top: 0; }
+
+  /* Pixel star */
+  .pixel-star {
+    display: inline-block;
+    color: var(--gold);
+    font-size: 24px;
+    text-shadow: 0 0 8px var(--gold);
+    margin: 0 2px;
+  }
+
+  /* Bar chart for financials */
+  .bar-chart-container {
+    display: flex; align-items: flex-end; gap: 24px;
+    height: 140px; margin: 20px auto;
+    justify-content: center;
+    padding-bottom: 30px;
+    border-bottom: 3px solid var(--muted);
+    border-left: 3px solid var(--muted);
+    padding-left: 10px;
+    width: fit-content;
+  }
+  .bar-group { text-align: center; }
+  .bar-group .bar {
+    width: 60px;
+    background: linear-gradient(180deg, var(--accent) 0%, var(--primary) 100%);
+    border: 2px solid var(--secondary);
+    margin: 0 auto;
+    transition: height 0.5s;
+    box-shadow: 4px 0 0 rgba(124,58,237,0.3);
+  }
+  .bar-group .bar-label {
+    font-family: 'Press Start 2P'; font-size: 10px;
+    color: var(--muted); margin-top: 8px;
+  }
+  .bar-group .bar-value {
+    font-family: 'Press Start 2P'; font-size: 11px;
+    color: var(--gold); margin-bottom: 4px;
+  }
+
+  /* Pie chart via conic-gradient */
+  .pixel-pie {
+    width: 120px; height: 120px;
+    border: 4px solid var(--secondary);
+    background: conic-gradient(
+      var(--accent) 0% 40%,
+      var(--mint) 40% 70%,
+      var(--primary) 70% 85%,
+      var(--gold) 85% 100%
+    );
+    box-shadow: 6px 6px 0 rgba(124,58,237,0.4);
+  }
+
+  .pie-legend {
+    text-align: left;
+    font-size: 18px;
+    margin-left: 20px;
+  }
+  .pie-legend-item { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+  .pie-legend-dot { width: 12px; height: 12px; display: inline-block; border: 2px solid rgba(255,255,255,0.3); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glitch, .cursor, .float { animation: none; }
+    .pixel-rocket .flame { animation: none; }
+  }
+  @media (max-width: 768px) {
+    .slide { padding: 40px 30px; }
+    .slide::before { inset: 10px; }
+    .grid-2, .grid-3 { flex-direction: column; align-items: center; }
+    .axis-chart { width: 280px; height: 220px; }
+    .pixel-skyline { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<!-- ===== SLIDE 0: COVER ===== -->
+<div class="slide active" id="slide-0">
+  <div style="margin-bottom:20px" class="float">
+    <div class="pixel-rocket" style="transform:scale(1.2)">
+      <div class="nose"></div>
+      <div class="body"></div>
+      <div class="fin-l"></div>
+      <div class="fin-r"></div>
+      <div class="flame"></div>
+    </div>
+  </div>
+  <h2 style="color:var(--muted);font-size:clamp(10px,1.5vw,16px);margin-bottom:20px">PRESS START</h2>
+  <h1 class="glitch">BRANDEA</h1>
+  <div class="pixel-divider"></div>
+  <p style="font-size:clamp(22px,3vw,36px);color:var(--secondary)">Stop doing admin.<br>Get paid faster.<span class="cursor">_</span></p>
+  <div style="margin-top:50px;color:var(--muted);font-size:22px">
+    <p>Slava Baranskyi, FCIM — Co-founder</p>
+    <p style="margin-top:8px;font-size:18px">IE University — EMBA Startup Lab</p>
+    <p style="margin-top:4px;font-size:16px">slava@brandea.app</p>
+  </div>
+  <!-- Pixel skyline Dubai -->
+  <div class="pixel-skyline">
+    <div class="bld" style="width:8px;height:30px"></div>
+    <div class="bld" style="width:12px;height:50px"></div>
+    <div class="bld" style="width:8px;height:40px"></div>
+    <div class="bld" style="width:6px;height:100px;background:var(--secondary)"></div>
+    <div class="bld" style="width:14px;height:60px"></div>
+    <div class="bld" style="width:10px;height:45px"></div>
+    <div class="bld" style="width:8px;height:70px"></div>
+    <div class="bld" style="width:16px;height:55px"></div>
+    <div class="bld" style="width:6px;height:80px"></div>
+    <div class="bld" style="width:12px;height:35px"></div>
+    <div class="bld" style="width:8px;height:90px;background:var(--gold)"></div>
+    <div class="bld" style="width:10px;height:42px"></div>
+    <div class="bld" style="width:14px;height:65px"></div>
+    <div class="bld" style="width:8px;height:38px"></div>
+  </div>
+  <span class="slide-number">0/10</span>
+</div>
+
+<!-- ===== SLIDE 1: PROBLEM ===== -->
+<div class="slide" id="slide-1">
+  <h2>THE PROBLEM</h2>
+  <div style="display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap">
+    <div>
+      <h1 style="font-size:clamp(18px,3vw,36px)">Creators lose <span class="neon">$1000s</span><br>to admin chaos</h1>
+      <div class="pixel-divider"></div>
+      <ul>
+        <li><span class="neon">60-120 day</span> payment delays from brands</li>
+        <li>Contracts across Gmail, WhatsApp, DMs</li>
+        <li>Manual invoicing — no VAT compliance</li>
+        <li>Forgotten unpaid invoices — no follow-up</li>
+        <li><span class="neon-gold">5-10 hrs/week</span> on admin, not content</li>
+      </ul>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+      <!-- Pixel "chaos" illustration: scattered items -->
+      <div style="position:relative;width:140px;height:140px">
+        <div class="pixel-envelope" style="position:absolute;top:0;left:10px;transform:rotate(-15deg)"></div>
+        <div class="pixel-coin" style="position:absolute;top:50px;right:0;transform:rotate(20deg)"></div>
+        <div class="pixel-phone" style="position:absolute;bottom:0;left:30px;transform:scale(0.6) rotate(10deg)"></div>
+        <div style="position:absolute;top:30px;left:60px;font-family:'Press Start 2P';font-size:20px;color:var(--accent)">?!</div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">1/10</span>
+</div>
+
+<!-- ===== SLIDE 2: SOLUTION ===== -->
+<div class="slide" id="slide-2">
+  <h2>THE SOLUTION</h2>
+  <div style="display:flex;align-items:center;justify-content:center;gap:50px;flex-wrap:wrap">
+    <div class="pixel-phone" style="transform:scale(1.8)" class="pulse-glow">
+      <div style="position:absolute;top:12px;left:10px;width:32px;height:8px;background:var(--mint);border:1px solid #047857"></div>
+      <div style="position:absolute;top:24px;left:10px;width:28px;height:8px;background:var(--gold);border:1px solid #B45309"></div>
+      <div style="position:absolute;top:36px;left:10px;width:35px;height:8px;background:var(--accent);border:1px solid #BE123C"></div>
+      <div style="position:absolute;top:48px;left:10px;width:20px;height:8px;background:var(--secondary);border:1px solid #6D28D9"></div>
+    </div>
+    <div>
+      <h1 style="font-size:clamp(16px,2.5vw,30px);text-align:left">One app for<br><span class="neon-mint">every deal</span></h1>
+      <div class="grid-3" style="margin-top:20px">
+        <div class="pixel-box" style="padding:20px;max-width:200px"><h3 style="font-size:12px">DEALS</h3><p style="font-size:18px">Pitch to payment pipeline</p></div>
+        <div class="pixel-box" style="padding:20px;max-width:200px"><h3 style="font-size:12px">INVOICES</h3><p style="font-size:18px">PDF + VAT 5% compliant</p></div>
+        <div class="pixel-box" style="padding:20px;max-width:200px"><h3 style="font-size:12px">REMINDERS</h3><p style="font-size:18px">Auto payment follow-ups</p></div>
+        <div class="pixel-box" style="padding:20px;max-width:200px"><h3 style="font-size:12px">ANALYTICS</h3><p style="font-size:18px">Revenue & trends</p></div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">2/10</span>
+</div>
+
+<!-- ===== SLIDE 3: TRACTION ===== -->
+<div class="slide" id="slide-3">
+  <h2>TRACTION & WHY NOW</h2>
+  <div class="grid-2">
+    <div class="pixel-box pulse-glow"><div class="stat-value" style="font-size:36px">12</div><div class="stat-label">Creator interviews</div></div>
+    <div class="pixel-box"><div class="stat-value" style="font-size:36px">50+</div><div class="stat-label">MENA influencers DB</div></div>
+    <div class="pixel-box"><div class="stat-value" style="font-size:36px">MVP</div><div class="stat-label">Landing live</div></div>
+    <div class="pixel-box"><div class="stat-value" style="font-size:36px">6</div><div class="stat-label">Mentor sessions</div></div>
+  </div>
+  <div style="margin-top:30px;display:flex;align-items:center;justify-content:center;gap:20px">
+    <div class="pixel-map" style="width:60px;height:60px"></div>
+    <div style="text-align:left">
+      <h3 style="font-size:14px">WHY NOW? WHY MENA?</h3>
+      <p style="font-size:22px;color:var(--muted)">MENA influencer market: <span class="neon-gold">$1.3B</span> (2025), growing 25% YoY<br>UAE CPM <span class="neon">3-5x higher</span> than EU average</p>
+    </div>
+  </div>
+  <span class="slide-number">3/10</span>
+</div>
+
+<!-- ===== SLIDE 4: BUSINESS MODEL ===== -->
+<div class="slide" id="slide-4">
+  <h2>BUSINESS MODEL</h2>
+  <h1 style="font-size:clamp(14px,2vw,24px)">Freemium <span class="neon-mint">→</span> SaaS</h1>
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px">
+    <div class="pixel-coin" style="transform:scale(0.7)"></div>
+    <div class="pixel-coin" style="transform:scale(0.7)"></div>
+    <div class="pixel-coin" style="transform:scale(0.7)"></div>
+  </div>
+  <div class="grid-3">
+    <div class="tier">
+      <h3>FREE</h3><div class="price">$0</div><div class="period">/month</div>
+      <ul><li>Up to 3 deals</li><li>Basic invoicing</li><li>Manual reminders</li></ul>
+    </div>
+    <div class="tier featured">
+      <h3 style="color:var(--accent)">PRO</h3><div class="price">$29</div><div class="period">/month</div>
+      <ul><li>Up to 20 deals</li><li>Auto reminders</li><li>Calendar view</li><li>Client CRM</li><li>VAT-ready invoices</li></ul>
+    </div>
+    <div class="tier">
+      <h3>BUSINESS</h3><div class="price">$69</div><div class="period">/month</div>
+      <ul><li>Unlimited deals</li><li>Full analytics</li><li>Multi-currency</li><li>Priority support</li><li>Team access</li></ul>
+    </div>
+  </div>
+  <span class="slide-number">4/10</span>
+</div>
+
+<!-- ===== SLIDE 5: GTM ===== -->
+<div class="slide" id="slide-5">
+  <h2>GO-TO-MARKET</h2>
+  <h1 style="font-size:clamp(14px,2vw,24px)"><span class="neon-mint">UAE first</span>, then MENA</h1>
+  <div class="pixel-divider"></div>
+  <div style="display:flex;align-items:flex-start;gap:40px;flex-wrap:wrap;justify-content:center">
+    <ul>
+      <li><span class="neon-gold">Phase 1:</span> UAE — Dubai & Abu Dhabi creators (existing DB)</li>
+      <li><span class="neon-gold">Phase 2:</span> Saudi Arabia — Riyadh & Jeddah expansion</li>
+      <li><span class="neon-gold">Phase 3:</span> Qatar, Kuwait, Bahrain, Egypt</li>
+    </ul>
+    <div style="text-align:center">
+      <div class="pixel-rocket float" style="transform:scale(0.9)">
+        <div class="nose"></div>
+        <div class="body"></div>
+        <div class="fin-l"></div>
+        <div class="fin-r"></div>
+        <div class="flame"></div>
+      </div>
+      <div style="margin-top:30px">
+        <h3 style="font-size:12px">KEY CHANNELS</h3>
+        <p style="font-size:18px;color:var(--muted)">Instagram DMs<br>Creator agencies<br>Dubai events & meetups<br>TikTok creator hubs</p>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">5/10</span>
+</div>
+
+<!-- ===== SLIDE 6: MARKET & COMPETITION ===== -->
+<div class="slide" id="slide-6">
+  <h2>MARKET & COMPETITION</h2>
+  <div class="grid-2">
+    <div>
+      <div class="pixel-box" style="max-width:300px"><div class="stat-value" style="font-size:24px">$1.3B</div><div class="stat-label">MENA Influencer Market</div></div>
+      <div class="pixel-box" style="max-width:300px"><div class="stat-value" style="font-size:24px">200K+</div><div class="stat-label">Active MENA creators</div></div>
+      <div class="pixel-box" style="max-width:300px"><div class="stat-value" style="font-size:24px">25%</div><div class="stat-label">YoY growth rate</div></div>
+    </div>
+    <div>
+      <div class="axis-chart">
+        <span class="axis-label-y" style="font-size:10px">MICRO ←→ ENTERPRISE</span>
+        <span class="axis-label-x" style="font-size:10px">SIMPLE ←→ COMPLEX</span>
+        <!-- Brandea -->
+        <div class="competitor-dot" style="bottom:72%;left:18%;background:var(--accent);border-color:var(--accent)"></div>
+        <span class="competitor-label" style="bottom:76%;left:26%;color:var(--accent);font-family:'Press Start 2P';font-size:10px">BRANDEA</span>
+        <!-- Grin -->
+        <div class="competitor-dot" style="bottom:20%;left:78%;background:var(--muted);border-color:var(--muted)"></div>
+        <span class="competitor-label" style="bottom:23%;left:84%;color:var(--muted)">Grin</span>
+        <!-- Vamp -->
+        <div class="competitor-dot" style="bottom:35%;left:60%;background:var(--muted);border-color:var(--muted)"></div>
+        <span class="competitor-label" style="bottom:38%;left:66%;color:var(--muted)">Vamp</span>
+        <!-- Influencer.ae -->
+        <div class="competitor-dot" style="bottom:50%;left:45%;background:var(--muted);border-color:var(--muted)"></div>
+        <span class="competitor-label" style="bottom:53%;left:51%;color:var(--muted)">Influencer.ae</span>
+        <!-- Excel -->
+        <div class="competitor-dot" style="bottom:82%;left:5%;background:var(--gold);border-color:var(--gold)"></div>
+        <span class="competitor-label" style="bottom:85%;left:12%;color:var(--gold)">Excel</span>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:20px;color:var(--muted);margin-top:10px">Competitors sell <em>to brands</em>. <span class="neon">We empower the creators themselves.</span></p>
+  <span class="slide-number">6/10</span>
+</div>
+
+<!-- ===== SLIDE 7: TEAM ===== -->
+<div class="slide" id="slide-7">
+  <h2>THE TEAM</h2>
+  <div class="pixel-divider"></div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px">
+    <div class="pixel-crown" style="transform:scale(0.7)">
+      <div class="base"></div>
+      <div class="point1"></div>
+      <div class="point2"></div>
+      <div class="point3"></div>
+      <div class="gem"></div>
+    </div>
+  </div>
+  <div class="grid-3">
+    <div class="team-member"><div class="pixel-avatar" style="background:linear-gradient(135deg,var(--accent),#BE123C)"></div><div class="name">SLAVA</div><div class="role">CMO / Product</div></div>
+    <div class="team-member"><div class="pixel-avatar" style="background:linear-gradient(135deg,var(--mint),#047857)"></div><div class="name">SHERMAN</div><div class="role">Engineering</div></div>
+    <div class="team-member"><div class="pixel-avatar" style="background:linear-gradient(135deg,var(--gold),#B45309)"></div><div class="name">TOMOKI</div><div class="role">Research</div></div>
+    <div class="team-member"><div class="pixel-avatar" style="background:linear-gradient(135deg,var(--secondary),#6D28D9)"></div><div class="name">GENEVIEVE</div><div class="role">Design</div></div>
+    <div class="team-member"><div class="pixel-avatar" style="background:linear-gradient(135deg,#F97316,#C2410C)"></div><div class="name">SRI</div><div class="role">Operations</div></div>
+    <div class="team-member"><div class="pixel-avatar" style="background:linear-gradient(135deg,#06B6D4,#0E7490)"></div><div class="name">KAMRAN</div><div class="role">Finance</div></div>
+  </div>
+  <p style="margin-top:30px;font-size:22px;color:var(--muted)">IE University EMBA — Startup Lab, Group C</p>
+  <span class="slide-number">7/10</span>
+</div>
+
+<!-- ===== SLIDE 8: FINANCIALS ===== -->
+<div class="slide" id="slide-8">
+  <h2>FINANCIALS</h2>
+  <h3>3-YEAR PROJECTION</h3>
+  <div class="bar-chart-container">
+    <div class="bar-group">
+      <div class="bar-value">$48K</div>
+      <div class="bar" style="height:20px"></div>
+      <div class="bar-label">Y1</div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-value">$580K</div>
+      <div class="bar" style="height:55px"></div>
+      <div class="bar-label">Y2</div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-value">$3.2M</div>
+      <div class="bar" style="height:130px;background:linear-gradient(180deg,var(--gold) 0%,var(--accent) 100%)"></div>
+      <div class="bar-label">Y3</div>
+    </div>
+  </div>
+  <div class="grid-3" style="margin-top:20px">
+    <div class="pixel-box" style="padding:15px;max-width:220px"><div class="stat-label">YEAR 1</div><div class="stat-value" style="font-size:20px">300</div><div class="stat-label">users (UAE)</div></div>
+    <div class="pixel-box" style="padding:15px;max-width:220px"><div class="stat-label">YEAR 2</div><div class="stat-value" style="font-size:20px">3,000</div><div class="stat-label">users (UAE+KSA)</div></div>
+    <div class="pixel-box" style="padding:15px;max-width:220px"><div class="stat-label">YEAR 3</div><div class="stat-value" style="font-size:20px">15,000</div><div class="stat-label">users (MENA)</div></div>
+  </div>
+  <p style="font-size:20px;color:var(--muted);margin-top:15px">
+    <span class="neon-gold">CAC $18</span> · <span class="neon-mint">LTV $540</span> · <span class="neon">LTV:CAC = 30x</span> · MENA premium pricing advantage
+  </p>
+  <span class="slide-number">8/10</span>
+</div>
+
+<!-- ===== SLIDE 9: FUNDING ===== -->
+<div class="slide" id="slide-9">
+  <h2>THE ASK</h2>
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px">
+    <div class="pixel-coin float" style="animation-delay:0s"></div>
+    <div class="pixel-coin float" style="animation-delay:0.3s"></div>
+    <div class="pixel-coin float" style="animation-delay:0.6s"></div>
+  </div>
+  <h1 style="font-size:clamp(20px,3.5vw,42px)"><span class="neon-gold">$750K</span> Pre-Seed</h1>
+  <div class="pixel-divider"></div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+    <ul>
+      <li><span class="neon-gold">40%</span> — Product (18-month runway)</li>
+      <li><span class="neon-mint">25%</span> — Growth & MENA community</li>
+      <li><span class="neon">25%</span> — Hiring (2 eng, 1 growth, 1 local ops)</li>
+      <li><span style="color:var(--secondary)">10%</span> — Legal, UAE freezone, compliance</li>
+    </ul>
+    <div style="text-align:center">
+      <div class="pixel-pie"></div>
+      <div class="pie-legend" style="margin-top:12px">
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--accent)"></div> Product 40%</div>
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--mint)"></div> Growth 25%</div>
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--primary)"></div> Hiring 25%</div>
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--gold)"></div> Legal 10%</div>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:20px;font-size:20px;color:var(--muted)">Goal: <span class="neon">3,000 active users</span> and <span class="neon-mint">PMF</span> in 18 months</p>
+  <span class="slide-number">9/10</span>
+</div>
+
+<!-- ===== SLIDE 10: RECAP ===== -->
+<div class="slide" id="slide-10">
+  <div style="display:flex;align-items:center;justify-content:center;gap:15px;margin-bottom:10px">
+    <div class="pixel-shield">✓</div>
+  </div>
+  <h1 class="glitch" style="font-size:clamp(24px,4vw,48px)">BRANDEA</h1>
+  <div class="pixel-divider"></div>
+  <p style="font-size:clamp(24px,3vw,38px);color:var(--secondary);margin-bottom:30px">Stop doing admin.<br>Get paid faster.</p>
+  <div style="margin-top:20px;color:var(--muted);font-size:24px">
+    <p><span class="neon-mint">200K+ MENA creators</span> deserve better tools.</p>
+    <p style="margin-top:8px">We're building them.</p>
+  </div>
+  <div style="margin-top:40px">
+    <p style="font-family:'Press Start 2P';font-size:clamp(10px,1.5vw,16px);color:var(--accent)">GAME ON?</p>
+    <div style="margin-top:20px;color:var(--muted);font-size:20px">
+      <p>Slava Baranskyi, FCIM</p>
+      <p>slava@brandea.app</p>
+    </div>
+  </div>
+  <!-- Pixel skyline -->
+  <div class="pixel-skyline">
+    <div class="bld" style="width:8px;height:30px"></div>
+    <div class="bld" style="width:12px;height:50px"></div>
+    <div class="bld" style="width:8px;height:40px"></div>
+    <div class="bld" style="width:6px;height:100px;background:var(--secondary)"></div>
+    <div class="bld" style="width:14px;height:60px"></div>
+    <div class="bld" style="width:10px;height:45px"></div>
+    <div class="bld" style="width:8px;height:70px"></div>
+    <div class="bld" style="width:16px;height:55px"></div>
+    <div class="bld" style="width:6px;height:80px"></div>
+    <div class="bld" style="width:12px;height:35px"></div>
+    <div class="bld" style="width:8px;height:90px;background:var(--gold)"></div>
+    <div class="bld" style="width:10px;height:42px"></div>
+  </div>
+  <span class="slide-number">10/10</span>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button onclick="changeSlide(-1)">◀ PREV</button>
+  <button onclick="changeSlide(1)">NEXT ▶</button>
+</div>
+
+<script>
+let current=0;
+const slides=document.querySelectorAll('.slide');
+const total=slides.length;
+const progress=document.getElementById('progress');
+function updateProgress(){progress.style.width=((current+1)/total*100)+'%'}
+function changeSlide(dir){
+  slides[current].classList.remove('active');
+  current=Math.max(0,Math.min(total-1,current+dir));
+  slides[current].classList.add('active');
+  updateProgress();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();changeSlide(1)}
+  if(e.key==='ArrowLeft'){e.preventDefault();changeSlide(-1)}
+  if(e.key==='Home'){e.preventDefault();slides[current].classList.remove('active');current=0;slides[0].classList.add('active');updateProgress()}
+  if(e.key==='End'){e.preventDefault();slides[current].classList.remove('active');current=total-1;slides[current].classList.add('active');updateProgress()}
+});
+let touchStart=0;
+document.addEventListener('touchstart',e=>{touchStart=e.touches[0].clientX});
+document.addEventListener('touchend',e=>{
+  const diff=touchStart-e.changedTouches[0].clientX;
+  if(Math.abs(diff)>50)changeSlide(diff>0?1:-1);
+});
+updateProgress();
+</script>
+</body>
+</html>
