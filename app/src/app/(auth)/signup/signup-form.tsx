@@ -45,6 +45,14 @@ export function SignUpForm() {
     }
 
     trackEvent({ action: "signup_success" });
+
+    // Google Ads conversion tracking
+    if (typeof window !== "undefined" && typeof window.gtag === "function") {
+      window.gtag("event", "conversion", {
+        send_to: "AW-1039954261/rtfLCJi7iY8cENXi8e8D",
+      });
+    }
+
     setLoading(false);
     setEmailSent(true);
   }
